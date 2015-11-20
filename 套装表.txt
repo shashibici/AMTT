@@ -1,0 +1,18 @@
+ÊÈÑªÌ××° 2999  =
+
+ÊÈÑªÃæ¾ß 2025+
+ÊÈÑªĞØ×¹ 2075+
+ÊÈÑªÖ¸»· 2094+
+ÊÈÑªÂÄ 2110 +
+
+
+hpcover = 24
+atk = 12+48
+ddef = 12
+strength = 16+8+48
+destroyr = 6
+atkspeed = 12
+atkspeedrate = 1.6
+eva = 6.4
+bom = 24
+bomatk = 12
