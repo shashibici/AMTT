@@ -42,14 +42,6 @@ class Scene_Equip2 < Scene_Base
     @status_window1 = Window_EquipStatus1.new(0,0,@actor)
     # 生命槽
     @status_window2 = Window_EquipStatus2.new(0,128-16,@actor)
-    # 第一状态
-    @status_window3 = Window_EquipStatus3.new(256,70,@actor)
-    # 第二状态
-    @status_window4 = Window_EquipStatus4.new(256,20,@actor)
-    
-	@status_window3.visible = false
-    @status_window2.visible = true
-    @status_window4.visible = false
 
     # 生成物品窗口
     create_item_windows
@@ -68,11 +60,6 @@ class Scene_Equip2 < Scene_Base
     update_detail_window
     @help_detail.visible = true
     
-    # 生成简单帮助窗口
-    @help_window = Window_Help.new()
-    @help_window.visible = false
-    @equip_window.help_window = @help_window
-    
   end
   #--------------------------------------------------------------------------
   # ● 结束处理
@@ -82,12 +69,8 @@ class Scene_Equip2 < Scene_Base
     @equip_window.dispose
     @status_window1.dispose
     @status_window2.dispose
-    @status_window3.dispose
-    @status_window4.dispose
     dispose_item_windows
     @help_detail.dispose
-    @help_window.dispose
-    
   end
   #--------------------------------------------------------------------------
   # ● 返回原来的画面
@@ -114,6 +97,9 @@ class Scene_Equip2 < Scene_Base
   end
   #--------------------------------------------------------------------------
   # ● 根据@equip_index设置@equip_window.index
+  #
+  #  	从物品选择返回的时候需要用到
+  #
   #--------------------------------------------------------------------------
   def set_equip_window_index
     case @equip_index
@@ -183,8 +169,6 @@ class Scene_Equip2 < Scene_Base
     set_equip_index
     # 更新物品窗口
     update_item_windows
-    # 更新帮助窗口
-    @help_window.update
     
     # 如果装备窗口活跃
     if @equip_window.active
@@ -252,13 +236,8 @@ class Scene_Equip2 < Scene_Base
     # 如果装备窗口出于激活状态，那么就是在选择装备种类，并不是选择新装备
     # 所以不用填写状态窗口右边属性的变化
     if @equip_window.active
-      # 如果装备窗口活跃，那么不用绘制额外信息
-      if @status_window3.visible
-        @status_window3.set_new_parameters(nil,nil,nil,nil,nil,nil,nil,nil,nil)
-      elsif @status_window4.visible
-        @status_window4.set_new_parameters(nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil)
-      end
-      
+      @status_window1.setup(@actor, 3)
+      @status_window2.setup(@actor, 3)
     # 否则是在选择物品
     elsif @item_window.active
       # 首先克隆一个临时角色
@@ -266,62 +245,8 @@ class Scene_Equip2 < Scene_Base
       # 临时角色更换装备
       # 装备类型号：@equip_window.index,物品：@item_window.item
       temp_actor.change_equip(@equip_window.index, @item_window.item, true)
-      # 获取新的数据——这里要添加更多的数据
-          @hmaxhpn = temp_actor.maxhp
-          @hmaxmpn =   temp_actor.maxmp
-          @hpcovern =   temp_actor.final_hpcover
-          @mpcovern =   temp_actor.final_mpcover
-          
-          @hatkn =   temp_actor.atk
-          @hdefn =   temp_actor.def
-          @strengthn =   temp_actor.final_strength
-          @wisdomn =   temp_actor.final_wisdom
-          @celerityn = temp_actor.final_celerity
-          
-          @destroyraten = temp_actor.final_destroyrate
-          @destroyn = temp_actor.base_destroy
-          @mdestroyraten = temp_actor.final_mdestroyrate
-          @mdestroyn = temp_actor.base_mdestroy
-          @atkraten  = temp_actor.final_atkrate  
-          @atkspeedn = temp_actor.base_atkspeed
-          
-          @hitn = temp_actor.final_hit
-          @hitraten = temp_actor.final_hitrate
-          @evan = temp_actor.final_eva
-          @evaraten = temp_actor.final_evarate  
-          @bomn = temp_actor.final_bom
-          @bomraten = temp_actor.final_bomrate
-          @bomatkn = temp_actor.final_bomatk
-          
-          
-      # 更新状态窗口右边属性的变化
-      if @status_window3.visible
-            @status_window3.set_new_parameters(\
-            @hmaxhpn,\
-            @hmaxmpn,\
-            @hpcovern,\
-            @mpcovern,\
-            @hatkn,\
-            @hdefn,\
-            @strengthn,\
-            @wisdomn,\
-            @celerityn)
-      else
-            @status_window4.set_new_parameters(\
-            @destroyraten,\
-            @destroyn,\
-            @mdestroyraten,\
-            @mdestroyn,\
-            @atkraten,\
-            @atkspeedn,\
-            @hitn,\
-            @hitraten,\
-            @evan,\
-            @evaraten,\
-            @bomn, @bomraten, @bomatkn)
-      end
-      
-      
+	  @status_window1.setup(temp_actor, 3)
+	  @status_window2.setup(temp_actor, 3)
     end
 
   end
@@ -332,27 +257,17 @@ class Scene_Equip2 < Scene_Base
   #
   #--------------------------------------------------------------------------
   def update_equip_selection
-  
     if Input.trigger?(Input::X)
-      @help_window.visible = !@help_window.visible
+      @help_detail.visible = !@help_detail.visible
       MySound.play_quest
-    elsif Input.trigger?(Input::Y)
-      MySound.game_pause
-      @status_window1.visible = !@status_window1.visible
-      @status_window2.visible = !@status_window2.visible
-      @status_window3.visible = !@status_window3.visible
-      @status_window4.visible = !@status_window4.visible
-      update_status_window
     elsif Input.trigger?(Input::B)
       Sound.play_cancel
       return_scene
     elsif Input.trigger?(Input::R)
       Sound.play_cursor
-      
       update_detail_window
     elsif Input.trigger?(Input::L)
       Sound.play_cursor
-      
       update_detail_window
     elsif Input.trigger?(Input::C)
 	  # 判断能否使用这个槽位	
@@ -369,7 +284,6 @@ class Scene_Equip2 < Scene_Base
       @equip_window.active = false
       @item_window.active = true
       @item_window.index = 0
-      @item_window.help_window = @help_window
       update_detail_window
       # 由装备选择进入物品选择，立即更新状态窗口
       update_status_window
@@ -384,26 +298,15 @@ class Scene_Equip2 < Scene_Base
   #--------------------------------------------------------------------------
   def update_item_selection
     if Input.trigger?(Input::X)
-      @help_window.visible = !@help_window.visible
+      @help_detail.visible = !@help_detail.visible
       MySound.play_quest
-    elsif Input.trigger?(Input::Y)
-      MySound.game_pause
-      @status_window1.visible = !@status_window1.visible
-      @status_window2.visible = !@status_window2.visible
-      @status_window3.visible = !@status_window3.visible
-      @status_window4.visible = !@status_window4.visible
-      update_status_window
     elsif Input.trigger?(Input::B)
       Sound.play_cancel
-      # 清除原来的内容
-      @status_window3.clearextras
-      @status_window4.clearextras
-      
       @equip_window.active = true
       @item_window.active = false
       @item_window.index = -1
+	  update_status_window
       update_detail_window
-      @equip_window.help_window = @help_window
     elsif Input.trigger?(Input::C)
       Sound.play_equip
       # 换装备
@@ -421,7 +324,6 @@ class Scene_Equip2 < Scene_Base
         item_window.refresh if item_window.visible == true
       end
       update_detail_window
-      @equip_window.help_window = @help_window
     # 如果是按上下左右键，那么就更新状态窗口
     elsif Input.trigger?(Input::UP)   
       update_status_window
@@ -436,7 +338,6 @@ class Scene_Equip2 < Scene_Base
       update_status_window
       update_detail_window("right")
     end
-    
   end
   #--------------------------------------------------------------------------
   # ● 更新帮助窗口
@@ -447,17 +348,13 @@ class Scene_Equip2 < Scene_Base
       @equip_window.type = @equip_index
       @equip_window.window_detail = @help_detail
       @equip_window.call_update_detail
-
     # 否则物品窗口激活  
     elsif @item_window.active == true
       @item_window.type = @equip_index
       @item_window.window_detail = @help_detail
       @item_window.call_update_detail
-      
     end
-    
   end
-  
 end
 
 

@@ -102,7 +102,7 @@ module GAME_INIT
 		colors.push("light purple")
 	end
     
-	atkspeed_val = item.read_suit_attr('atk_speed')
+	atkspeed_val = item.read_suit_attr('atkspeed')
 	if nil != atkspeed_val
 		values.push("攻击速度   +  "+atkspeed_val.to_s) 
 		colors.push("light purple")

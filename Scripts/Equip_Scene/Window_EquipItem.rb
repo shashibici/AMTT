@@ -22,6 +22,7 @@ class Window_EquipItem < Window_Item
     @actor = actor
     @equip_type = equip_type
     super(x, y, width, height)
+	self.contents.font.name = "华文细黑"
   end
   #--------------------------------------------------------------------------
   # ● 列表中包含的物品
@@ -61,7 +62,6 @@ class Window_EquipItem < Window_Item
   # ● 更新详细信息窗口 (继承内容)
   #--------------------------------------------------------------------------
   def update_detail
-    
     # 修改内容
     if self.item == nil
       text = []
@@ -76,21 +76,8 @@ class Window_EquipItem < Window_Item
       text = temp[0]
       colors = temp[1]
     end
-    
     @window_detail.set_text(text, 0, colors)
-    
-    # 设置位置
-    @window_detail.x = self.x + self.width/4 + index % @column_max * self.width/2 
-    @window_detail.y = self.y + 24 + (index / @column_max - top_row) * WLH
-
-    # 修改位置
-    if @window_detail.y + @window_detail.height >= 500
-      @window_detail.y -= @window_detail.height
-    end
-    if @window_detail.x + @window_detail.width >= 640
-      @window_detail.x -= @window_detail.width
-    end
-    
+    # 不需要修改位置
   end 
   
   

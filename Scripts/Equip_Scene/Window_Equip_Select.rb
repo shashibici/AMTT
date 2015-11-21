@@ -22,6 +22,7 @@ class Window_Equip_Select < Window_Selectable
 		self.opacity = 0
 		@actor = actor
 		self.contents.font.size = 20
+		self.contents.font.name = "华文细黑"
 		@edge = 0
 		refresh
 		@index = 0
@@ -78,33 +79,6 @@ class Window_Equip_Select < Window_Selectable
 			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
 			draw_item_name(@data[i], 67, WLH*i+@edge*i)
 		end
-
-		# self.contents.draw_text(4, WLH * 0,       72, WLH, "武器1")
-		# self.contents.draw_text(4, WLH * 1+@edge*1, 72, WLH, "武器2")
-		# self.contents.draw_text(4, WLH * 2+@edge*2, 72, WLH, "头部")
-		# self.contents.draw_text(4, WLH * 3+@edge*3, 72, WLH, "颈部")
-		# self.contents.draw_text(4, WLH * 4+@edge*4, 72, WLH, "盾")
-		# self.contents.draw_text(4, WLH * 5+@edge*5, 72, WLH, "衣服")
-		# self.contents.draw_text(4, WLH * 6+@edge*6, 72, WLH, "戒指")
-		# self.contents.draw_text(4, WLH * 7+@edge*7, 72, WLH, "鞋子")
-		# self.contents.draw_text(4, WLH * 8+@edge*8, 72, WLH, "宝物1")
-		# self.contents.draw_text(4, WLH * 9+@edge*9, 72, WLH, "宝物2")
-		# self.contents.draw_text(4, WLH * 10+@edge*10, 72, WLH, "宝物3")
-		# self.contents.draw_text(4, WLH * 11+@edge*11, 72, WLH, "宝物4")
-		
-		
-		# draw_item_name(@data[0], 67, WLH * 0)
-		# draw_item_name(@data[1], 67, WLH * 1+@edge*1)
-		# draw_item_name(@data[2], 67, WLH * 2+@edge*2)
-		# draw_item_name(@data[3], 67, WLH * 3+@edge*3)
-		# draw_item_name(@data[4], 67, WLH * 4+@edge*4)
-		# draw_item_name(@data[5], 67, WLH * 5+@edge*5)
-		# draw_item_name(@data[6], 67, WLH * 6+@edge*6)
-		# draw_item_name(@data[7], 67, WLH * 7+@edge*7)
-		# draw_item_name(@data[8], 67, WLH * 8+@edge*8)
-		# draw_item_name(@data[9], 67, WLH * 9+@edge*9)
-		# draw_item_name(@data[10], 67, WLH * 10+@edge*10)
-		# draw_item_name(@data[11], 67, WLH * 11+@edge*11)
 	end
 	
 	#--------------------------------------------------------------------------
