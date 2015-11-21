@@ -7,6 +7,8 @@
 class Window_Equip_Select < Window_Selectable 
 	include Kernel
 	WLH = 24
+	# NAMES --> 0~13
+	NAMES = ["武器1","武器2","头部","颈部","盾","衣服","戒指","鞋子","宝物1","宝物2","宝物3","宝物4","宝物5","宝物6"]
 	attr_accessor   :index
 	attr_accessor   :type
 	#--------------------------------------------------------------------------
@@ -16,7 +18,7 @@ class Window_Equip_Select < Window_Selectable
 		#     actor : 角色
 	#--------------------------------------------------------------------------
 	def initialize(x, y, actor)
-		super(x, y, 276, WLH * 12 + 36)
+		super(x, y, 288, WLH * 14 + 36)
 		self.opacity = 0
 		@actor = actor
 		self.contents.font.size = 20
@@ -25,13 +27,25 @@ class Window_Equip_Select < Window_Selectable
 		@index = 0
 	end
 	#--------------------------------------------------------------------------
-		# ● 获取物品
+	# ● 获取物品
 	#--------------------------------------------------------------------------
 	def item
 		return @data[self.index]
 	end
 	#--------------------------------------------------------------------------
-		# ● 刷新
+	# ● 获取可用宝物最大槽位
+	#--------------------------------------------------------------------------
+	def max_weapon_index
+		return @actor.weapon_num-1
+	end
+	#--------------------------------------------------------------------------
+	# ● 获取可用宝物最大槽位
+	#--------------------------------------------------------------------------
+	def max_trea_index
+		return @data.size-1-(6-@actor.trea_num)
+	end
+	#--------------------------------------------------------------------------
+	# ● 刷新
 	#--------------------------------------------------------------------------
 	def refresh
 		self.contents.clear
@@ -41,34 +55,56 @@ class Window_Equip_Select < Window_Selectable
 		
 		@item_max = @data.size
 		
-		self.contents.font.color = system_color
+		# 画能够使用的武器槽位
+		for i in 0...@actor.weapon_num
+			self.contents.font.color = system_color
+			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
+			draw_item_name(@data[i], 67, WLH*i+@edge*i)
+		end
+		# 画不能使用的武器槽位
+		for i in @actor.weapon_num...2
+			self.contents.font.color = getColor("gray")
+			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
+			draw_item_name(@data[i], 67, WLH*i+@edge*i)
+		end
+		# 只绘画能够使用的宝物数量(6-@actor.trea_num)
+		for i in 2...@data.size-(6-@actor.trea_num)
+			self.contents.font.color = system_color
+			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
+			draw_item_name(@data[i], 67, WLH*i+@edge*i)
+		end
+		for i in @data.size-(6-@actor.trea_num)...@data.size
+			self.contents.font.color = getColor("gray")
+			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
+			draw_item_name(@data[i], 67, WLH*i+@edge*i)
+		end
+
+		# self.contents.draw_text(4, WLH * 0,       72, WLH, "武器1")
+		# self.contents.draw_text(4, WLH * 1+@edge*1, 72, WLH, "武器2")
+		# self.contents.draw_text(4, WLH * 2+@edge*2, 72, WLH, "头部")
+		# self.contents.draw_text(4, WLH * 3+@edge*3, 72, WLH, "颈部")
+		# self.contents.draw_text(4, WLH * 4+@edge*4, 72, WLH, "盾")
+		# self.contents.draw_text(4, WLH * 5+@edge*5, 72, WLH, "衣服")
+		# self.contents.draw_text(4, WLH * 6+@edge*6, 72, WLH, "戒指")
+		# self.contents.draw_text(4, WLH * 7+@edge*7, 72, WLH, "鞋子")
+		# self.contents.draw_text(4, WLH * 8+@edge*8, 72, WLH, "宝物1")
+		# self.contents.draw_text(4, WLH * 9+@edge*9, 72, WLH, "宝物2")
+		# self.contents.draw_text(4, WLH * 10+@edge*10, 72, WLH, "宝物3")
+		# self.contents.draw_text(4, WLH * 11+@edge*11, 72, WLH, "宝物4")
 		
-		self.contents.draw_text(4, WLH * 0,       72, WLH, "武器1")
-		self.contents.draw_text(4, WLH * 1+@edge*1, 72, WLH, "武器2")
-		self.contents.draw_text(4, WLH * 2+@edge*2, 72, WLH, "头部")
-		self.contents.draw_text(4, WLH * 3+@edge*3, 72, WLH, "颈部")
-		self.contents.draw_text(4, WLH * 4+@edge*4, 72, WLH, "盾")
-		self.contents.draw_text(4, WLH * 5+@edge*5, 72, WLH, "衣服")
-		self.contents.draw_text(4, WLH * 6+@edge*6, 72, WLH, "戒指")
-		self.contents.draw_text(4, WLH * 7+@edge*7, 72, WLH, "鞋子")
-		self.contents.draw_text(4, WLH * 8+@edge*8, 72, WLH, "宝物1")
-		self.contents.draw_text(4, WLH * 9+@edge*9, 72, WLH, "宝物2")
-		self.contents.draw_text(4, WLH * 10+@edge*10, 72, WLH, "宝物3")
-		self.contents.draw_text(4, WLH * 11+@edge*11, 72, WLH, "宝物4")
 		
-		
-		draw_item_name(@data[0], 67, WLH * 0)
-		draw_item_name(@data[1], 67, WLH * 1+@edge*1)
-		draw_item_name(@data[2], 67, WLH * 2+@edge*2)
-		draw_item_name(@data[3], 67, WLH * 3+@edge*3)
-		draw_item_name(@data[4], 67, WLH * 4+@edge*4)
-		draw_item_name(@data[5], 67, WLH * 5+@edge*5)
-		draw_item_name(@data[6], 67, WLH * 6+@edge*6)
-		draw_item_name(@data[7], 67, WLH * 7+@edge*7)
-		draw_item_name(@data[8], 67, WLH * 8+@edge*8)
-		draw_item_name(@data[9], 67, WLH * 9+@edge*9)
-		draw_item_name(@data[10], 67, WLH * 10+@edge*10)
-		draw_item_name(@data[11], 67, WLH * 11+@edge*11)
+		# draw_item_name(@data[0], 67, WLH * 0)
+		# draw_item_name(@data[1], 67, WLH * 1+@edge*1)
+		# draw_item_name(@data[2], 67, WLH * 2+@edge*2)
+		# draw_item_name(@data[3], 67, WLH * 3+@edge*3)
+		# draw_item_name(@data[4], 67, WLH * 4+@edge*4)
+		# draw_item_name(@data[5], 67, WLH * 5+@edge*5)
+		# draw_item_name(@data[6], 67, WLH * 6+@edge*6)
+		# draw_item_name(@data[7], 67, WLH * 7+@edge*7)
+		# draw_item_name(@data[8], 67, WLH * 8+@edge*8)
+		# draw_item_name(@data[9], 67, WLH * 9+@edge*9)
+		# draw_item_name(@data[10], 67, WLH * 10+@edge*10)
+		# draw_item_name(@data[11], 67, WLH * 11+@edge*11)
 	end
 	
 	#--------------------------------------------------------------------------
@@ -86,7 +122,7 @@ class Window_Equip_Select < Window_Selectable
 			draw_icon(item.icon_index, x, y, enabled)
 			self.contents.font.color = getColor(item.getColor)
 			self.contents.font.color.alpha = enabled ? 255 : 128
-			self.contents.draw_text(x + 24, y, 145, WLH, item.name)
+			self.contents.draw_text(x + 24, y, 157+16, WLH, item.name)
 		end
 	end
 	#--------------------------------------------------------------------------
@@ -95,8 +131,6 @@ class Window_Equip_Select < Window_Selectable
 	def update_help
 		@help_window.set_text(item == nil ? "" : item.description)
 	end
-	
-	
 	#--------------------------------------------------------------------------
 		# ● 调用详细窗口刷新函数
 	#--------------------------------------------------------------------------
@@ -126,15 +160,7 @@ class Window_Equip_Select < Window_Selectable
 		end
 		@window_detail.set_text(text, 0, colors)
 		# 设置位置
-		@window_detail.x = self.x + self.width*3.0/4
-		@window_detail.y = self.y + 24 + (index / @column_max - top_row) * WLH
-		# 修改位置
-		if @window_detail.y + @window_detail.height >= 500
-			@window_detail.y -= @window_detail.height
-		end
-		if @window_detail.x + @window_detail.width >= 640
-			@window_detail.x -= @window_detail.width
-		end
-		
+		@window_detail.x = self.x + self.width - 24
+		@window_detail.y = 4
 	end   
 end

@@ -18,7 +18,7 @@ class Window_HelpDetail < Window_Base
 	@font_size = size
     super(x, y, w, h)
     self.contents.font.size = @font_size
-	self.contents.font.name = "楷体_GB2312"
+	self.contents.font.name = "华文细黑"
     self.z = 3000
     self.windowskin = Cache.system("WindowDetail")
     self.opacity = opacity

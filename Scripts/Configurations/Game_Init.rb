@@ -94,24 +94,24 @@ module GAME_INIT
     atk_val = item.read_suit_attr('atk')
 	if nil != atk_val
 		values.push("攻击            +  "+atk_val.to_s) 
-		colors.push("light green")
+		colors.push("light purple")
 	end
     atkrate_val = item.read_suit_attr('atkrate')
 	if nil != atkrate_val
 		values.push("攻击            +  "+atkrate_val.to_s+"%") 
-		colors.push("light green")
+		colors.push("light purple")
 	end
     
 	atkspeed_val = item.read_suit_attr('atk_speed')
 	if nil != atkspeed_val
 		values.push("攻击速度   +  "+atkspeed_val.to_s) 
-		colors.push("light green")
+		colors.push("light purple")
 	end
     
     atkspeedrate_val = item.read_suit_attr('atkspeedrate')
 	if nil != atkspeedrate_val
 		values.push("攻击频率   +  "+atkspeedrate_val.to_s+"%") 
-		colors.push("light green")
+		colors.push("light purple")
 	end
 	
     ddef_val = item.read_suit_attr('ddef')
@@ -139,13 +139,13 @@ module GAME_INIT
 	eva_val = item.read_suit_attr('eva')
 	if nil != eva_val
 		values.push("闪避技巧   +  "+eva_val.to_s) 
-		colors.push("light purple")
+		colors.push("light blue")
 	end
     
     evarate_val = item.read_suit_attr('evarate')
 	if nil != evarate_val
 		values.push("闪避概率   +  "+evarate_val.to_s+"%")
-		colors.push("light purple")
+		colors.push("light blue")
 	end
     
 	#---------------------------------------------------
@@ -1037,7 +1037,7 @@ module GAME_INIT
 #----------------------------------------------------------------------------
 #       type    class_id   武器1  武器2  头部  项链  盾  衣服  戒指  鞋子     
 #----------------------------------------------------------------------------
-#       宝物1    宝物2     宝物3  宝物4
+#       宝物1    宝物2     宝物3  宝物4  宝物5  宝物6
 #===========================================================================
 #   ●●●●●●●●●●●●●1号勇士●●●●●●●●●●●●●
 #---------------------------------------------------------------------------
@@ -1049,7 +1049,7 @@ module GAME_INIT
 #--------------------------------------------------------------------------
         1,         2,        21,     0,    22,    0,   42,  0,    0,   0,
 #---------------------------------------------------------------------------
-        0,         0,        0,     0,
+        0,         0,        0,     0,     0,     0
  ],
 #===========================================================================    
 #   ●●●●●●●●●●●●●2号刺客●●●●●●●●●●●●●
@@ -1066,7 +1066,7 @@ module GAME_INIT
 #--------------------------------------------------------------------------
         2,         2,        4,     0,    0,    0,   42,  51,    0,   0,
 #---------------------------------------------------------------------------
-        0,         0,        0,     0,
+        0,         0,        0,     0,    0,    0
  ],
 ]  
 

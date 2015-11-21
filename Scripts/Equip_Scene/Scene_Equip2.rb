@@ -39,22 +39,23 @@ class Scene_Equip2 < Scene_Base
     
     # 创建状态窗口
     # 头像
-    @status_window1 = Window_EquipStatus1.new(260,0,@actor)
+    @status_window1 = Window_EquipStatus1.new(0,0,@actor)
     # 生命槽
-    @status_window2 = Window_EquipStatus2.new(266,-5,@actor)
+    @status_window2 = Window_EquipStatus2.new(0,128-16,@actor)
     # 第一状态
     @status_window3 = Window_EquipStatus3.new(256,70,@actor)
     # 第二状态
     @status_window4 = Window_EquipStatus4.new(256,20,@actor)
     
-    @status_window2.visible = false
+	@status_window3.visible = false
+    @status_window2.visible = true
     @status_window4.visible = false
 
     # 生成物品窗口
     create_item_windows
 
     # 生成装备窗口
-    @equip_window = Window_Consult2.new(0, 0, @actor)
+    @equip_window = Window_Equip_Select.new(168, 0, @actor)
     @equip_window.opacity = 0
     
     # 刚开始，设置装备窗口的索引，以后不用这种方法设置
@@ -62,7 +63,8 @@ class Scene_Equip2 < Scene_Base
     
     
     # 生成详细信息窗口
-    @help_detail = Window_HelpDetail.new(180,30,200,358)
+    @help_detail = Window_HelpDetail.new(0,0,224,358)
+	@help_detail.opacity = 0
     update_detail_window
     @help_detail.visible = true
     
@@ -207,8 +209,8 @@ class Scene_Equip2 < Scene_Base
       # 选择哪一类装备，哪一类物品窗口设为可见
       @item_windows[i].visible = (@equip_index == i)
       # 坐标
-      @item_windows[i].y = 316
-      @item_windows[i].height = 162
+      @item_windows[i].y = 350
+      @item_windows[i].height = 128
       # 只是可见，没有被激活
       @item_windows[i].active = false
       # 索引也没有
@@ -353,6 +355,16 @@ class Scene_Equip2 < Scene_Base
       
       update_detail_window
     elsif Input.trigger?(Input::C)
+	  # 判断能否使用这个槽位	
+	  if @equip_window.index < 2 and @equip_window.index > @equip_window.max_weapon_index
+		# 超过最大可用武器槽位
+		Sound.play_buzzer
+		return
+	  elsif @equip_window.index > @equip_window.max_trea_index
+		# 超过最大可用宝物槽位
+		Sound.play_buzzer
+		return
+	  end
       Sound.play_decision
       @equip_window.active = false
       @item_window.active = true

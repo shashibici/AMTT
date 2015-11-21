@@ -11,10 +11,13 @@ class Window_EquipStatus1 < Window_Base
   # ● 初始化对象
   #--------------------------------------------------------------------------
   def initialize(x,y,actor)
-    super(x, y, 64+8, 96+8)
+    super(x, y, 160+32, 96+32) # x, y, 192, 128
     self.contents.font.size = 20
+	self.contents.font.name = "华文细黑"
+	self.opacity = 0
     @face_size = 96
-	@edge = 1
+	@pic_size = 64
+	@edge = 0
     setup(actor)
     @isInit = true
   end 
@@ -31,6 +34,11 @@ class Window_EquipStatus1 < Window_Base
     @actor_face_index = actor.face_index
     # 名字
     @name = @actor.name
+	# 属性
+	@atk = @actor.atk
+	@ddef = @actor.def
+	@strength = @actor.final_strength
+	@celerity = @actor.final_celerity
   end
   #--------------------------------------------------------------------------
   # ● 重新绘制该窗口
@@ -42,17 +50,35 @@ class Window_EquipStatus1 < Window_Base
     setup(@actor)
     #-------------描绘角色--------------------------
     # 描绘脸部 (64*64)
+	dst_rect = Rect.new(0,0,@pic_size,@pic_size)
     bitmap = Cache.face(@actor_face)
     rect = Rect.new(0, 0, 0, 0)
     rect.x = @actor_face_index % 4 * 96 + (96 - @face_size) / 2
     rect.y = @actor_face_index / 4 * 96 + (96 - @face_size) / 2
     rect.width = @face_size
     rect.height = @face_size
-    self.contents.blt(-8, -8, bitmap, rect)
+	# dst_src, src_bitmap, src_rect of src_bitmap. 
+	self.contents.stretch_blt(dst_rect, bitmap, rect)
     bitmap.dispose
     # 描绘名字(72+108=180)
+	self.contents.font.size = 24
+	self.contents.font.name = "黑体"
     color = Color.new(255, 255, 255)
-    draw_a_line(color, @face_size + RW, @edge, 64, WLH, @name, 1)  
+    draw_a_line(color, @edge, @pic_size + RW, 64, WLH, @name, 1) 
+	# 描绘攻、防、力、敏
+	self.contents.font.size = 18
+	color = getColor("light purple")
+	draw_a_line(color, @pic_size + RW, @edge, 32, WLH, "攻: ", 0)
+	draw_a_line(color, @pic_size + RW+32, @edge, self.width-32-@pic_size-RW-32, WLH, @atk.ceil.to_s, 0)
+	color = getColor("light blue")
+	draw_a_line(color, @pic_size + RW, @edge+WLH, 32, WLH, "防: ", 0)
+	draw_a_line(color, @pic_size + RW+32, @edge+WLH, self.width-32-@pic_size-RW-32, WLH, @ddef.ceil.to_s, 0)
+	color = getColor("red")
+	draw_a_line(color, @pic_size + RW, @edge+WLH*2, 32, WLH, "力: ", 0)
+	draw_a_line(color, @pic_size + RW+32, @edge+WLH*2, self.width-32-@pic_size-RW-32, WLH, @strength.ceil.to_s, 0)
+	color = getColor("light green")
+	draw_a_line(color, @pic_size + RW, @edge+WLH*3, 32, WLH, "敏: ", 0)
+	draw_a_line(color, @pic_size + RW+32, @edge+WLH*3, self.width-32-@pic_size-RW-32, WLH, @celerity.ceil.to_s, 0)
   end    
   #--------------------------------------------------------------------------
   # ● 判断是否需要重新获取数据
@@ -62,6 +88,10 @@ class Window_EquipStatus1 < Window_Base
     return true if @name != @actor.name
     return true if @actor_face != @actor.face_name 
     return true if @actor_face_index != @actor.face_index
+	return true if @actor.atk != @atk
+	return true if @actor.def != @ddef
+	return true if @actor.final_strength != @strength
+	return true if @actor.final_celerity != @celerity
     return false
   end  
   #--------------------------------------------------------------------------
@@ -79,57 +109,109 @@ end
 #==========================================================================
 # ■ Window_EquipStatus2
 #---------------------------------------------------------------------------
-# 	显示角色 攻击、防御、力量、敏捷
+# 	主要显示生命， 和其他不经常更新的东西，分开更新
 #===========================================================================
 class Window_EquipStatus2 < Window_Base
-  WLH = 19      # 每行字的高度
+  WLH = 20      # 每行字的高度
   RW = 8        # 每一个项目之间的间隔
   #--------------------------------------------------------------------------
   # ● 初始化对象
   #--------------------------------------------------------------------------
-  def initialize(x,y,actor)
-    super(x, y, 380, 80)
+  def initialize(x,y,actor, w = 160+32, h = 200+32)
+    super(x, y, w, h)
     self.opacity = 0
-    self.contents.font.size = 18
+    self.contents.font.size = 19
+	self.contents.font.name = "黑体" 
+	@gw_width = w - 32
     @edge = 0
-    @face_size = 64
     @isInit = true
+	@info_sprite = Sprite.new
+	@info_sprite.bitmap = Bitmap.new(w - 16, h - 32 - WLH*2)
+	@info_sprite.x = self.x + 16
+	@info_sprite.y = self.y + 16 + WLH*2
+	@info_sprite.bitmap.font.size = 18
+	@info_sprite.bitmap.font.name = "华文细黑"
     setup(actor)
-  end   
+  end
   #--------------------------------------------------------------------------
   # ● 配置
   #     actor  : 角色(hero对象)
   #--------------------------------------------------------------------------
   def setup(actor)
-    
     # 获得角色
     @actor = actor
-    
     # 最大值
     @maxhp = actor.maxhp
     @maxmp = actor.maxmp
-    
     # 当前值
     @hp = @actor.hp
     @mp = @actor.mp
-  end    
+	# 生命回复率
+	@hpcover = @actor.final_hpcover
+	# 物理伤害
+	@destroy = @actor.base_destroy              # 物理破坏力因子
+    @destroyrate = @actor.final_destroyrate     # 物理破坏额外倍数（%）
+	# 攻击速度
+    @atkspeed = @actor.base_atkspeed            # 攻速因子
+    @atkrate = @actor.final_atkrate             # 攻速率
+	# 暴击技巧
+    @bom = @actor.final_bom                     # 暴击因子
+    @bomatk = @actor.final_bomatk               # 暴击扩张倍数（%）
+	# 命中技巧
+    @hit = @actor.final_hit                     # 命中因子
+	# 闪避技巧
+    @eva = @actor.final_eva                     # 闪避因子
+  end   
   #--------------------------------------------------------------------------
   # ● 重新绘制该窗口
   #
   #--------------------------------------------------------------------------
   def refresh
+	@info_sprite.bitmap.clear
+	tmp_content = @info_sprite.bitmap
+	@info_sprite.bitmap.draw_text(0, 0, 50, WLH, "物理伤害:")
+	@info_sprite.bitmap.draw_text(50, 0, tmp_content.width-50, WLH, @destroy.ceil.to_s+"×"+Fround(@destroyrate,1).to_s+"%", 0)
+	@info_sprite.bitmap.draw_text(0, 0, 50, WLH, "物伤威力:")
+	@info_sprite.bitmap.draw_text(50, 0, tmp_content.width-50, WLH, @destroy.ceil.to_s+"×"+Fround(@destroyrate,1).to_s+"%", 0)
+	@info_sprite.bitmap.draw_text(0, WLH, 50, WLH, "攻速:")
+	@info_sprite.bitmap.draw_text(50, WLH, tmp_content.width-50, WLH, @atkspeed.ceil.to_s+"×"+Fround(@atkrate,1).to_s+"%", 0)
+	@info_sprite.bitmap.draw_text(0, WLH*2, 50, WLH, "暴击:")
+	@info_sprite.bitmap.draw_text(50, WLH*2, tmp_content.width-50, WLH, @bom.ceil.to_s+"×"+Fround(@bomatk,1).to_s+"%", 0)
+	@info_sprite.bitmap.draw_text(0, WLH*3, 100, WLH, "命中技巧:")
+	@info_sprite.bitmap.draw_text(100, WLH*3, tmp_content.width-100, WLH, @hit.ceil.to_s, 0)
+	@info_sprite.bitmap.draw_text(0, WLH*4, 100, WLH, "闪避技巧:")
+	@info_sprite.bitmap.draw_text(100, WLH*7, tmp_content.width-100, WLH, @eva.ceil.to_s, 0)
+  
+  end
+  #--------------------------------------------------------------------------
+  # ● 是否需要更新其他数据
+  #--------------------------------------------------------------------------
+  def need_refresh?
+    return true if @isInit
+	return true if @hpcover != @actor.final_hpcover
+	return true if @destroy != @actor.base_destroy
+	return true if @destroyrate != @actor.final_destroyrate
+	return true if @atkspeed != @actor.base_atkspeed
+	return true if @atkrate != @actor.final_atkrate
+	return true if @bom != @actor.final_bom
+	return true if @bomatk != @actor.final_bomatk
+	return true if @hit != @actor.final_hit
+	return true if @eva != @actor.final_eva
+    return false
+  end
+  #--------------------------------------------------------------------------
+  # ● 重新绘制该窗口
+  #
+  #--------------------------------------------------------------------------
+  def refresh_hp
     self.contents.clear
-
     # 重新获取数据
-    
     # 最大值
     @maxhp = @actor.maxhp
     @maxmp = @actor.maxmp
-    
     # 当前值
     @hp = @actor.hp
     @mp = @actor.mp
-    
 
     # 描绘HP槽-------------------------------------
     rate = @hp / @maxhp
@@ -146,140 +228,23 @@ class Window_EquipStatus2 < Window_Base
     self.contents.fill_rect(0, WLH - 8, gw, 6, gc1)
     
     # 绘制文字
-    self.contents.font.color = system_color
-    self.contents.draw_text(0, 0, 30, WLH, "生命")
-    xr = 340
-    # 计算hp的长度
-    if @hp > 9 and @hp <= 99
-      bk1 = 5
-    elsif @hp > 99 and @hp <= 999
-      bk1 = 6
-    elsif @hp > 999 and @hp <= 9999
-      bk1 = 7
-    elsif @hp > 9999 and @hp <= 99999
-      bk1 = 8
-    elsif @hp > 99999 and @hp <= 999999
-      bk1 = 9
-    elsif @hp > 999999 and @hp <= 9999999
-      bk1 = 10
-    elsif @hp > 9999999 
-      bk1 = 11
-    else 
-      bk1 = 4
-    end  
-    # 计算maxhp的长度
-    if @maxhp > 9 and @maxhp <= 99
-      bk2 = 5
-    elsif @maxhp > 99 and @maxhp <= 999
-      bk2 = 6
-    elsif @maxhp > 999 and @maxhp <= 9999
-      bk2 = 7
-    elsif @maxhp > 9999 and @maxhp <= 99999
-      bk2 = 8
-    elsif @maxhp > 99999 and @maxhp <= 999999
-      bk2 = 9
-    elsif @maxhp > 999999 and @maxhp <= 9999999
-      bk2 = 10
-    elsif @maxhp > 9999999
-      bk2 = 11
-    else 
-      bak2 = 4
-    end  
-    
-    if bk1 + bk2 + 1 >= 23
-  	  self.contents.font.color = gc1
-      self.contents.draw_text(xr - 190, 0, 90, WLH, "?????????", 2)
-      self.contents.draw_text(xr - 100, 0, 10, WLH, "/", 2)
-      self.contents.draw_text(xr - 90,  0, 90, WLH, "?????????", 2)
-    else
-    
-      self.contents.font.color = gc1
-      self.contents.draw_text(xr - 10*(bk1+bk2+1), 0, bk1*10, WLH, Fround(@hp,2), 2)
-      self.contents.draw_text(xr - 10*(bk2+1),     0, 10, WLH, "/", 2)
-      self.contents.draw_text(xr - 10*bk2,         0, bk2*10, WLH, Fround(@maxhp,2), 2)
-    end
-    
-    
-    # 描绘MP槽----------------------------------------
-    rate = @mp / @maxmp
-    gw = Integer(340 * rate)
-    if rate > 0.5
-      gc1 = Color.new(Integer(255*(1-rate*2)),255,0)
-    else
-      gc1 = Color.new(255,Integer(255*rate*2),0)
-    end
-    gc2 = Color.new(0,0,0)
-    
-    # 填满指定的颜色
-    self.contents.fill_rect(0, WLH*2 - 8, 230, 6, gc2)
-    self.contents.fill_rect(0, WLH*2 - 8, gw, 6, gc1) 
-    
-    # 绘制文字
-    self.contents.font.color = system_color
-    self.contents.draw_text(0, WLH, 30, WLH, "Pow")
-    xr = 340
-    # 计算mp的长度
-    if @mp > 9 and @mp <= 99
-      bk1 = 5
-    elsif @mp > 99 and @mp <= 999
-      bk1 = 6
-    elsif @mp > 999 and @mp <= 9999
-      bk1 = 7
-    elsif @mp > 9999 and @mp <= 99999
-      bk1 = 8
-    elsif @mp > 99999 and @mp <= 999999
-      bk1 = 9
-    elsif @mp > 999999 and @mp <= 9999999
-      bk1 = 10
-    elsif @mp > 9999999 
-      bk1 = 11
-    else
-      bk1 = 4
-    end  
-    # 计算maxhp的长度
-    if @maxmp > 9 and @maxmp <= 99
-      bk2 = 5
-    elsif @maxmp > 99 and @maxmp <= 999
-      bk2 = 6
-    elsif @maxmp > 999 and @maxmp <= 9999
-      bk2 = 7
-    elsif @maxmp > 9999 and @maxmp <= 99999
-      bk2 = 8
-    elsif @maxmp > 99999 and @maxmp <= 999999
-      bk2 = 9
-    elsif @maxmp > 999999 and @maxmp <= 9999999
-      bk2 = 10
-    elsif @maxmp > 9999999 
-      bk2 = 11
-    else
-      bk2 = 4
-    end    
-    
-    
-    if bk1 + bk2 + 1 >= 23
-  	  self.contents.font.color = gc1
-      self.contents.draw_text(xr - 190, 0, 90, WLH, "?????????", 2)
-      self.contents.draw_text(xr - 100, 0, 10, WLH, "/", 2)
-      self.contents.draw_text(xr - 90,  0, 90, WLH, "?????????", 2)
-    else
-      
-      self.contents.font.color = gc1
-      self.contents.draw_text(xr - 10*(bk1+bk2+1), WLH, bk1*10, WLH, Fround(@mp,2), 2)
-      self.contents.draw_text(xr - 10*(bk2+1),     WLH, 10, WLH, "/", 2)
-      self.contents.draw_text(xr - 10*bk2,         WLH, bk2*10, WLH, Fround(@maxmp,2), 2)
-    end
-  end    
+    self.contents.font.color = getColor("red")
+    self.contents.draw_text(0, 0, 20, WLH, "HP")
+	self.contents.draw_text(15, 0, @gw_width-15, WLH, @hp.ceil.to_s+"/"+@maxhp.ceil.to_s, 2)
+
+  end 
+
   #--------------------------------------------------------------------------
-  # ● 判断是否需要重新获取数据
+  # ● 是否需要更新 HP 显示
   #--------------------------------------------------------------------------
-  def need_refresh?
+  def need_refresh_hp?
     return true if @isInit
     return true if @hp  != @actor.hp
     return true if @mp != @actor.mp
     return true if @maxhp != @actor.maxhp 
     return true if @maxmp != @actor.maxmp 
     return false
-  end  
+  end
   #--------------------------------------------------------------------------
   # ● 更新画面
   #--------------------------------------------------------------------------
@@ -288,7 +253,8 @@ class Window_EquipStatus2 < Window_Base
       # 更新画面效果
       self.contents_opacity = 255
       # 更新内容
-      refresh if need_refresh?
+      refresh_hp if need_refresh_hp?
+	  refresh if need_refresh?
       @isInit = false
     end
   end   
