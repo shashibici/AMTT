@@ -24,10 +24,8 @@ class Game_Battler
   attr_accessor   :maxmp_plus
   attr_accessor   :fcounthp          # 记录帧数，计算恢复HP
   attr_accessor   :fcountmp          # 记录帧数，计算恢复MP
-  
   #=========================================================================
-  #  self 系列的参数，是自身条件产生的，没有依靠任何装备
-  #
+  #  self 系列的参数，是自身条件产生的，没有依靠任何装备  
   #=========================================================================
   #--------------------------------------------------------------------------
   # ● 获得自身maxhp
@@ -498,7 +496,6 @@ class Game_Battler
       return @hp
     end
   end  
-  
   #--------------------------------------------------------------------------
   # ● 获取生命值
   #
@@ -507,7 +504,6 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def mp
     return @mp if @mp <= 0
-    
     if (temp = Graphics.frame_count - @fcountmp) >= 60
       # 更新fcountmp
       @fcountmp = Graphics.frame_count
@@ -810,7 +806,122 @@ class Game_Battler
   #
   #  各个参数进行计算后，得出一次攻击的结果。
   #=========================================================================
-  
+  #--------------------------------------------------------------------------
+  # ● 控制战斗流程  (一次攻击的入口)
+  #    
+  #    preattack  
+  #    doattack 
+  #    predamage
+  #    dodamage
+  #    postdamage
+  # 
+  #    flag   :身份标识，0英雄或者怪物，1怪物分身1，2怪物分身2，3怪物分身3
+  #
+  #--------------------------------------------------------------------------
+  def excuteBattle(target, flag = 0)   
+    # 判断死亡 首先判断自己是否死亡
+    if self.hp <= 0
+      self.doDead(flag)
+      return 
+    end
+	# 自己没死 再判断对方是否死亡
+    if target.hp <= 0
+      target.doDead(flag)
+      return 
+    end
+    
+    # 计算
+    brate = preattack(target)
+    drate =  doattack(target)
+    dmg = predamage(brate, drate, target)
+    
+    
+    # 如果是怪物受伤
+    if !target.hero?
+      # 判断是否分身
+      case flag
+      when 0
+        # 设置本尊受到的伤害
+        $game_variables[35] = dmg
+      when 1
+        # 设置分身1受到的伤害
+      when 2
+        # 设置分身2受到的伤害
+      when 3
+        # 设置分身3受到的伤害
+      end
+      
+    # 否则是英雄受伤
+    else
+      # 判断是否分身
+      case flag
+      when 0
+        # 设置本尊造成的伤害
+        $game_variables[34] = dmg
+      when 1
+        # 设置分身1造成的伤害
+        $game_variables[118] = dmg
+      when 2
+        # 设置分身2造成的伤害
+        $game_variables[122] = dmg
+      when 3
+        # 设置分身3造成的伤害
+      end
+    # 受伤判断结束
+    end
+    
+    # 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
+    dodamage(target, dmg, flag)
+    
+    
+    # 修改命中状况
+    if @hitflag == false and self.hero?
+      # 如果是hero并且丢失，修改hero命中开关
+      $game_switches[105] = true
+    elsif @hitflag == false and  !self.hero?
+      # 如果不是英雄并且丢失，修改怪物命中开关
+      case flag
+      when 0    
+        # 本尊发动的攻击
+        $game_switches[106] = true
+      when 1    
+        # 分身1发动的攻击
+        $game_switches[120] = true
+      when 2    
+        # 分身2发动的攻击
+        $game_switches[123] = true
+      when 3    
+        # 分身3发动的攻击
+      end
+    end
+    
+    
+    # 记录暴击状况
+    if @bomflag == true and self.hero?
+      # 英雄暴击
+      $game_switches[109] = true
+    elsif @bomflag == true and !self.hero?
+      # 怪物暴击
+     case flag
+      when 0    
+        # 本尊发动的攻击
+        $game_switches[110] = true
+      when 1    
+        # 分身1发动的攻击
+        $game_switches[119] = true
+      when 2    
+        # 分身2发动的攻击
+        $game_switches[122] = true
+      when 3    
+        # 分身3发动的攻击
+      end
+    end
+    
+    
+    # 伤害之后的处理——判断胜负
+    postdamage(target, flag)
+    
+  end  
   #------------------------------------------------------------------------
   # ● 下面开始准备战斗函数
   #
@@ -826,28 +937,42 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def preattack(target)
-    
     # 计算暴击技巧产生的暴击率
     n = self.final_bom + 0.0
+	# 默认，CONST_MAX_BOM = 4000，每点暴击技巧增加0.025个百分点
+	# 暴击技巧 = 20 则 暴击概率为 20*0.025% = 0.5% 暴击概率
+	# 暴击技巧 = 1000 则 暴击概率为 1000*0.025% = 25% 暴击概率
     n = n / CONST_MAX_BOM
     
     # 命中影响暴击率
+	# 正常情况下命中技巧应该是闪避技巧的1.5倍。 
+	# 自身命中技巧 - 目标闪避技巧的1.5倍 = 0 - 此时不受影响
+	# 如果命中 = 2倍闪避，则暴击可能为：
+	# (0.5/2.0) * 1.2 = 0.3 = 30% 会有30% 暴击可能
     bom_hit = 1.2*(self.final_hit - target.final_eva*1.5) / self.final_hit
+	
+	# 修正，正常提供的暴击不能大于36%，
+	# 拖后腿也不会小于 -100% 
+	# 只要保持自身命中 > 对方闪避1.5倍 则不会出现拖后腿现象。
+	# 闪避高可以暴击 - 保护敏捷英雄
     if bom_hit > 0
       bom_hit = [bom_hit, 0.36].min
     else
-      bom_hit = [bom_hit, -0.5].max
+      bom_hit = [bom_hit, -1.0].max
     end
     
     # 防御影响暴击率
+	# 防御高可以防暴击 - 保护敏捷英雄
     bom_def = (self.def-target.def) / self.def
     if bom_def > 0
       bom_def = [bom_def, 0.3].min
     else
-      bom_def = [bom_def, -0.4].max
+      bom_def = [bom_def, -0.8].max
     end
     
-    # 力量影响暴击
+    # 力量影响暴击 - 加强力量英雄
+	# 只要自身力量 > 对方力量则可以防止拖后腿现象
+	# 此因素普通 （<15%）
     bom_str = 1.5*(self.final_strength - target.final_strength) / self.final_strength
     if bom_str > 0
       bom_str = [bom_str, 0.45].min
@@ -855,17 +980,18 @@ class Game_Battler
       bom_str = [bom_str, -0.4].max
     end
     
-    
-    
-    # 计算最终百分比数值，不超过70%
+    # 计算最终百分比数值，不超过80%
+	# 最后计算处 0~100 之间的一个数字
     final_bom_percent = (bom_hit + bom_def + bom_str + n) * 100.0
     if final_bom_percent > 0
-      final_bom_percent = [final_bom_percent, 70].min
+      final_bom_percent = [final_bom_percent, 80].min
     else
       final_bom_percent = 0
     end
     
     # 扩大100倍进行比较
+	# 例如70， 70*100 = 7000，最后和 10000 比较
+	# 如果暴击则直接返回暴击伤害倍数，例如200% 则返回2.0
     if final_bom_percent * 100 > rand(10001)
       @bomflag = true
       @hitflag = true
@@ -877,13 +1003,21 @@ class Game_Battler
     
     # ---- 否则不暴击，计算命中率--------
     # 闪避率由三个分量组成
+	# 正常情况下，(命中-闪避) / 命中 = 0.5
+	# 0.5 * 3.0 = 1.5; 最大不超过150% 拖后腿不小于-50%
+	# 一般而言只要命中 > 闪避
     hit_hit_eva = [3.0*(self.final_hit - target.final_eva) / self.final_hit, -0.5].max
-    hit_cel_cel = [1.0*(self.final_celerity - target.final_celerity) / self.final_celerity, -1].max
-    hit_def_def = [0.4*(self.def-target.def) / self.def, 0.4].max
-    hit_final = [[hit_hit_eva + hit_cel_cel + hit_def_def, 0.4].max, 2].min
+	# 加强敏捷英雄
+	# 最大拖后腿能够达到-100% (保护敏捷英雄)
+    hit_cel_cel = [2.0*(self.final_celerity - target.final_celerity) / self.final_celerity, -1].max
+	# 防御起很小作用 略微加强敏捷
+    hit_def_def = [0.6*(self.def-target.def) / self.def, -0.4].max
+	# 命中最低不小于30%(防止敏捷太变态) 最高不超过200% 
+    hit_final = [[hit_hit_eva + hit_cel_cel + hit_def_def, 0.3].max, 2].min
+	# 最后计算命中概率
     @hitflag = (hit_final * 100 >= rand(101));
 
-    # 暴击率返回0
+    # 暴击伤害倍数返回0 
     return 0
     
   end
@@ -900,32 +1034,25 @@ class Game_Battler
      rate = self.atk / target.def
      return rate
   end
-  
   #--------------------------------------------------------------------------
   # ● 准备伤害
   #
   #    计算出最终的伤害
-  #    
-  #
+  #    计算过程需要考虑双方的状态，也就是有技能的因素在
   #
   #--------------------------------------------------------------------------
   def predamage(brate, damagerate, target)
     return 0 if @hitflag == false
     # 计算伤害
     dmg = final_destroy * damagerate
-    
     # 制造随机伤害
     dmg = dmg * (180 + rand(41)) / 200.00
-    
     # 攻击力造成的额外伤害
     dmg += [(self.atk - target.def) / 4.0 , 0].max
     dmg = [dmg, 0].max
-    
     # 如果暴击
     dmg = dmg *  brate if bomflag == true and brate > 0
-    
     return dmg
-    
   end  
   #--------------------------------------------------------------------------
   # ● 执行伤害
@@ -1059,121 +1186,6 @@ class Game_Battler
       return 
     end
   end
-  #--------------------------------------------------------------------------
-  # ● 控制战斗流程
-  #    
-  #    preattack  
-  #    doattack 
-  #    predamage
-  #    dodamage
-  #    postdamage
-  # 
-  #    flag   :身份标识，0英雄或者怪物，1怪物分身1，2怪物分身2，3怪物分身3
-  #
-  #--------------------------------------------------------------------------
-  def excuteBattle(target, flag = 0)   
-    
-    # 判断死亡
-    if self.hp <= 0 and target.hp <= 0
-      doDead(flag)
-      return 
-    end
-    if target.hp <= 0
-      target.doDead(flag)
-      return 
-    end
-    
-    # 计算
-    brate = preattack(target)
-    drate =  doattack(target)
-    dmg = predamage(brate, drate, target)
-    
-    
-    # 如果是怪物受伤
-    if !target.hero?
-      # 判断是否分身
-      case flag
-      when 0
-        # 设置本尊受到的伤害
-        $game_variables[35] = dmg
-      when 1
-        # 设置分身1受到的伤害
-      when 2
-        # 设置分身2受到的伤害
-      when 3
-        # 设置分身3受到的伤害
-      end
-      
-    # 否则是英雄受伤
-    else
-      # 判断是否分身
-      case flag
-      when 0
-        # 设置本尊造成的伤害
-        $game_variables[34] = dmg
-      when 1
-        # 设置分身1造成的伤害
-        $game_variables[118] = dmg
-      when 2
-        # 设置分身2造成的伤害
-        $game_variables[122] = dmg
-      when 3
-        # 设置分身3造成的伤害
-      end
-    # 受伤判断结束
-    end
-    
-    # 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
-    dodamage(target, dmg, flag)
-    
-    
-    # 修改命中状况
-    if @hitflag == false and self.hero?
-      # 如果是hero并且丢失，修改hero命中开关
-      $game_switches[105] = true
-    elsif @hitflag == false and  !self.hero?
-      # 如果不是英雄并且丢失，修改怪物命中开关
-      case flag
-      when 0    
-        # 本尊发动的攻击
-        $game_switches[106] = true
-      when 1    
-        # 分身1发动的攻击
-        $game_switches[120] = true
-      when 2    
-        # 分身2发动的攻击
-        $game_switches[123] = true
-      when 3    
-        # 分身3发动的攻击
-      end
-    end
-    
-    
-    # 记录暴击状况
-    if @bomflag == true and self.hero?
-      # 英雄暴击
-      $game_switches[109] = true
-    elsif @bomflag == true and !self.hero?
-      # 怪物暴击
-     case flag
-      when 0    
-        # 本尊发动的攻击
-        $game_switches[110] = true
-      when 1    
-        # 分身1发动的攻击
-        $game_switches[119] = true
-      when 2    
-        # 分身2发动的攻击
-        $game_switches[122] = true
-      when 3    
-        # 分身3发动的攻击
-      end
-    end
-    
-    
-    # 伤害之后的处理——判断胜负
-    postdamage(target, flag)
-    
-  end  
+  
   
 end

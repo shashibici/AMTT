@@ -8,7 +8,7 @@
 module GAME_CONF
   
   #--------------------------------------------------------------------------
-  # 合成套装的物品的id们
+  # 合成套装的物品的id们 通常就是合成石
   #--------------------------------------------------------------------------
   ANCILLARY = [66, 67, 68, 69]
   
@@ -61,11 +61,11 @@ module GAME_CONF
   # 每点敏捷增加的命中技巧
   BONUS_CELERITY_HIT = 0.3
   # 每点敏捷增加的闪避技巧
-  BONUS_CELERITY_EVA = 0.15
+  BONUS_CELERITY_EVA = 0.22
   
   
   # 每点力量增加的生命恢复量
-  BONUS_STRENGTH_HPCOVER = 0.18
+  BONUS_STRENGTH_HPCOVER = 0.36
   # 每点力量增加的生命量
   BONUS_STRENGTH_MAXHP = 14.0
   # 每点力量增加的物理破坏
@@ -119,6 +119,23 @@ module GAME_CONF
   
   # 基础伤害的比例
   CONST_BASE_DAMAGE_RATE     = 1.0
+  
+  # 没点技能点添加个属性的值
+  HP_ASCEND 				=	70
+  MP_ASCEND					=	70
+  HPCOVER_ASCEND			=	2
+  MPCOVER_ASCEND			=	2
+  ATK_ASCEND				=	3
+  DEF_ASCEND				=	1.5
+  STRENGTH_ASCEND			=	1
+  WISDOM_ASCEND				=	1
+  CELERITY_ASCEND			=	1
+  DESTROY_ASCEND			=	1.1
+  MDESTROY_ASCEND			=	1.1
+  ATKSPEED_ASCEND			=	0.75
+  HIT_ASCEND				=	1.2
+  EVA_ASCEND				=	0.8
+  
   
   #-------------------------------------------------------------------------
   #   这是记录各个地图和魔塔号、层数号相对应的数组  
