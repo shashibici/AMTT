@@ -333,7 +333,7 @@ class Window_Consult_Status3 < Window_Base
 		draw_a_line(color, 0, @edge, 80, WLH, "等级: ", 0)
 		draw_a_line(color, 80, @edge, self.contents.width/2-80, WLH, @lvl.ceil, 0)
 		# 金钱
-		color = getColor("light yellow")
+		color = getColor("yellow")
 		draw_a_line(color, 0, @edge+WLH, 80, WLH, "金钱: ", 0)
 		draw_a_line(color, 80, @edge+WLH, self.contents.width/2-80, WLH, @money.ceil, 0)
 		# 经验
