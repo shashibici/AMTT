@@ -550,7 +550,7 @@ class Scene_Addpoint < Scene_Base
       return if @menu_index >= 14
       
       # 如果该属性被添加过至少一次
-      if @totally_ascend[@menu_index].abs >= @each_ascend[@menu_index].abs
+      if @totally_ascend[@menu_index] >= @each_ascend[@menu_index]-0.0001
         # 减少
         @totally_ascend[@menu_index] -= @each_ascend[@menu_index]
         # 获得一点技能点

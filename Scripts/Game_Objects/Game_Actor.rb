@@ -18,6 +18,13 @@ class Game_Actor < Game_Battler
 	attr_accessor   :is_equip_changed   # 装备， 0-没有变过，1-变过
 	attr_accessor   :myequips           # 保存当前装备的实体
 	attr_accessor   :myequip_kits       # 保存包含套装的实体（包括虚拟套装）
+	attr_accessor	:my_skills
+	#--------------------------------------------------------------------------
+	# ● 是否有这个技能
+	#--------------------------------------------------------------------------
+	def has_skill?(skill_id)
+		return @my_skills.include?(skill_id)
+	end
 	#--------------------------------------------------------------------------
 		# ● 初始化对象
 		#     actor_id : 角色 ID
@@ -35,6 +42,7 @@ class Game_Actor < Game_Battler
 		@is_equip_changed = 1
 		@myequip_kits = []
 		@myequips = [] 
+		@my_skills = {}
 		# 设置角色
 		setup(actor_id)
 		@last_skill_id = 0

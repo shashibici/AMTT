@@ -832,9 +832,15 @@ class Game_Battler
     
     # 计算
     brate = preattack(target)
-    drate =  doattack(target)
-    dmg = predamage(brate, drate, target)
-    
+    pre_dmg =  doattack(target)
+    dmg = predamage(brate, pre_dmg, target)
+	$NOW_TIME = $TIME_POST_PRE_DAMAGE
+	
+	# 实现 “反弹” 技能
+	sk = RPG::Fantan.new()
+    sk.id = 1
+	sk.setup(self, target)
+	ret = sk.triggered(brate, pre_dmg, dmg, 0)
     
     # 如果是怪物受伤
     if !target.hero?
@@ -1008,14 +1014,14 @@ class Game_Battler
 	# 一般而言只要命中 > 闪避
     hit_hit_eva = [3.0*(self.final_hit - target.final_eva) / self.final_hit, -0.5].max
 	# 加强敏捷英雄
-	# 最大拖后腿能够达到-100% (保护敏捷英雄)
-    hit_cel_cel = [2.0*(self.final_celerity - target.final_celerity) / self.final_celerity, -1].max
+	# 最大拖后腿能够达到-60% (保护敏捷英雄)
+    hit_cel_cel = [2.0*(self.final_celerity - target.final_celerity) / self.final_celerity, -0.6].max
 	# 防御起很小作用 略微加强敏捷
     hit_def_def = [0.6*(self.def-target.def) / self.def, -0.4].max
-	# 命中最低不小于30%(防止敏捷太变态) 最高不超过200% 
-    hit_final = [[hit_hit_eva + hit_cel_cel + hit_def_def, 0.3].max, 2].min
+	# 命中最低不小于40%(防止敏捷太变态) 最高不超过200% 
+    hit_final = [[hit_hit_eva + hit_cel_cel + hit_def_def, 0.4].max, 2].min
 	# 最后计算命中概率
-    @hitflag = (hit_final * 100 >= rand(101));
+	@hitflag = (hit_final * 100 >= rand(101));
 
     # 暴击伤害倍数返回0 
     return 0
@@ -1023,41 +1029,42 @@ class Game_Battler
   end
   #--------------------------------------------------------------------------
   # ● 执行攻击
-  #    
-  #    进行攻击、护甲的比较
-  #    
-  #    返回最后伤害作用的比率
+  #
+  #    得出产生的伤害这个伤害大概是 物理伤害+部分攻击力
   #
   #--------------------------------------------------------------------------
   def doattack(target)
-    # 进行攻击、防御的修正
-     rate = self.atk / target.def
-     return rate
+	return 0 if @hitflag == false
+	# 计算伤害
+    dmg = final_destroy + self.atk / 4.0
+    return dmg
   end
   #--------------------------------------------------------------------------
   # ● 准备伤害
   #
-  #    计算出最终的伤害
-  #    计算过程需要考虑双方的状态，也就是有技能的因素在
+  #    	计算出最终的伤害
+  #    	计算过程需要考虑双方的状态，也就是有技能的因素在
+  #    	实现反弹、吸血等等
   #
+  #		brate 	:	暴击比例
+  # 	dmg 	: 	产生的伤害
+  # 	target	:	目标
   #--------------------------------------------------------------------------
-  def predamage(brate, damagerate, target)
-    return 0 if @hitflag == false
-    # 计算伤害
-    dmg = final_destroy * damagerate
+  def predamage(brate, dmg, target)
+	# 进行攻击、防御的修正
+    rate = self.atk / target.def
+    final_dmg = dmg * rate
+	final_dmg += (self.atk - target.def) / 4.0
     # 制造随机伤害
-    dmg = dmg * (180 + rand(41)) / 200.00
-    # 攻击力造成的额外伤害
-    dmg += [(self.atk - target.def) / 4.0 , 0].max
-    dmg = [dmg, 0].max
+    final_dmg = final_dmg * (180 + rand(41)) / 200.00
     # 如果暴击
-    dmg = dmg *  brate if bomflag == true and brate > 0
-    return dmg
+    final_dmg = final_dmg *  brate if bomflag == true and brate > 0
+    return final_dmg
   end  
   #--------------------------------------------------------------------------
   # ● 执行伤害
   #    
-  #     实现反弹、吸血等等
+  #     
   #
   #
   #--------------------------------------------------------------------------
