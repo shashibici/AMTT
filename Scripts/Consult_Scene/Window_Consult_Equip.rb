@@ -1,10 +1,10 @@
 #===========================================================================
-	# ■ Window_Consult2
+	# ■ Window_Consult_Equip
 	#---------------------------------------------------------------------------
 	#     本窗口用来显示怪物的装备信息
 	#
 #===========================================================================
-class Window_Equip_Select < Window_Selectable 
+class Window_Consult_Equip < Window_Selectable 
 	include Kernel
 	WLH = 25
 	# NAMES --> 0~13
@@ -26,6 +26,13 @@ class Window_Equip_Select < Window_Selectable
 		@edge = 0
 		refresh
 		@index = 0
+		@type = 0
+	end
+	#--------------------------------------------------------------------------
+	# ● 获取物品
+	#--------------------------------------------------------------------------
+	def item
+		return @data[self.index]
 	end
 	#--------------------------------------------------------------------------
 	# ● 获取项目要描画的矩形
@@ -40,59 +47,20 @@ class Window_Equip_Select < Window_Selectable
 		return rect
 	end
 	#--------------------------------------------------------------------------
-	# ● 获取物品
-	#--------------------------------------------------------------------------
-	def item
-		return @data[self.index]
-	end
-	#--------------------------------------------------------------------------
-	# ● 获取可用宝物最大槽位
-	#--------------------------------------------------------------------------
-	def max_weapon_index
-		return @actor.weapon_num-1
-	end
-	#--------------------------------------------------------------------------
-	# ● 获取可用宝物最大槽位
-	#--------------------------------------------------------------------------
-	def max_trea_index
-		return @data.size-1-(6-@actor.trea_num)
-	end
-	#--------------------------------------------------------------------------
 	# ● 刷新
 	#--------------------------------------------------------------------------
 	def refresh
 		self.contents.clear
 		@data = []
-		
 		for item in @actor.equips(false) do @data.push(item) end
-		
 		@item_max = @data.size
-		
 		# 画能够使用的武器槽位
-		for i in 0...@actor.weapon_num
+		for i in 0...@item_max
 			self.contents.font.color = system_color
-			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
-			draw_item_name(@data[i], 67, WLH*i+@edge*i)
-		end
-		# 画不能使用的武器槽位
-		for i in @actor.weapon_num...2
-			self.contents.font.color = getColor("gray")
-			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
-			draw_item_name(@data[i], 67, WLH*i+@edge*i)
-		end
-		# 只绘画能够使用的宝物数量(6-@actor.trea_num)
-		for i in 2...@data.size-(6-@actor.trea_num)
-			self.contents.font.color = system_color
-			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
-			draw_item_name(@data[i], 67, WLH*i+@edge*i)
-		end
-		for i in @data.size-(6-@actor.trea_num)...@data.size
-			self.contents.font.color = getColor("gray")
 			self.contents.draw_text(4, WLH*i+@edge*i, 72, WLH, NAMES[i])
 			draw_item_name(@data[i], 67, WLH*i+@edge*i)
 		end
 	end
-	
 	#--------------------------------------------------------------------------
 		# ● 描绘物品名
 		#
@@ -112,13 +80,14 @@ class Window_Equip_Select < Window_Selectable
 		end
 	end
 	#--------------------------------------------------------------------------
-		# ● 更新帮助文本
+	# ● 更新窗口
 	#--------------------------------------------------------------------------
-	def update_help
-		@help_window.set_text(item == nil ? "" : item.description)
+	def update
+		super
+		call_update_detail
 	end
 	#--------------------------------------------------------------------------
-		# ● 调用详细窗口刷新函数
+	# ● 调用详细窗口刷新函数
 	#--------------------------------------------------------------------------
 	def call_update_detail
 		if (self.active and self.visible) and @window_detail != nil
@@ -146,6 +115,6 @@ class Window_Equip_Select < Window_Selectable
 		@window_detail.set_text(text, 0, colors)
 		# 设置位置
 		@window_detail.x = self.x + self.width - 24
-		@window_detail.y = 4
+		@window_detail.y = self.y + 4
 	end   
 end

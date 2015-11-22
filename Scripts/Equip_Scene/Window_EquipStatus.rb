@@ -27,7 +27,7 @@ class Window_EquipStatus1 < Window_Base
   #  	flag   : 0 defualt all, 3 only refresh actor
   #--------------------------------------------------------------------------
   def setup(actor, flag = 0)
-    # 获得角色
+	  # 获得角色
     @actor = actor
 	if 0 != flag
 		return
@@ -120,7 +120,7 @@ class Window_EquipStatus2 < Window_Base
   #--------------------------------------------------------------------------
   # ● 初始化对象
   #--------------------------------------------------------------------------
-  def initialize(x,y,actor, w = 160+32, h = 200+32)
+  def initialize(x,y,actor, w = 160+32, h = 256+32)
     super(x, y, w, h)
     self.opacity = 0
     self.contents.font.size = 19
@@ -183,29 +183,32 @@ class Window_EquipStatus2 < Window_Base
   
 	@info_sprite.bitmap.clear
 	tmp_content = @info_sprite.bitmap
+	tmp_content.font.color = getColor("light gray")
+	@info_sprite.bitmap.draw_text(0, 0, 80, WLH, "生命恢复:")
+	@info_sprite.bitmap.draw_text(80, 0, tmp_content.width-80, WLH, @hpcover.ceil.to_s, 0)
 	tmp_content.font.color = getColor("heavy orange")
-	@info_sprite.bitmap.draw_text(0, 0, 80, WLH, "物理伤害:")
-	@info_sprite.bitmap.draw_text(80, 0, tmp_content.width-80, WLH, @destroy.ceil.to_s, 0)
-	@info_sprite.bitmap.draw_text(0, WLH, 80, WLH, "物伤威力:")
-	@info_sprite.bitmap.draw_text(80, WLH, tmp_content.width-80, WLH, Fround(@destroyrate,1).to_s+"%", 0)
+	@info_sprite.bitmap.draw_text(0, WLH, 80, WLH, "物理伤害:")
+	@info_sprite.bitmap.draw_text(80, WLH, tmp_content.width-80, WLH, @destroy.ceil.to_s, 0)
+	@info_sprite.bitmap.draw_text(0, WLH*2, 80, WLH, "物伤威力:")
+	@info_sprite.bitmap.draw_text(80, WLH*2, tmp_content.width-80, WLH, Fround(@destroyrate,1).to_s+"%", 0)
 	
 	tmp_content.font.color = getColor("light yellow")
-	@info_sprite.bitmap.draw_text(0, WLH*2, 80, WLH, "暴击技巧:")
-	@info_sprite.bitmap.draw_text(80, WLH*2, tmp_content.width-80, WLH, @bom.ceil.to_s, 0)
-	@info_sprite.bitmap.draw_text(0, WLH*3, 80, WLH, "暴击威力:")
-	@info_sprite.bitmap.draw_text(80, WLH*3, tmp_content.width-80, WLH, Fround(@bomatk,1).to_s+"%", 0)
+	@info_sprite.bitmap.draw_text(0, WLH*3, 80, WLH, "暴击技巧:")
+	@info_sprite.bitmap.draw_text(80, WLH*3, tmp_content.width-80, WLH, @bom.ceil.to_s, 0)
+	@info_sprite.bitmap.draw_text(0, WLH*4, 80, WLH, "暴击威力:")
+	@info_sprite.bitmap.draw_text(80, WLH*4, tmp_content.width-80, WLH, Fround(@bomatk,1).to_s+"%", 0)
 	
 	tmp_content.font.color = getColor("light purple")
-	@info_sprite.bitmap.draw_text(0, WLH*4, 80, WLH, "攻击速度:")
-	@info_sprite.bitmap.draw_text(80, WLH*4, tmp_content.width-80, WLH, @atkspeed.ceil.to_s, 0)
-	@info_sprite.bitmap.draw_text(0, WLH*5, 80, WLH, "攻击频率:")
-	@info_sprite.bitmap.draw_text(80, WLH*5, tmp_content.width-80, WLH, Fround(@atkrate,1).to_s+"%", 0)
+	@info_sprite.bitmap.draw_text(0, WLH*5, 80, WLH, "攻击速度:")
+	@info_sprite.bitmap.draw_text(80, WLH*5, tmp_content.width-80, WLH, @atkspeed.ceil.to_s, 0)
+	@info_sprite.bitmap.draw_text(0, WLH*6, 80, WLH, "攻击频率:")
+	@info_sprite.bitmap.draw_text(80, WLH*6, tmp_content.width-80, WLH, Fround(@atkrate,1).to_s+"%", 0)
 	
 	tmp_content.font.color = getColor("light blue")
-	@info_sprite.bitmap.draw_text(0, WLH*6, 80, WLH, "命中技巧:")
-	@info_sprite.bitmap.draw_text(80, WLH*6, tmp_content.width-80, WLH, @hit.ceil.to_s, 0)
-	@info_sprite.bitmap.draw_text(0, WLH*7, 80, WLH, "闪避技巧:")
-	@info_sprite.bitmap.draw_text(80, WLH*7, tmp_content.width-80, WLH, @eva.ceil.to_s, 0)
+	@info_sprite.bitmap.draw_text(0, WLH*7, 80, WLH, "命中技巧:")
+	@info_sprite.bitmap.draw_text(80, WLH*7, tmp_content.width-80, WLH, @hit.ceil.to_s, 0)
+	@info_sprite.bitmap.draw_text(0, WLH*8, 80, WLH, "闪避技巧:")
+	@info_sprite.bitmap.draw_text(80, WLH*8, tmp_content.width-80, WLH, @eva.ceil.to_s, 0)
   end
   #--------------------------------------------------------------------------
   # ● 是否需要更新其他数据
@@ -240,7 +243,7 @@ class Window_EquipStatus2 < Window_Base
 
     # 描绘HP槽-------------------------------------
     rate = @hp / @maxhp
-    gw = Integer(340 * rate)
+    gw = Integer(@gw_width * rate)
     if rate > 0.5
       gc1 = Color.new(Integer(255*(1-rate*2)),255,0)
     else
@@ -249,7 +252,7 @@ class Window_EquipStatus2 < Window_Base
     gc2 = Color.new(0,0,0)
     
     # 填满指定的颜色
-    self.contents.fill_rect(0, WLH - 8, 230, 6, gc2)
+    self.contents.fill_rect(0, WLH - 8, @gw_width, 6, gc2)
     self.contents.fill_rect(0, WLH - 8, gw, 6, gc1)
     
     # 绘制文字

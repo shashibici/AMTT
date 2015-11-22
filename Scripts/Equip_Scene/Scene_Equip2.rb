@@ -41,7 +41,7 @@ class Scene_Equip2 < Scene_Base
     # 头像
     @status_window1 = Window_EquipStatus1.new(0,0,@actor)
     # 生命槽
-    @status_window2 = Window_EquipStatus2.new(0,128-16,@actor)
+    @status_window2 = Window_EquipStatus2.new(0,128-24,@actor)
 
     # 生成物品窗口
     create_item_windows
@@ -193,8 +193,8 @@ class Scene_Equip2 < Scene_Base
       # 选择哪一类装备，哪一类物品窗口设为可见
       @item_windows[i].visible = (@equip_index == i)
       # 坐标
-      @item_windows[i].y = 350
-      @item_windows[i].height = 128
+      @item_windows[i].y = 374
+      @item_windows[i].height = 104
       # 只是可见，没有被激活
       @item_windows[i].active = false
       # 索引也没有
