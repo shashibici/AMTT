@@ -46,13 +46,14 @@ module RPG
 		# ● 被触发,必须在每个技能中都有实现
 		# 	
 		# 	brate	: 	暴击倍数， 0-没暴击
-		#	drate	:	计算护甲后伤害扩张倍数，最后作用于destroy
-		#	dmg 	: 	作用了减伤
+		#	pre_dmg	:	计算护甲之前。 攻击者产生的伤害
+		#	dmg 	: 	计算护甲之后。实际作用伤害
 		# 	pure	: 	纯粹伤害，如果有
-		#
+		#	hitflg	:	是否命中
+		# 	bomflg	:	是否暴击
 		#--------------------------------------------------------------------------
-		def triggered(brate = 0, drate = 0, dmg = 0, pure = 0)
-			return [brate, drate, dmg, pure]
+		def triggered(brate = 0, pre_dmg = 0, dmg = 0, pure = 0, hitflag = true, bomflag = false)
+			return [brate, pre_dmg, dmg, pure]
 		end
 	end
 	#==============================================================================
@@ -89,7 +90,10 @@ module RPG
 		#
 		#
 		#--------------------------------------------------------------------------
-		def triggered(brate = 0, drate = 0, dmg = 0, pure = 0)
+		def triggered(brate = 0, drate = 0, dmg = 0, pure = 0, hitflag = true, bomflag = false)
+			if hitflag == false
+				return [brate, drate, dmg, pure]
+			end
 			if $TIME_POST_PRE_DAMAGE != $NOW_TIME or !@target.has_skill?(self.id)
 				return [brate, drate, dmg, pure]
 			end

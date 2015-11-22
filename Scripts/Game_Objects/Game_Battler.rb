@@ -840,7 +840,7 @@ class Game_Battler
 	sk = RPG::Fantan.new()
     sk.id = 1
 	sk.setup(self, target)
-	ret = sk.triggered(brate, pre_dmg, dmg, 0)
+	ret = sk.triggered(brate, pre_dmg, dmg, 0, @hitflag, @bomflag)
     
     # 如果是怪物受伤
     if !target.hero?
@@ -1051,6 +1051,7 @@ class Game_Battler
   # 	target	:	目标
   #--------------------------------------------------------------------------
   def predamage(brate, dmg, target)
+	return 0 if @hitflag = false
 	# 进行攻击、防御的修正
     rate = self.atk / target.def
     final_dmg = dmg * rate
