@@ -34,7 +34,6 @@ class Game_Actor < Game_Battler
   def level_up
     @level += 1
     @point += LEVEL_UP_POINT + @level
-    
     # 显示动画
     $game_player.animation_id = 99
     
@@ -50,8 +49,8 @@ end
 #==============================================================================
 class Scene_Addpoint < Scene_Base
   include GAME_CONF
+  MIN_FLOAT	=	0.000001
   WLH = 18             # 帮助窗口每行的高度
-
   #--------------------------------------------------------------------------
   # ● 初始化对像
   #     actor_index : 角色索引
@@ -363,17 +362,14 @@ class Scene_Addpoint < Scene_Base
     
     # 画出增值的部分
     for i in 0...@totally_ascend.size do
-      
       if Fround(@clone_attr[i],2) > Fround(@current_attr[i],2) 
         # 浅绿色
         color = getColor("green")
-        @lvup_window1.draw_a_line(color, 205, 24*i, 100, 24, Fround(@clone_attr[i],2), 2)
-        
+        @lvup_window1.draw_a_line(color, 205, 24*i, 100, 24, Fround(@clone_attr[i],2), 2) 
       elsif Fround(@clone_attr[i],2) < Fround(@current_attr[i],2) 
-        # 深绿色
+        # 红色
         color = getColor("red")
         @lvup_window1.draw_a_line(color, 205, 24*i, 100, 24, Fround(@clone_attr[i],2), 2)
-        
       else
         # 不作绘画
       end
@@ -448,11 +444,10 @@ class Scene_Addpoint < Scene_Base
       # 归还没有确定的点数
       for i in 0...@totally_ascend.size do
         # 英雄获得点数
-        @hero.point += Integer(@totally_ascend[i] / @each_ascend[i])
+		@hero.point += Integer((@totally_ascend[i]+MIN_FLOAT) / @each_ascend[i])
         # 英雄增加的值清零
         @totally_ascend[i] = 0
       end      
-      
       # 播放音效
       Sound.play_cancel
       $scene = Scene_Menu2.new(3)
@@ -461,14 +456,12 @@ class Scene_Addpoint < Scene_Base
     elsif Input.trigger?(Input::C)
       # 确定加点或者重置
       @menu_index = @command_window.index
-      
       # 如果是重置
       if @menu_index == 14
-        
         # 对所有属性都执行
         for i in 0...@totally_ascend.size do
           # 英雄获得点数
-          @hero.point += Integer(@totally_ascend[i] / @each_ascend[i])
+          @hero.point += Integer((@totally_ascend[i]+MIN_FLOAT) / @each_ascend[i])
           # 英雄增加的值清零
           @totally_ascend[i] = 0
         end
@@ -550,7 +543,7 @@ class Scene_Addpoint < Scene_Base
       return if @menu_index >= 14
       
       # 如果该属性被添加过至少一次
-      if @totally_ascend[@menu_index] >= @each_ascend[@menu_index]-0.0001
+      if @totally_ascend[@menu_index] >= @each_ascend[@menu_index]-MIN_FLOAT
         # 减少
         @totally_ascend[@menu_index] -= @each_ascend[@menu_index]
         # 获得一点技能点
@@ -606,12 +599,10 @@ class Scene_Addpoint < Scene_Base
   #--------------------------------------------------------------------------
   def terminate
     super
-
     @lvup_window1.dispose
     @command_window.dispose
     @point_window.dispose
     @abstract_window.dispose
-
   end
   
 end
