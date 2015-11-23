@@ -835,12 +835,13 @@ class Game_Battler
     pre_dmg =  doattack(target)
     dmg = predamage(brate, pre_dmg, target)
 	$NOW_TIME = $TIME_POST_PRE_DAMAGE
-	
+	p @hitflag
 	# 实现 “反弹” 技能
 	sk = RPG::Fantan.new()
     sk.id = 1
 	sk.setup(self, target)
 	ret = sk.triggered(brate, pre_dmg, dmg, 0, @hitflag, @bomflag)
+	
     
     # 如果是怪物受伤
     if !target.hero?
@@ -1022,7 +1023,6 @@ class Game_Battler
     hit_final = [[hit_hit_eva + hit_cel_cel + hit_def_def, 0.4].max, 2].min
 	# 最后计算命中概率
 	@hitflag = (hit_final * 100 >= rand(101));
-
     # 暴击伤害倍数返回0 
     return 0
     
@@ -1051,7 +1051,7 @@ class Game_Battler
   # 	target	:	目标
   #--------------------------------------------------------------------------
   def predamage(brate, dmg, target)
-	return 0 if @hitflag = false
+	return 0 if false == @hitflag
 	# 进行攻击、防御的修正
     rate = self.atk / target.def
     final_dmg = dmg * rate
