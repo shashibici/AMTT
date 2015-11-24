@@ -835,7 +835,6 @@ class Game_Battler
     pre_dmg =  doattack(target)
     dmg = predamage(brate, pre_dmg, target)
 	$NOW_TIME = $TIME_POST_PRE_DAMAGE
-	p @hitflag
 	# 实现 “反弹” 技能
 	sk = RPG::Fantan.new()
     sk.id = 1
