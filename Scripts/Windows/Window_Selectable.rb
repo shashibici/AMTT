@@ -22,6 +22,7 @@ class Window_Selectable < Window_Base
 			self.contents.font.color.alpha = enabled ? 255 : 128
 			self.contents.draw_text(x + 24, y, 157+16, WLH, item.name)
 			self.contents.font.color = old_color
+			self.contents.font.color.alpha = enabled ? 255 : 128
 		end
 	end
 end	

@@ -483,7 +483,7 @@ class Game_Battler
       temp /= (Graphics.frame_rate+0.0)
       # 非战斗状态，回血快
       if $game_switches[103] == false
-        @hp = [@hp + temp * self.maxhp * 0.03, self.maxhp].min
+        @hp = [@hp + temp * self.maxhp * 0.1, self.maxhp].min
       # 战斗状态，回血慢
       else
         @hp = [@hp + temp * self.final_hpcover, self.maxhp].min
