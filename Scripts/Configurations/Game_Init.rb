@@ -158,7 +158,7 @@ module GAME_INIT
 	end
     hprate_val = item.read_suit_attr('hprate')
 	if nil != hprate_val
-		values.push("生命恢复   +  "+hprate_val.to_s+"%") 
+		values.push("每秒恢复   +  "+hprate_val.to_s+"%") 
 		colors.push("light gray")
 	end
     

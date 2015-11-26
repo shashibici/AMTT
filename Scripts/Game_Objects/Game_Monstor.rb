@@ -147,9 +147,12 @@ class Game_Monstor < Game_Actor
     @money = get_money
     @monstor_exp = @money * 5
     # 金钱扩展
-    @money *= @level ** 1.22
+    # @money *= @level ** 1.21
+    # @money /= 12.0
+    # @money = (@money+ 6*(@level**2.2)).round
+	@money *= @level ** 1.03
     @money /= 12.0
-    @money = (@money+ 6*(@level**2.2)).round
+    @money = (@money+ 13*(@level**1.3)).round
     
     
     # 设置扩张金钱、经验
@@ -642,7 +645,7 @@ class Game_Monstor < Game_Actor
       if i == 2
         delta = 10
       else
-        delta = (i-1)*80-80
+        delta = (i-1)*80-85
       end
       n += delta
     end
