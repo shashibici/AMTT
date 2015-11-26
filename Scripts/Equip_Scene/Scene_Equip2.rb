@@ -150,6 +150,10 @@ class Scene_Equip2 < Scene_Base
       @equip_index = 7
     when 11
       @equip_index = 7
+	when 12
+	  @equip_index = 7
+	when 13
+	  @equip_index = 7
     end
   end   
   #--------------------------------------------------------------------------
