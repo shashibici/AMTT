@@ -248,8 +248,7 @@ class Game_Monstor < Game_Actor
   #--------------------------------------------------------------------------
   def makeattrbutes
     x = @level
-
-
+	
     @evarate               = @level**([1.2, ((x-1)*0.01)+1.0].min) * 1.85
     @bom                   = 0
     @bomrate               = 0
@@ -309,8 +308,8 @@ class Game_Monstor < Game_Actor
     #-----------------------
     # 设置恢复
     #------------------------
-    @hpcover = 1.8 * x**([1.2, ((x-1)*0.01)+1.0].min)
-    @mpcover = 1.8 * x**([1.2, ((x-1)*0.01)+1.0].min)
+    @hpcover = 7.2 * x**([1.2, ((x-1)*0.01)+1.0].min)
+    @mpcover = 7.2 * x**([1.2, ((x-1)*0.01)+1.0].min)
     
     #-----------------------
     # 设置物理伤害 魔法伤害
@@ -351,9 +350,9 @@ class Game_Monstor < Game_Actor
     
     case @type
     when 1   # 力量
-      @destroyrate           = 100 + @level * 2.85
+      @destroyrate           = 100 + @level * 2.95
       @mdestroyrate          = 100 + @level * 1.25
-      @atkrate               = 100 + @level * 1.45
+      @atkrate               = 100 + @level * 1.35
     when 2   # 敏捷
       @destroyrate           = 100 + @level * 1.35
       @mdestroyrate          = 100 + @level * 1.25
@@ -363,8 +362,6 @@ class Game_Monstor < Game_Actor
       @mdestroyrate          = 100 + @level * 2.75
       @atkrate               = 100 + @level * 1.45
     end    
-    
-    
   end  
   
   #--------------------------------------------------------------------------
@@ -377,7 +374,6 @@ class Game_Monstor < Game_Actor
     @monstor_exp           *=  $game_variables[92] / 1000.0
     @money                 =   Integer(@money)
     @monstor_exp           =   Integer(@monstor_exp)
-    
     
     @hmaxhp                *= $game_variables[92] / 1000.0
     @hmaxmp                *= $game_variables[92] / 1000.0
@@ -397,18 +393,15 @@ class Game_Monstor < Game_Actor
     
     # 暴击技巧不受影响
 #~     @bom                   *= $game_variables[92] / 1000.0
-    
     # 暴击倍率不受影响
 #~     @bomatk                *= $game_variables[92] / 1000.0
+
     @hit                   *= $game_variables[92] / 1000.0
-    
     @hpcover               *= $game_variables[92] / 1000.0
     @hprate                *= $game_variables[92] / 1000.0
     @mpcover               *= $game_variables[92] / 1000.0
     @mprate                *= $game_variables[92] / 1000.0
-    
   end
-  
   #--------------------------------------------------------------------------
   # ● 剩余变量初始化
   #
@@ -562,11 +555,8 @@ class Game_Monstor < Game_Actor
     
     # 换了装备之后更新恢复率
     recover_change
-    
-    
-    
+
   end  
-   
 
 #===========================================================================
 # ▼▼▼▼▼▼▼▼▼▼▼属性计算▼▼▼▼▼▼▼▼▼▼▼
@@ -649,9 +639,7 @@ class Game_Monstor < Game_Actor
       end
       n += delta
     end
-    
     return n
-    
   end   
 #============================================================================
 #▼▼▼▼▼▼▼以下为Monstor独有，Hero没有▼▼▼▼▼▼▼▼▼▼▼▼▼▼
@@ -694,7 +682,6 @@ class Game_Monstor < Game_Actor
       return      
     end
     
-    
      # 否则执行真正的胜利
     
      # 初始化系统变量
@@ -735,48 +722,48 @@ class Game_Monstor < Game_Actor
      
      # 队伍获得经验、金钱、掉落物品
      
-     # 获得物品
-     for i in 59..68 do
-        # 如果掉落类型为空，则跳过
-        next if (k = $game_variables[i]) == 0
+     # 获得物品 --  如果设置了宝物掉落开关，则以那个开关为准
+	 # 宝物掉落开关默认为关,如果开关打开，则会掉落宝物。
+	 if $game_variables[58] != 0
+		for i in 59..68 do
+			# 如果掉落类型为空，则跳过
+			next if (k = $game_variables[i]) == 0
         
-        # 否则掉落类型不为空
-        case k
-        # 物品
-        when 1
-          # 如果id不为0
-          if (j = $game_variables[i+10]) != 0
-            # 如果掉宝
-            if rand($game_variables[i+20]) == 0 
-              $game_party.gain_item($data_items[j], 1)
-              $game_vict_equips.push($data_items[j].name)
-            end
-          end
-          
-        # 武器
-        when 2
-          # 如果id不为0
-          if (j = $game_variables[i+10]) != 0
-            # 如果掉宝
-            if rand($game_variables[i+20]) == 0 
-              $game_party.gain_item($data_weapons[j], 1)
-              $game_vict_equips.push($data_weapons[j].name)
-            end
-          end          
-          
-        # 防具
-        when 3
-          # 如果id不为0
-          if (j = $game_variables[i+10]) != 0
-            # 如果掉宝
-            if rand($game_variables[i+20]) == 0 
-              $game_party.gain_item($data_armors[j], 1)
-              $game_vict_equips.push($data_armors[j].name)
-            end
-          end          
-        end
+			# 否则掉落类型不为空
+			case k
+			# 物品
+			when 1
+				# 如果id不为0
+				if (j = $game_variables[i+10]) != 0
+					# 如果掉宝
+					if rand($game_variables[i+20]) == 0 
+						$game_party.gain_item($data_items[j], 1)
+						$game_vict_equips.push($data_items[j].name)
+					end
+				end
+			# 武器
+			when 2
+				# 如果id不为0
+				if (j = $game_variables[i+10]) != 0
+					# 如果掉宝
+					if rand($game_variables[i+20]) == 0 
+						$game_party.gain_item($data_weapons[j], 1)
+						$game_vict_equips.push($data_weapons[j].name)
+					end
+				end          
+			# 防具
+			when 3
+				# 如果id不为0
+				if (j = $game_variables[i+10]) != 0
+					# 如果掉宝
+					if rand($game_variables[i+20]) == 0 
+						$game_party.gain_item($data_armors[j], 1)
+						$game_vict_equips.push($data_armors[j].name)
+					end
+				end          
+			end
+		end
      end
-     
      # 获得金钱
      $game_party.gain_gold(self.money) 
      $game_variables[90] = self.money
@@ -794,9 +781,5 @@ class Game_Monstor < Game_Actor
   #     
   #
   #--------------------------------------------------------------------------
-  
-  
-  
-
   
 end
