@@ -121,14 +121,14 @@ module GAME_CONF
   #        if a >= b ……
   #---------------------------------------------------------------------------
   # 基础物理破坏值
-  CONST_BASE_DESTROY         = 20
+  CONST_BASE_DESTROY         = 0#20
   # 基础魔法破坏值
   CONST_BASE_MDESTROY        = 10
   
   # 基础攻击速度
   # 初始攻速 = 每秒 CONST_BASE_ATKSPEED * 60/CONST_MAX_ATKSPEED 次攻击
   # --- 已经重新定义 ---
-  CONST_BASE_ATKSPEED        = 10    # 1次
+  CONST_BASE_ATKSPEED        = 0#10    # 1次
   
   # 系统攻速基数
   # 就是每一点攻速每秒增加 60/CONST_MAX_ATKSPEED  次攻击
