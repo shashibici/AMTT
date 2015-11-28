@@ -17,8 +17,112 @@ class Game_Actor < Game_Battler
 	attr_accessor   :name
 	attr_accessor   :is_equip_changed   # 装备， 0-没有变过，1-变过
 	attr_accessor   :myequips           # 保存当前装备的实体
+	# 实际上 @myequip_kits = @myequips + self.kits
 	attr_accessor   :myequip_kits       # 保存包含套装的实体（包括虚拟套装）
 	attr_accessor	:my_skills
+	attr_accessor   :weapon1_id 
+	attr_accessor   :weapon2_id  
+	attr_accessor   :armor1_id   
+	attr_accessor   :armor2_id   
+	attr_accessor   :armor3_id   
+	attr_accessor   :armor4_id   
+	attr_accessor   :armor5_id  
+	attr_accessor   :armor6_id  
+	attr_accessor   :armor7_id   
+	attr_accessor   :armor8_id  
+	attr_accessor   :armor9_id  
+	attr_accessor   :armor10_id  
+	attr_accessor   :armor11_id  
+	attr_accessor   :armor12_id 
+	
+	#---------------------------------------------------
+	# 	能力属性值相关 - 装备相关
+	#----------------------------------------------------
+	attr_accessor   :real_hpcover   # 记录英雄每秒回血
+	attr_accessor   :real_mpcover   # 记录英雄每秒回魔
+	attr_accessor   :type           # 记录英雄的主属性：1力量2敏捷3智力
+	attr_accessor   :level
+	
+	#=======以下是描述英雄能力的各个属性====================
+  
+	attr_accessor   :hmaxhp       # 生命
+	attr_accessor   :hmaxmp       # 魔法
+	attr_accessor   :hatk         # 攻击
+	attr_accessor   :hdef         # 护甲
+  
+	attr_accessor   :strength     # 力量
+	attr_accessor   :celerity     # 敏捷
+	attr_accessor   :wisdom       # 智力
+  
+	attr_accessor   :destroy      # 物理破坏力因子
+	attr_accessor   :destroyrate  # 物理破坏额外倍数（%）
+  
+	attr_accessor   :mdestroy     # 魔法破坏力因子
+	attr_accessor   :mdestroyrate # 魔法破坏额外倍数（%）
+  
+	attr_accessor   :atkspeed     # 攻速因子
+	attr_accessor   :atkrate      # 攻速率
+  
+	attr_accessor   :eva          # 闪避因子
+	attr_accessor   :evarate      # 闪避率
+  
+	attr_accessor   :bom          # 暴击因子
+	attr_accessor   :bomrate      # 暴击率
+	attr_accessor   :bomatk       # 暴击扩张倍数（%）
+  
+	attr_accessor   :hit          # 命中因子
+	attr_accessor   :hitrate      # 命中率
+  
+	attr_accessor   :hpcover      # 生命恢复因子
+	attr_accessor   :hprate       # 生命恢复率
+	attr_accessor   :mpcover      # 魔法恢复因子
+	attr_accessor   :mprate       # 魔法恢复率
+  
+	#=======下为武器装备产生的额外增加（英雄的成长值）=========
+  
+	attr_accessor   :xhmaxhp       # 生命
+	attr_accessor   :xhmaxmp       # 魔法
+	attr_accessor   :xhatk         # 攻击
+	attr_accessor   :xhdef         # 护甲
+  
+	attr_accessor   :xstrength     # 力量
+	attr_accessor   :xcelerity     # 敏捷
+	attr_accessor   :xwisdom       # 智力
+  
+	attr_accessor   :xdestroy      # 物理破坏力因子
+	attr_accessor   :xdestroyrate  # 物理破坏额外倍数（%）
+	
+	attr_accessor   :xmdestroy     # 魔法破坏力因子
+	attr_accessor   :xmdestroyrate # 魔法破坏额外倍数（%）
+  
+	attr_accessor   :xatkspeed     # 攻速因子
+	attr_accessor   :xatkrate      # 攻速率
+  
+	attr_accessor   :xeva          # 闪避因子
+	attr_accessor   :xevarate      # 闪避率
+  
+	attr_accessor   :xbom          # 暴击因子
+	attr_accessor   :xbomrate      # 暴击率
+	attr_accessor   :xbomatk       # 暴击扩张倍数（%）
+  
+	attr_accessor   :xhit          # 命中因子
+	attr_accessor   :xhitrate      # 命中率
+  
+	attr_accessor   :xhpcover      # 生命恢复因子
+	attr_accessor   :xhprate       # 生命恢复率
+	attr_accessor   :xmpcover      # 魔法恢复因子
+	attr_accessor   :xmprate       # 魔法恢复率
+	
+	# 按百分比加成的装备
+	attr_accessor   :xmaxhprate				
+	attr_accessor   :xmaxmprate				
+	attr_accessor   :xmaxatkrate			
+	attr_accessor   :xmaxdefrate			
+	attr_accessor   :xmaxstrengthrate		
+	attr_accessor   :xmaxcelerityrate		
+	attr_accessor   :xmaxwisdomrate
+	
+	
 	#--------------------------------------------------------------------------
 	# ● 是否有这个技能
 	#--------------------------------------------------------------------------
@@ -51,17 +155,22 @@ class Game_Actor < Game_Battler
 		@activeskills.push($data_skills[1])
 	end  
 	#--------------------------------------------------------------------------
-		# ● 设置套装装备记录表
-		# 
-		#      调用此函数修改当前套装的收集情况
-		#      此函数调用结束后，应该调用set_kits函数判断收集情况
-		#      每当有装备变动时都应该调用此函数
+	# ● 设置套装装备记录表
+	# 
+	#      调用此函数修改当前套装的收集情况
+	#      此函数调用结束后，应该调用set_kits函数判断收集情况
+	#      每当有装备变动时都应该调用此函数
+	#
+	#  		配合 set_kits 使用，套装部件不能有两个相同的
+	# 		例如，不能有两个 A 装备，组成为一个 B 装备。 
+	#		必须由 A 装备和 B 装备 组合成 C 装备
+	#
 	#--------------------------------------------------------------------------
 	def set_suits
 		
 		# 首先清空原来的残留物
 		@suits = {}
-		# 此时不考虑套装
+		# 此时不考虑套装,把所有实体装备拿出来
 		for equip in (weapons + armors) do 
 			next if equip == nil
 			# 如果不是套装组件则跳过
@@ -90,7 +199,7 @@ class Game_Actor < Game_Battler
 					# 再修改
 					componets = @suits[id]         # 获得当前组成
 					componets.delete(equip_id)     # 删除当前装备的序号
-					@suits[id] = componets         # 将修改后的列表写回          
+					@suits[id] = componets         # 将修改后的列表写回
 				end
 				# 对该装备能够组成的一件套装处理完毕    
 			end
@@ -119,15 +228,15 @@ class Game_Actor < Game_Battler
 			|key, value|
 			if value == []
 				# 说明该套装已经符合
-				# 那么应该载入该装备的实体，放到kit_ids中
+				# 那么应该载入该装备的id，放到kit_ids中
 				@kit_ids.push(key)
 			end
 		}
 	end
 	#--------------------------------------------------------------------------
-		# ● 获取虚拟套装（将所有部件装在身上就能获得一个相应的‘虚拟套装'效果）
-		#
-		#    
+	# ● 获取虚拟套装（将所有部件装在身上就能获得一个相应的‘虚拟套装'效果）
+	#
+	#    
 	#--------------------------------------------------------------------------
 	def kits
 		result = []
@@ -192,7 +301,7 @@ class Game_Actor < Game_Battler
 	#--------------------------------------------------------------------------
 	def getAllComponents(equip)
 		# 如果是空，直接返回空
-		return nil if equip == nil
+		return [] if equip == nil
 		
 		# 否则查看套装表
 		queue = []
@@ -233,17 +342,25 @@ class Game_Actor < Game_Battler
 		end
 		# 最后返回一个装备对象列表
 		return result
-	end
+		end
 	#--------------------------------------------------------------------------
 	# ● 获取装备对象列表
 	#
 	#    参数  flag  ： 是否考虑套装，在还没初始化套装时，不考虑套装
 	#                   其他情况下，考虑套装
 	#
+	#			flag  = flase, 不考虑所有虚拟装备（套装的子装备或者装备合成的虚拟套装）
+	#			flag  = true, 考虑所有虚拟装备（套装的子装备，装备集齐后的虚拟套装）
+	#
+	# 	@myequips 		:	用来存放实体部件
+	#	@myequip_kits 	：	存放实体部件+所有虚拟部件
+	#
 	#    重定义
 	#  
 	#--------------------------------------------------------------------------
 	def equips(flag = true)
+		# 如果并不是因为刚刚换过装备，那么不需要重新计算
+		# 直接用原来的值就行了。
 		if 0 == @is_equip_changed
 			if flag == true
 				return @myequip_kits
@@ -251,21 +368,24 @@ class Game_Actor < Game_Battler
 				return @myequips
 			end
 		end
-		# 否则换过装备，需要重新计算
-		res = weapons + armors
-		@myequips = res.clone
-		# 为真，考虑套装效果
-		if flag == true
-			# 加上虚拟套装的效果（此套装的所有组件都穿在身上）
-			res += kits
-			for e in res.clone
-				next if nil == e
-				res += getAllComponents(e)
-			end
-		end
-		@myequip_kits = res.clone
 		@is_equip_changed = 0
-		return res
+		# 否则刚刚换过装备，需要重新计算
+		res = weapons + armors
+		# 清空原有缓存
+		@myequips = res
+		# 更新虚拟套装的缓存(集齐散装后获得的虚拟部件)
+		@myequip_kits = @myequips + kits
+		# 更新虚拟套装的缓存(通过实体部件获得虚拟散装部件)
+		for e in @myequips
+			next if nil == e
+			@myequip_kits += getAllComponents(e)
+		end
+		# 如果需要考虑虚拟套装
+		if flag == true
+			return @myequip_kits
+		else
+			return @myequips
+		end
 	end
 	
 end

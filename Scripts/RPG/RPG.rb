@@ -138,19 +138,19 @@ module RPG
 			
 		end
 		#-----------------------------------------------------------------------
-			# ● 获得一个装备的所有属性值
-			#
-			#
-			#     [maxhp, maxhpr, maxmp, maxmpr, atk, atkr, def, defr,
-			#      strength, strengthr, celerity, celerityr, wisdom, wsidomr,
-			#      destroy, destroyr(%), mdestroy, mdestroyr(%), atkspeed, 
-			#      atkspeedr(%),
-			#      eva, evar(%), bom, bomrate(%), bomatk, hit, hitrate(%), 
-			#      hpcover, hprate(%),
-			#      mpcover, mprate(%)]
-			#
-			#     input: 是否需要清空 @attrs
-			#
+		# ● 获得一个装备的所有属性值
+		#
+		#
+		#     [maxhp, maxhpr, maxmp, maxmpr, atk, atkr, def, defr,
+		#      strength, strengthr, celerity, celerityr, wisdom, wsidomr,
+		#      destroy, destroyr(%), mdestroy, mdestroyr(%), atkspeed, 
+		#      atkspeedr(%),
+		#      eva, evar(%), bom, bomrate(%), bomatk, hit, hitrate(%), 
+		#      hpcover, hprate(%),
+		#      mpcover, mprate(%)]
+		#
+		#     input: 是否需要清空 @attrs
+		#
 		#-----------------------------------------------------------------------
 		def read_suit_all(needclear = false)
 			if true == needclear

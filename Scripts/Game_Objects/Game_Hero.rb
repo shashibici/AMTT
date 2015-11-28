@@ -74,97 +74,14 @@ class Game_Hero < Game_Actor
   # ● 定义实例变量
   #    这些变量，应该在初始化的时候设置，因为英雄并不是很多，通常就一两个
   #--------------------------------------------------------------------------
-  attr_accessor   :real_hpcover   # 记录英雄每秒回血
-  attr_accessor   :real_mpcover   # 记录英雄每秒回魔
-  attr_accessor   :type           # 记录英雄的主属性：1力量2敏捷3智力
+  
   attr_accessor   :point          # 记录英雄可用的加点数
-  attr_accessor   :level
+  
   attr_accessor   :trea_num       # 英雄可以使用几个宝物格子,在换装备时限制
   attr_accessor   :weapon_num     # 英雄可以使用几个武器，在换装备时限制
-  attr_accessor   :weapon1_id 
-  attr_accessor   :weapon2_id  
-  attr_accessor   :armor1_id   
-  attr_accessor   :armor2_id   
-  attr_accessor   :armor3_id   
-  attr_accessor   :armor4_id   
-  attr_accessor   :armor5_id  
-  attr_accessor   :armor6_id  
-  attr_accessor   :armor7_id   
-  attr_accessor   :armor8_id  
-  attr_accessor   :armor9_id  
-  attr_accessor   :armor10_id  
-  attr_accessor   :armor11_id  
-  attr_accessor   :armor12_id 
   
-  #=======以下是描述英雄能力的各个属性====================
   
-  attr_accessor   :hmaxhp       # 生命
-  attr_accessor   :hmaxmp       # 魔法
-  attr_accessor   :hatk         # 攻击
-  attr_accessor   :hdef         # 护甲
-  
-  attr_accessor   :strength     # 力量
-  attr_accessor   :celerity     # 敏捷
-  attr_accessor   :wisdom       # 智力
-  
-  attr_accessor   :destroy      # 物理破坏力因子
-  attr_accessor   :destroyrate  # 物理破坏额外倍数（%）
-  
-  attr_accessor   :mdestroy     # 魔法破坏力因子
-  attr_accessor   :mdestroyrate # 魔法破坏额外倍数（%）
-  
-  attr_accessor   :atkspeed     # 攻速因子
-  attr_accessor   :atkrate      # 攻速率
-  
-  attr_accessor   :eva          # 闪避因子
-  attr_accessor   :evarate      # 闪避率
-  
-  attr_accessor   :bom          # 暴击因子
-  attr_accessor   :bomrate      # 暴击率
-  attr_accessor   :bomatk       # 暴击扩张倍数（%）
-  
-  attr_accessor   :hit          # 命中因子
-  attr_accessor   :hitrate      # 命中率
-  
-  attr_accessor   :hpcover      # 生命恢复因子
-  attr_accessor   :hprate       # 生命恢复率
-  attr_accessor   :mpcover      # 魔法恢复因子
-  attr_accessor   :mprate       # 魔法恢复率
-  
-  #=======下为武器装备产生的额外增加（英雄的成长值）=========
-  
-  attr_accessor   :xhmaxhp       # 生命
-  attr_accessor   :xhmaxmp       # 魔法
-  attr_accessor   :xhatk         # 攻击
-  attr_accessor   :xhdef         # 护甲
-  
-  attr_accessor   :xstrength     # 力量
-  attr_accessor   :xcelerity     # 敏捷
-  attr_accessor   :xwisdom       # 智力
-  
-  attr_accessor   :xdestroy      # 物理破坏力因子
-  attr_accessor   :xdestroyrate  # 物理破坏额外倍数（%）
-  
-  attr_accessor   :xmdestroy     # 魔法破坏力因子
-  attr_accessor   :xmdestroyrate # 魔法破坏额外倍数（%）
-  
-  attr_accessor   :xatkspeed     # 攻速因子
-  attr_accessor   :xatkrate      # 攻速率
-  
-  attr_accessor   :xeva          # 闪避因子
-  attr_accessor   :xevarate      # 闪避率
-  
-  attr_accessor   :xbom          # 暴击因子
-  attr_accessor   :xbomrate      # 暴击率
-  attr_accessor   :xbomatk       # 暴击扩张倍数（%）
-  
-  attr_accessor   :xhit          # 命中因子
-  attr_accessor   :xhitrate      # 命中率
-  
-  attr_accessor   :xhpcover      # 生命恢复因子
-  attr_accessor   :xhprate       # 生命恢复率
-  attr_accessor   :xmpcover      # 魔法恢复因子
-  attr_accessor   :xmprate       # 魔法恢复率
+
   
   #--------------------------------------------------------------------------
   # ● 初始化对象               重写
@@ -282,6 +199,14 @@ class Game_Hero < Game_Actor
     @xhprate                = 0
     @xmpcover               = 0
     @xmprate                = 0
+	@xmaxhprate				= 0
+	@xmaxmprate				= 0
+	@xmaxatkrate			= 0
+	@xmaxdefrate			= 0
+	@xmaxstrengthrate		= 0
+	@xmaxcelerityrate		= 0
+	@xmaxwisdomrate			= 0
+	
     
     # 填充装备
     @weapon_num  = 1      # 刚开始只能使用一把武器
@@ -338,6 +263,9 @@ class Game_Hero < Game_Actor
   #
   #    这里主要就是对装备产生的影响做了修改，每次更换装备都要调用此函数
   #
+  #		flag 	: true - 有装备变更，找出变更装备并且修改属性，可以加速
+  #				: false - 没有装备变更，仅仅是刷行属性，或者是其他原因
+  #
   #---------------------------------------------------------------------------
   #    注意：
   #
@@ -364,7 +292,7 @@ class Game_Hero < Game_Actor
     
     
     # 0
-    p0 = @xhmaxhp                
+    p0 = @xhmaxhp
     p1 = @xhmaxmp                
     p2 = @xhatk                  
     p3 = @xhdef                  
@@ -397,15 +325,25 @@ class Game_Hero < Game_Actor
     p20 = @xhpcover               
     p21 = @xhprate                
     p22 = @xmpcover              
-    p23 = @xmprate                
+    p23 = @xmprate  
+	
+	# 按比例增加的变量
+	p24 = @xmaxhprate
+	p25 = @xmaxmprate
+	p26 = @xmaxatkrate
+	p27 = @xmaxdefrate
+	p28 = @xmaxstrengthrate
+	p29 = @xmaxcelerityrate
+	p30 = @xmaxwisdomrate
     
-
+	
     if true == flag
-      # 设置装备变更指示器
+	  # 设置装备变更指示器
       @is_equip_changed = 1
-      # 获得装备的变化（失去什么装备，增加什么装备）
+	  # 获得更换装备之前的就装备（包括虚拟装备）
       old_equips = @myequip_kits.clone
-      new_equips = self.equips(false).clone
+	  # 考虑虚拟套装，因为失去虚拟套装也是需要改变属性的
+      new_equips = self.equips(true).clone
       # 删除nil
       old_equips.delete(nil)
       new_equips.delete(nil)
@@ -449,19 +387,12 @@ class Game_Hero < Game_Actor
         next if e == nil
         val = e.attrs
         p0 += val[0]
-        p0 += val[1] * self_maxhp / 100.0
         p1 += val[2]
-        p1 += val[3]* self_maxmp / 100.0
         p2 += val[4]
-        p2 += val[5] * self_atk / 100.0
         p3 += val[6]
-        p3 += val[7] * self_def / 100.0 
-        p4 += val[8]
-        p4 += val[9] * self_strength / 100.0 
-        p5 += val[10]
-        p5 += val[11] * self_celerity / 100.0 
+        p4 += val[8] 
+        p5 += val[10] 
         p6 += val[12]
-        p6 += val[13] * self_wisdom / 100.0 
         p7 += val[14]
         p8 += val[15]
         p9 += val[16]
@@ -479,25 +410,32 @@ class Game_Hero < Game_Actor
         p21 += val[28]
         p22 += val[29]
         p23 += val[30]
+		# 按比例增长maxhp
+        p24 += val[1]
+		p25 += val[3]
+		# 不推荐出按比例增长攻击的装备，影响平衡性
+        p26 += val[5]
+		# 不推荐出按比例增长防御的装备，影响平衡性
+        p27 += val[7]
+		# 不推荐出按比例增长力量的装备，影响平衡性
+        p28 += val[9]
+		# 不推荐出按比例增长力量的装备，影响平衡性
+        p29 += val[11]
+		# 不推荐出按比例增长智力的装备，影响平衡性
+        p30 += val[13]
       end
       # 属性减少
       for e in lose_equips
         next if e == nil
         val = e.attrs
+		# 一般而言val[0]、val[1]至少有一个为0
         p0 -= val[0]
-        p0 -= val[1] * self_maxhp / 100.0
         p1 -= val[2]
-        p1 -= val[3]* self_maxmp / 100.0
         p2 -= val[4]
-        p2 -= val[5] * self_atk / 100.0
         p3 -= val[6]
-        p3 -= val[7] * self_def / 100.0 
         p4 -= val[8]
-        p4 -= val[9] * self_strength / 100.0 
         p5 -= val[10]
-        p5 -= val[11] * self_celerity / 100.0 
         p6 -= val[12]
-        p6 -= val[13] * self_wisdom / 100.0 
         p7 -= val[14]
         p8 -= val[15]
         p9 -= val[16]
@@ -515,18 +453,32 @@ class Game_Hero < Game_Actor
         p21 -= val[28]
         p22 -= val[29]
         p23 -= val[30]
+		# 按比例增长maxhp
+        p24 -= val[1]
+		p25 -= val[3]
+		# 不推荐出按比例增长攻击的装备，影响平衡性
+        p26 -= val[5]
+		# 不推荐出按比例增长防御的装备，影响平衡性
+        p27 -= val[7]
+		# 不推荐出按比例增长力量的装备，影响平衡性
+        p28 -= val[9]
+		# 不推荐出按比例增长力量的装备，影响平衡性
+        p29 -= val[11]
+		# 不推荐出按比例增长智力的装备，影响平衡性
+        p30 -= val[13]
       end
       
     # 并没有真正换装备，只需要重新计算装备的影响效果.
     # 目前只对maxhp有影响,如果对其他有影响，用到的时候再添加
     else
-      # 重新计算p0 其它值不变
+      # 重新计算p0、p24 其它值不变
       p0 = 0
+	  p24 = 0
       for e in equips
         next if e == nil
         val = e.attrs
         p0 += val[0]
-        p0 += val[1] * self_maxhp / 100.0
+        p24 += val[1]
       end
     end
     
@@ -566,6 +518,14 @@ class Game_Hero < Game_Actor
     @xmpcover               = p22
     @xmprate                = p23
     
+	# 按比例增长的部分
+	@xmaxhprate				= p24
+	@xmaxmprate				= p25
+	@xmaxatkrate			= p26
+	@xmaxdefrate			= p27
+	@xmaxstrengthrate		= p28
+	@xmaxcelerityrate		= p29
+	@xmaxwisdomrate			= p30
     
     # 换了装备之后更新恢复率
     recover_change

@@ -21,87 +21,78 @@ class Game_Monstor < Game_Actor
   #    这些变量，应该在初始化的时候设置，因为英雄并不是很多，通常就一两个
   #--------------------------------------------------------------------------
   attr_accessor   :intension      # 怪物的强度比例
-  attr_accessor   :real_hpcover   # 记录英雄每秒回血
-  attr_accessor   :real_mpcover   # 记录英雄每秒回魔  
-  attr_accessor   :type           # 英雄的主属性
   attr_accessor   :money          # 怪物的钱
   attr_accessor   :monstor_exp    # 怪物的经验
-  attr_accessor   :thing1         # 第一样物品
-  attr_accessor   :thing2         # 第二样物品
-  attr_accessor   :thingrate1     # 分母
-  attr_accessor   :thingrate2     # 分母
-  attr_accessor   :weapon1_id
   
+  # =======以下是描述英雄能力的各个属性====================
   
-  #=======以下是描述英雄能力的各个属性====================
+  # attr_accessor   :hmaxhp       # 生命
+  # attr_accessor   :hmaxmp       # 魔法
+  # attr_accessor   :hatk         # 攻击
+  # attr_accessor   :hdef         # 护甲
   
-  attr_accessor   :hmaxhp       # 生命
-  attr_accessor   :hmaxmp       # 魔法
-  attr_accessor   :hatk         # 攻击
-  attr_accessor   :hdef         # 护甲
+  # attr_accessor   :strength     # 力量
+  # attr_accessor   :celerity     # 敏捷
+  # attr_accessor   :wisdom       # 智力
   
-  attr_accessor   :strength     # 力量
-  attr_accessor   :celerity     # 敏捷
-  attr_accessor   :wisdom       # 智力
+  # attr_accessor   :destroy      # 物理破坏力因子
+	  # attr_accessor   :destroyrate  # 物理破坏额外倍数（%）
   
-  attr_accessor   :destroy      # 物理破坏力因子
-  attr_accessor   :destroyrate  # 物理破坏额外倍数（%）
+  # attr_accessor   :mdestroy     # 魔法破坏力因子
+  # attr_accessor   :mdestroyrate # 魔法破坏额外倍数（%）
   
-  attr_accessor   :mdestroy     # 魔法破坏力因子
-  attr_accessor   :mdestroyrate # 魔法破坏额外倍数（%）
+  # attr_accessor   :atkspeed     # 攻速因子
+  # attr_accessor   :atkrate      # 攻速率
   
-  attr_accessor   :atkspeed     # 攻速因子
-  attr_accessor   :atkrate      # 攻速率
+  # attr_accessor   :eva          # 闪避因子
+  # attr_accessor   :evarate      # 闪避率
   
-  attr_accessor   :eva          # 闪避因子
-  attr_accessor   :evarate      # 闪避率
+  # attr_accessor   :bom          # 暴击因子
+  # attr_accessor   :bomrate      # 暴击率
+  # attr_accessor   :bomatk       # 暴击扩张倍数（%）
   
-  attr_accessor   :bom          # 暴击因子
-  attr_accessor   :bomrate      # 暴击率
-  attr_accessor   :bomatk       # 暴击扩张倍数（%）
+  # attr_accessor   :hit          # 命中因子
+  # attr_accessor   :hitrate      # 命中率
   
-  attr_accessor   :hit          # 命中因子
-  attr_accessor   :hitrate      # 命中率
+  # attr_accessor   :hpcover      # 生命恢复因子
+  # attr_accessor   :hprate       # 生命恢复率
+  # attr_accessor   :mpcover      # 魔法恢复因子
+  # attr_accessor   :mprate       # 魔法恢复率
   
-  attr_accessor   :hpcover      # 生命恢复因子
-  attr_accessor   :hprate       # 生命恢复率
-  attr_accessor   :mpcover      # 魔法恢复因子
-  attr_accessor   :mprate       # 魔法恢复率
+  # =======下为武器装备产生的额外增加（英雄的成长值）=========
   
-  #=======下为武器装备产生的额外增加（英雄的成长值）=========
+  # attr_accessor   :xhmaxhp       # 生命
+  # attr_accessor   :xhmaxmp       # 魔法
+  # attr_accessor   :xhatk         # 攻击
+  # attr_accessor   :xhdef         # 护甲
   
-  attr_accessor   :xhmaxhp       # 生命
-  attr_accessor   :xhmaxmp       # 魔法
-  attr_accessor   :xhatk         # 攻击
-  attr_accessor   :xhdef         # 护甲
+  # attr_accessor   :xstrength     # 力量
+  # attr_accessor   :xcelerity     # 敏捷
+  # attr_accessor   :xwisdom       # 智力
   
-  attr_accessor   :xstrength     # 力量
-  attr_accessor   :xcelerity     # 敏捷
-  attr_accessor   :xwisdom       # 智力
+  # attr_accessor   :xdestroy      # 物理破坏力因子
+  # attr_accessor   :xdestroyrate  # 物理破坏额外倍数（%）
   
-  attr_accessor   :xdestroy      # 物理破坏力因子
-  attr_accessor   :xdestroyrate  # 物理破坏额外倍数（%）
+  # attr_accessor   :xmdestroy     # 魔法破坏力因子
+  # attr_accessor   :xmdestroyrate # 魔法破坏额外倍数（%）
   
-  attr_accessor   :xmdestroy     # 魔法破坏力因子
-  attr_accessor   :xmdestroyrate # 魔法破坏额外倍数（%）
+  # attr_accessor   :xatkspeed     # 攻速因子
+  # attr_accessor   :xatkrate      # 攻速率
   
-  attr_accessor   :xatkspeed     # 攻速因子
-  attr_accessor   :xatkrate      # 攻速率
+  # attr_accessor   :xeva          # 闪避因子
+  # attr_accessor   :xevarate      # 闪避率
   
-  attr_accessor   :xeva          # 闪避因子
-  attr_accessor   :xevarate      # 闪避率
+  # attr_accessor   :xbom          # 暴击因子
+  # attr_accessor   :xbomrate      # 暴击率
+  # attr_accessor   :xbomatk       # 暴击扩张倍数（%）
   
-  attr_accessor   :xbom          # 暴击因子
-  attr_accessor   :xbomrate      # 暴击率
-  attr_accessor   :xbomatk       # 暴击扩张倍数（%）
+  # attr_accessor   :xhit          # 命中因子
+  # attr_accessor   :xhitrate      # 命中率
   
-  attr_accessor   :xhit          # 命中因子
-  attr_accessor   :xhitrate      # 命中率
-  
-  attr_accessor   :xhpcover      # 生命恢复因子
-  attr_accessor   :xhprate       # 生命恢复率
-  attr_accessor   :xmpcover      # 魔法恢复因子
-  attr_accessor   :xmprate       # 魔法恢复率
+  # attr_accessor   :xhpcover      # 生命恢复因子
+  # attr_accessor   :xhprate       # 生命恢复率
+  # attr_accessor   :xmpcover      # 魔法恢复因子
+  # attr_accessor   :xmprate       # 魔法恢复率
   
   #--------------------------------------------------------------------------
   # ● 初始化对象               重写
@@ -157,19 +148,11 @@ class Game_Monstor < Game_Actor
     
     # 设置扩张金钱、经验
     @money          +=  $game_variables[90]
-    @monstor_exp    +=  $game_variables[91]
-    
-    # 没有使用
-    @thing1                =  monstor.drop_item1
-    @thing2                =  monstor.drop_item2
-    @thingrate1            =  @thing1.denominator 
-    @thingrate2            =  @thing2.denominator 
-    
+    @monstor_exp    +=  $game_variables[91] 
   
     # 属性设置---------------------------------------------
     # 自动计算属性
     makeattrbutes
-    
     
     # 补充附加属性
     @hmaxhp                += monstor.read_note('maxhp') == nil ? 0 : monstor.read_note('maxhp')
@@ -350,13 +333,13 @@ class Game_Monstor < Game_Actor
     
     case @type
     when 1   # 力量
-      @destroyrate           = 100 + @level * 2.95
+      @destroyrate           = 100 + @level * 1.85
       @mdestroyrate          = 100 + @level * 1.25
-      @atkrate               = 100 + @level * 1.35
+      @atkrate               = 100 + @level * 1.15
     when 2   # 敏捷
-      @destroyrate           = 100 + @level * 1.35
+      @destroyrate           = 100 + @level * 1.25
       @mdestroyrate          = 100 + @level * 1.25
-      @atkrate               = 100 + @level * 2.95
+      @atkrate               = 100 + @level * 1.55
     when 3   # 智力
       @destroyrate           = 100 + @level * 1.25
       @mdestroyrate          = 100 + @level * 2.75
@@ -438,8 +421,12 @@ class Game_Monstor < Game_Actor
   #
   #--------------------------------------------------------------------------
   def onEquipChanges
+	# 每次调用该函数都将临时参数 p 清零，然后载入重新载入所有参数
     p0 = p1 = p2 = p3 = p4 = p5 = p6 = p7 = p8 = p9 = p10 = p11 = p12 = 0
     p13 = p14 = p15 = p16 = p17 = p18 = p19 = p20 = p21 = p22 = p23 = 0
+	p24 = p25 = p26 = p27 = p28 = p29 = p30 = 0
+	
+	
     
     for e in equips do
       next if e == nil
@@ -448,7 +435,7 @@ class Game_Monstor < Game_Actor
         p0 += e.read_note('maxhp')
       end
       if e.read_note('maxhprate') != nil
-        p0 += e.read_note('maxhprate') * self_maxhp / 100.0
+        p24 += e.read_note('maxhprate')
       end
       
       ### maxmp
@@ -456,7 +443,7 @@ class Game_Monstor < Game_Actor
         p1 += e.read_note('maxmp')
       end      
       if e.read_note('maxmprate') != nil
-        p1 += e.read_note('maxmprate') * self_maxmp / 100.0
+        p25 += e.read_note('maxmprate')
       end
       
       ### atk
@@ -464,24 +451,24 @@ class Game_Monstor < Game_Actor
         p2 += e.read_note('atk')
       end         
       if e.read_note('atkrate') != nil
-        p2 += e.read_note('atkrate') * self_atk / 100.0
+        p26 += e.read_note('atkrate')
       end
       
       # def
       p3 += e.read_note('ddef') if e.read_note('ddef') != nil
-      p3 += e.read_note('defrate') * self_def / 100.0 if e.read_note('defrate') != nil
+      p27 += e.read_note('defrate') if e.read_note('defrate') != nil
       
       # strength
       p4 += e.read_note('strength') if e.read_note('strength') != nil
-      p4 += e.read_note('strengthrate') * self_strength / 100.0 if e.read_note('strengthrate') != nil
+      p28 += e.read_note('strengthrate') if e.read_note('strengthrate') != nil
       
       # celerity
       p5 += e.read_note('celerity') if e.read_note('celerity') != nil
-      p5 += e.read_note('celerityrate') * self_celerity / 100.0 if e.read_note('celerityrate') != nil
+      p29 += e.read_note('celerityrate') if e.read_note('celerityrate') != nil
 
       # wisdom
       p6 += e.read_note('wisdom') if e.read_note('wisdom') != nil
-      p6 += e.read_note('wisdomrate') * self_wisdom / 100.0 if e.read_note('wisdomrate') != nil      
+      p30 += e.read_note('wisdomrate') if e.read_note('wisdomrate') != nil      
       
       # destroy
       p7 += e.read_note('destroy') if e.read_note('destroy') != nil
@@ -552,6 +539,15 @@ class Game_Monstor < Game_Actor
     @xhprate                = p21
     @xmpcover               = p22
     @xmprate                = p23
+	
+	# 按比例增长的部分
+	@xmaxhprate				= p24
+	@xmaxmprate				= p25
+	@xmaxatkrate			= p26
+	@xmaxdefrate			= p27
+	@xmaxstrengthrate		= p28
+	@xmaxcelerityrate		= p29
+	@xmaxwisdomrate			= p30
     
     # 换了装备之后更新恢复率
     recover_change
@@ -724,8 +720,9 @@ class Game_Monstor < Game_Actor
      
      # 获得物品 --  如果设置了宝物掉落开关，则以那个开关为准
 	 # 宝物掉落开关默认为关,如果开关打开，则会掉落宝物。
-	 if $game_variables[58] != 0
-		for i in 59..68 do
+	 if $game_switches[159]
+		# 计算1~10宝物掉落情况
+		for i in (Array (59..68)) + (Array (168..177)) do
 			# 如果掉落类型为空，则跳过
 			next if (k = $game_variables[i]) == 0
         
@@ -763,9 +760,9 @@ class Game_Monstor < Game_Actor
 				end          
 			end
 		end
-     end
+	 end
      # 获得金钱
-     $game_party.gain_gold(self.money) 
+     
      $game_variables[90] = self.money
      
      # 获得经验

@@ -24,6 +24,10 @@ class Game_Battler
   attr_accessor   :maxmp_plus
   attr_accessor   :fcounthp          # 记录帧数，计算恢复HP
   attr_accessor   :fcountmp          # 记录帧数，计算恢复MP
+  #-------------------------------------------------------------
+				
+  
+  
   #=========================================================================
   #  self 系列的参数，是自身条件产生的，没有依靠任何装备  
   #=========================================================================
@@ -32,7 +36,8 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_maxhp
     n = @hmaxhp
-    n += @strength * GAME_CONF::BONUS_STRENGTH_MAXHP
+    # n += @strength * GAME_CONF::BONUS_STRENGTH_MAXHP
+	n += base_strength * GAME_CONF::BONUS_STRENGTH_MAXHP
     return n
   end
   
@@ -41,7 +46,8 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_maxmp
     n = @hmaxmp
-    n += @wisdom * GAME_CONF::BONUS_WISDOM_MAXMP
+    # n += @wisdom * GAME_CONF::BONUS_WISDOM_MAXMP
+	n += base_wisdom * GAME_CONF::BONUS_WISDOM_MAXMP
     return n
   end
   
@@ -53,11 +59,11 @@ class Game_Battler
     # 主属性加成
     case @type
     when 1    # 力量
-      n += @strength * GAME_CONF::BONUS_STRENGTH_ATTACK
+      n += base_strength * GAME_CONF::BONUS_STRENGTH_ATTACK
     when 2    # 敏捷
-      n += @celerity * GAME_CONF::BONUS_CELERITY_ATTACK
+      n += base_celerity * GAME_CONF::BONUS_CELERITY_ATTACK
     when 3    # 智力
-      n += @wisdom * GAME_CONF::BONUS_WISDOM_ATTACK
+      n += base_wisdom * GAME_CONF::BONUS_WISDOM_ATTACK
     end
     return n
   end
@@ -71,7 +77,7 @@ class Game_Battler
   def self_def
     n = @hdef
     # 每一点敏捷增加0.33点防御力
-    n += @celerity * GAME_CONF::BONUS_CELERITY_DEF
+    n += base_celerity * GAME_CONF::BONUS_CELERITY_DEF
     return n
   end
   
@@ -116,7 +122,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_destroy
     n = @destroy + GAME_CONF::CONST_BASE_DESTROY
-    n += self_strength * BONUS_STRENGTH_DESTROY
+    n += base_strength * BONUS_STRENGTH_DESTROY
     return n
   end
   
@@ -128,7 +134,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_mdestroy
     n = @mdestroy + GAME_CONF::CONST_BASE_MDESTROY
-    n += self_wisdom * BONUS_WISDOM_MDESTROY
+    n += base_wisdom * BONUS_WISDOM_MDESTROY
     return n
   end
   
@@ -140,7 +146,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_atkspeed
     n = @atkspeed
-    n += self_celerity * GAME_CONF::BONUS_CELERITY_ATKSPEED
+    n += base_celerity * GAME_CONF::BONUS_CELERITY_ATKSPEED
     return n
   end
   
@@ -151,7 +157,7 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def self_eva
-    n = (@eva + self_celerity * BONUS_CELERITY_EVA) * (1 + @evarate/100.0)
+    n = (@eva + base_celerity * BONUS_CELERITY_EVA) * (1 + @evarate/100.0)
     return n
   end
   #--------------------------------------------------------------------------
@@ -161,7 +167,7 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def self_hit
-    n = (@hit + self_celerity * BONUS_CELERITY_HIT) * (1 + @hitrate/100.0)
+    n = (@hit + base_celerity * BONUS_CELERITY_HIT) * (1 + @hitrate/100.0)
     return n
   end
   #--------------------------------------------------------------------------
@@ -171,7 +177,7 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def self_bom
-    n = (@bom + self_strength * BONUS_STRENGTH_BOM) * (1 + @bomrate/100.0)
+    n = (@bom + base_strength * BONUS_STRENGTH_BOM) * (1 + @bomrate/100.0)
     return n
   end
   
@@ -194,7 +200,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_hpcover
     n = @hpcover
-    n += self_strength * GAME_CONF::BONUS_STRENGTH_HPCOVER
+    n += base_strength * GAME_CONF::BONUS_STRENGTH_HPCOVER
     n += self_maxhp * @hprate / 100.0
     return n
   end
@@ -207,7 +213,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_mpcover
     n = @mpcover
-    n += self_wisdom * GAME_CONF::BONUS_WISDOM_MPCOVER
+    n += base_wisdom * GAME_CONF::BONUS_WISDOM_MPCOVER
     n += self_maxmp * @mprate / 100.0
     return n
   end  
@@ -219,12 +225,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   # ● 获取基本 MaxHP
   #
-  #     重写覆盖
-  #     基本maxhp = ((自身maxhp+属性加成) + 武器加成 + 额外属性加成)+类型加成
-  #     自身maxhp    :@hmaxhp
-  #     属性加成     :@strength 所带来的加成（例如每个力量加4血）
-  #     武器加成     :@xhmaxhp
-  #     额外属性加成 :@xstrength 所带来的加成
+  #     重写覆盖  
   #     类型加成     :例如力量型英雄，生命值会再次加成
   #
   #     其实最后到battler类中还有一个状态加成，例如“攻击力上升”状态
@@ -232,10 +233,10 @@ class Game_Battler
   def base_maxhp
     # n初始为自身maxhp
     n = self_maxhp
+	# 装备百分比加成
+	n *= (@xmaxhprate + 100.0) / 100.0
     # 装备加成
     n += @xhmaxhp
-    # 额外属性加成
-    n += @xstrength * BONUS_STRENGTH_MAXHP
     
     # 类型加成 -- 暂时不实现
     return n
@@ -249,10 +250,10 @@ class Game_Battler
   def base_maxmp
     # n初始为自身maxhp
     n = self_maxmp
+	# 装备百分比加成
+	n *= (@xmaxmprate + 100.0) / 100.0
     # 装备加成
     n += @xhmaxmp
-    # 额外属性加成
-    n += @xwisdom * BONUS_WISDOM_MAXMP
 
     # 类型加成 -- 暂时不实现
     
@@ -268,18 +269,10 @@ class Game_Battler
   def base_atk
     # n初始为自身hatk
     n = self_atk
+	# 装备百分比加成
+	n *= (@xmaxatkrate + 100.0) / 100.0
     # 装备加成
     n += @xhatk
-    
-    # 额外属性加成
-    case type
-    when 1    # 力量
-      n += @xstrength * GAME_CONF::BONUS_STRENGTH_ATTACK
-    when 2    # 敏捷
-      n += @xcelerity * GAME_CONF::BONUS_CELERITY_ATTACK
-    when 3    # 智力
-      n += @xwisdom * GAME_CONF::BONUS_WISDOM_ATTACK
-    end
     
     # 类型加成 -- 暂时不实现
     
@@ -295,10 +288,10 @@ class Game_Battler
   def base_def
     # n初始为自身hatk
     n = self_def
+	# 装备百分比加成
+	n *= (@xmaxdefrate + 100.0) / 100.0
     # 每一件装备增加的防御力
     n += @xhdef
-    # 额外属性加成
-    n += @xcelerity * GAME_CONF::BONUS_CELERITY_DEF
 
     # 类型加成 -- 暂时不实现
     
@@ -313,6 +306,8 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def base_strength
     n = self_strength
+	# 装备百分比加成
+	n *= (@xmaxstrengthrate + 100.0) / 100.0
     n += @xstrength
     return n
   end  
@@ -325,6 +320,8 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def base_wisdom
     n = self_wisdom
+	# 装备百分比加成
+	n *= (@xmaxwisdomrate + 100.0) / 100.0
     n += @xwisdom
     return n
   end  
@@ -337,6 +334,8 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def base_celerity
     n = self_celerity
+	# 装备百分比加成
+	n *= (@xmaxcelerityrate + 100.0) / 100.0
     n += @xcelerity
     return n
   end
@@ -349,8 +348,6 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def base_destroy
     n = self_destroy + @xdestroy
-    # 额外属性加成
-    n += @xstrength * BONUS_STRENGTH_DESTROY
     return n
   end  
   
@@ -363,9 +360,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def base_mdestroy
     n = self_mdestroy + @xmdestroy
-    n += @xwisdom * BONUS_WISDOM_MDESTROY
     return n    
-    
   end  
   
   
@@ -377,7 +372,6 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def base_atkspeed
     n = self_atkspeed + @xatkspeed
-    n += @xcelerity * BONUS_CELERITY_ATKSPEED
     return n    
   end   
   
@@ -388,8 +382,7 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_eva
-    # 额外属性加成
-    n = self_eva + @xcelerity * BONUS_CELERITY_EVA
+    n = self_eva
     # 扩张
     n *= (100.0 + @xevarate) / 100.0
     # 装备加成
@@ -404,7 +397,7 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_hit
-    n = self_hit + @xcelerity * BONUS_CELERITY_HIT
+    n = self_hit
     n *= (100.0 + @xhitrate) / 100.0
     n += @xhit
     return n    
@@ -417,7 +410,7 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_bom
-    n = self_bom + @xstrength * BONUS_STRENGTH_BOM
+    n = self_bom
     n = n * (100.0 + @xbomrate) / 100.0 + @xbom
     return n    
   end  
@@ -442,7 +435,7 @@ class Game_Battler
   def base_hpcover
     n = self_hpcover
     n += @xhpcover 
-    n += @xstrength * GAME_CONF::BONUS_STRENGTH_HPCOVER
+	# 按百分比回复
     n += self_maxhp * @xhprate / 100.0
     return n
   end
@@ -456,7 +449,7 @@ class Game_Battler
   def base_mpcover
     n = self_mpcover
     n += @xmpcover
-    n += @xwisdom * GAME_CONF::BONUS_WISDOM_MPCOVER
+	# 按百分比回复
     n += self_maxmp * @xmprate / 100.0
     return n
   end 
@@ -662,12 +655,8 @@ class Game_Battler
   def final_hitrate
     return (self.hitrate + self.xhitrate)
   end  
-  
-  
-  
-  
   #--------------------------------------------------------------------------
-  # ● 获取最终暴击因子
+  # ● 获取最终暴击因子（暴击技巧）
   #
   #    注：这个因子要和GAME_CONF::CONST_MAX_BOM比较，得出暴击率
   #        如果这个值大于 ONST_MAX_BOM，在比较后会自动修正
@@ -676,12 +665,12 @@ class Game_Battler
   def final_bom
     bom_val = base_bom
     # 0~400 * 1
-    # 401~800 * 0.75
-    # 801~1200 * 0.5
-    # 1201~1600 * 0.25
-    # 1601~2000 * 0.125
-    # > 2000 * 0.0625
-    rate_list = [0, 1.0, 0.75, 0.5, 0.25, 0.125]
+    # 401~800 * 0.8
+    # 801~1200 * 0.6
+    # 1201~1600 * 0.4
+    # 1601~2000 * 0.2
+    # > 2000 * 0.1
+    rate_list = [0, 1.0, 0.8, 0.6, 0.4, 0.2]
     bom_list = [0, 400, 800, 1200, 1600, 2000]
     n = 0
     for index in 1...bom_list.size
@@ -693,7 +682,7 @@ class Game_Battler
       end
     end
     if bom_val > 2000
-      n += (bom_val - 2000) * 0.0625
+      n += (bom_val - 2000) * 0.1
     end
     return n 
   end
@@ -1055,8 +1044,18 @@ class Game_Battler
     rate = self.atk / target.def
     final_dmg = dmg * rate
 	final_dmg += (self.atk - target.def) / 4.0
+	# 计算等级带来的伤害影响
+	# 自身等级与对方等级差带来的伤害修正
+	if self.hero?
+		diff = @level - (target.level * 2)
+	else
+		diff = (@level * 2) - target.level
+	end
+	diff = [[diff, 4].min, -4].max
+	effect = LEVEL_EFFECT[diff+4]
+	final_dmg *= effect
     # 制造随机伤害
-    final_dmg = final_dmg * (180 + rand(41)) / 200.00
+    final_dmg = final_dmg * (190 + rand(21)) / 200.00
     # 如果暴击
     final_dmg = final_dmg *  brate if bomflag == true and brate > 0
     return final_dmg
