@@ -189,8 +189,6 @@ class Scene_Map < Scene_Base
       @battleshow_back.z = 0      
       @battleshow_back.bitmap = Cache.system("MessageBack")
       
-      
-      
     # 否则战斗状态已经开始,只需要更新
     elsif $game_switches[103] == true
       # 更新战斗信息窗口

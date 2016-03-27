@@ -18,7 +18,7 @@ class Window_PlayerInfo < Window_Base
   # ● 初始化对象
   #--------------------------------------------------------------------------
   def initialize(x,y)
-    super(x, y, 192, 480)
+	  super(x, y, 192, 480)
     self.windowskin = Cache.system("Window3")
     self.opacity = 255
     self.back_opacity = 128
