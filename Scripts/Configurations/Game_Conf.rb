@@ -153,12 +153,12 @@ module GAME_CONF
 	CONST_BASE_MDESTROY        = 10
 	
 	# 基础攻击速度
-		# 初始攻速 = 每秒 CONST_BASE_ATKSPEED * 60/CONST_MAX_ATKSPEED 次攻击
+	# 初始攻速 = 每秒 CONST_BASE_ATKSPEED * 60/CONST_MAX_ATKSPEED 次攻击
 	# --- 已经重新定义 ---
 	CONST_BASE_ATKSPEED        = 0#10    # 1次
 	
 	# 系统攻速基数
-		# 就是每一点攻速每秒增加 60/CONST_MAX_ATKSPEED  次攻击
+	# 就是每一点攻速每秒增加 60/CONST_MAX_ATKSPEED  次攻击
 	# --- 没有使用 ---
 	CONST_MAX_ATKSPEED         = 12000   # 0.05次
 	

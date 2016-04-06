@@ -4,69 +4,6 @@
 # 　处理角色的类。本类在 Game_Actors 类 ($game_actors)
 # 的内部使用、Game_Party 类请参考 ($game_party) 。
 #==============================================================================
-=begin
-
-魔兽争霸III: 冰封王座: 攻防表 
-
-     轻甲 中甲 重甲 城甲 英雄 无甲 
-普通 100% 150% 100% 70%  100% 100% 
-穿刺 200% 75%  100% 35%  50%  150% 
-攻城 100% 50%  100% 150% 50%  150% 
-魔法 125% 75%  200% 35%  50%  100% 
-混乱 100% 100% 100% 100% 100% 100% 
-技能 100% 100% 100% 100% 70%  100% 
-英雄 100% 100% 100% 50%  100% 100% 
-
-伤害增减
-对于正的护甲值，伤害减少 = ((护甲)*0.06)/(1+0.06*(护甲))
-对于负的护甲值，伤害增加 = 2-0.94^(-护甲)
-
------------------------------------------------------------
-本游戏个参数计算方法：
-1、@hmaxhp 作为最根本的maxhp，只有升级加点能够直接影响他的值。
-2、@hmaxmp 同上
-3、@hatk 同上
-4、@hdef 同上
-5、@strength 同上
-6、@clerity 同上
-7、@wisdom 同上
-8、@destroy
-
-------------------------------------------------------------
-
-英雄属性计算方法：
-1、maxhp= (@hmaxhp + @strength*4) + equips + @xstrength*4
-2、maxmp= (@hmaxhp + @strength*4) + equips + @xstrength*4
-3、atk= (@hatk + 主属性加成) + equips + @x主属性加成
-4、def= (@hdef + @celerity*0.1) +equips +@xcelerity*0.1
-
-5、strength= @strength + @xstrength
-6、celerity= @celerity + @xcelerity
-7、wisdom= @wisdom = @xwisdom
-
-8、destroy(最终破坏)=const+(@destroy + @xdestroy)*(@destroyrate+@xdestroyrate)
-9、destroyrate
-10、mdestroy
-11、mdestroyrate
-12、atkspeed(最终速度)= const + (@atkspeed+@xatkspeed)*(@atkrate+@xatkrate)
-13、atkrate
-14、eva(最终闪避) = const + (@eva+@xeva)*(@evarate+@xevarate)
-15、evarate
-16、bom(最终暴击)=const + (@bom+@xbom)*(@bomrate+@xbomrate)
-17、bomrate
-18、bomatk(以100%为单位)如果值为10那么增加10%伤害，如果为100那么增加100%伤害。
-19、hit(最终命中) = const +(@hit+@xhit)*(@hitrate+@xhitrate)
-20、hitrate
-
-21、hpcover(最终恢复)=@hpcover+@xhpcover+(@hprate+@xhprate)*maxhp 
-22、hprate
-23、mpcover
-24、mprate
-
-
-=end
-
-
 
 class Game_Hero < Game_Actor
   include GAME_CONF
@@ -76,13 +13,10 @@ class Game_Hero < Game_Actor
   #--------------------------------------------------------------------------
   
   attr_accessor   :point          # 记录英雄可用的加点数
-  
   attr_accessor   :trea_num       # 英雄可以使用几个宝物格子,在换装备时限制
   attr_accessor   :weapon_num     # 英雄可以使用几个武器，在换装备时限制
   
-  
 
-  
   #--------------------------------------------------------------------------
   # ● 初始化对象               重写
   #     actor_id : 角色 ID
@@ -175,42 +109,74 @@ class Game_Hero < Game_Actor
     @type                  = h[24]
     
     # 初始化装备属性
+	# 装备增加最大生命
     @xhmaxhp                = 0
+	# 装备增加最大魔法
     @xhmaxmp                = 0
+	# 装备增加攻击
     @xhatk                  = 0
+	# 装备增加防御
     @xhdef                  = 0
+	# 装备增加力量
     @xstrength              = 0
+	# 装备增加敏捷
     @xcelerity              = 0
+	# 装备增加智力
     @xwisdom                = 0
+	# 装备增加物理伤害
     @xdestroy               = 0
+	# 装备增加物伤威力
     @xdestroyrate           = 0
+	# 装备增加魔法伤害
     @xmdestroy              = 0
+	# 装备增加魔伤威力
     @xmdestroyrate          = 0
+	# 装备增加攻击速度
     @xatkspeed              = 0
+	# 装备按比例增加攻击
     @xatkrate               = 0
+	# 装备增加闪避技巧
     @xeva                   = 0
+	# 装备按比例增加闪避
     @xevarate               = 0
+	# 装备增加暴击技巧
     @xbom                   = 0
+	# 装备按比例增加暴击技巧
     @xbomrate               = 0
+	# 装备增加暴击威力
     @xbomatk                = 0
+	# 装备增加命中
     @xhit                   = 0
+	# 装备按比例增加命中
     @xhitrate               = 0
+	# 装备增加生命恢复
     @xhpcover               = 0
+	# 装备按比例生命恢复
     @xhprate                = 0
+	# 装备增加魔法恢复
     @xmpcover               = 0
+	# 装备按比例魔法恢复
     @xmprate                = 0
+	# 装备按比例增加最大生命
 	@xmaxhprate				= 0
+	# 装备按比例增加最大魔法
 	@xmaxmprate				= 0
+	# 装备按比例增加攻击 - 影响平衡不推荐使用
 	@xmaxatkrate			= 0
+	# 装备按比例增加攻击 - 不推荐使用
 	@xmaxdefrate			= 0
+	# 装备按比例增加力量 - 不推荐使用
 	@xmaxstrengthrate		= 0
+	# 装备按比例增加敏捷 - 不推荐使用
 	@xmaxcelerityrate		= 0
+	# 装备按比例增加智力 - 不推荐使用
 	@xmaxwisdomrate			= 0
+	
 	
     
     # 填充装备
-    @weapon_num  = 1      # 刚开始只能使用一把武器
-    @trea_num    = 1      # 刚开始只能使用1个宝物格子
+    @weapon_num  = 1      	# 刚开始只能使用一把武器
+    @trea_num    = 1      	# 刚开始只能使用1个宝物格子
     @class_id    = h[25]
     @weapon1_id  = h[26]
     @weapon2_id  = h[27]
@@ -242,19 +208,16 @@ class Game_Hero < Game_Actor
     # 初始化恢复速度
     recover_change
     
-    
   end
   #--------------------------------------------------------------------------
   # ● 剩余变量初始化
   #
   #--------------------------------------------------------------------------
   def initOthers
-    
     @fcounthp = @fcountmp = Graphics.frame_count
     @bomflag = false
     @hitflag = false
     @point = 20
-
     onEquipChanges(true)
   end
   
@@ -289,7 +252,6 @@ class Game_Hero < Game_Actor
     
 #~     p0 = p1 = p2 = p3 = p4 = p5 = p6 = p7 = p8 = p9 = p10 = p11 = p12 = 0
 #~     p13 = p14 = p15 = p16 = p17 = p18 = p19 = p20 = p21 = p22 = p23 = 0
-    
     
     # 0
     p0 = @xhmaxhp
@@ -335,8 +297,7 @@ class Game_Hero < Game_Actor
 	p28 = @xmaxstrengthrate
 	p29 = @xmaxcelerityrate
 	p30 = @xmaxwisdomrate
-    
-	
+
     if true == flag
 	  # 设置装备变更指示器
       @is_equip_changed = 1
@@ -526,20 +487,15 @@ class Game_Hero < Game_Actor
 	@xmaxstrengthrate		= p28
 	@xmaxcelerityrate		= p29
 	@xmaxwisdomrate			= p30
-    
     # 换了装备之后更新恢复率
     recover_change
-
   end  
    
-
 #===========================================================================
 # ▼▼▼▼▼▼▼▼▼▼▼属性计算▼▼▼▼▼▼▼▼▼▼▼
 #---------------------------------------------------------------------------
 
-  
-
-  
+    
 #============================================================================
 #▼▼▼▼▼▼▼▼▼▼▼其他辅助函数▼▼▼▼▼▼▼▼▼▼▼
 #---------------------------------------------------------------------------
@@ -743,7 +699,6 @@ class Game_Hero < Game_Actor
     old_hp_rate = 1.0 * hp / maxhp
     old_mp_rate = 1.0 * mp / maxmp
     
-    
     # 获得刚才装在身上的那件装备
     last_item = equips(false)[equip_type]
     
@@ -791,7 +746,6 @@ class Game_Hero < Game_Actor
     
     # 更新套装
     set_suits
-    
     # 更新属性
     onEquipChanges(true)
     # 更新maxhp maxmp
@@ -841,7 +795,6 @@ class Game_Hero < Game_Actor
   #     exp  : 新的经验值
   #     show : 显示升级标志
   #
-  #
   #            重定义
   #
   #--------------------------------------------------------------------------
@@ -874,7 +827,6 @@ class Game_Hero < Game_Actor
   #     show : 显示升级标志
   #
   #     如果要实现经验翻倍功能，那么后期可以添加一个经验扩张属性
-  #
   #
   #        重载覆盖
   #
