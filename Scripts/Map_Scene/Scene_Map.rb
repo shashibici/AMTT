@@ -7,10 +7,10 @@
 class Scene_Map < Scene_Base
 	
 	#--------------------------------------------------------------------------
-		# ● 开始处理
-		#
-		#       重定义
-		#
+	# ● 开始处理
+	#
+	#       重定义
+	#
 	#--------------------------------------------------------------------------
 	def start
 		super
@@ -24,9 +24,6 @@ class Scene_Map < Scene_Base
 		@battle_show_window22 = nil
 		@battle_show_window3 = nil
 		@battle_show_window33 = nil
-		# 创建战斗面板
-		#$battle_panel_enemy_window = nil
-		#$battle_back_window = nil
 		
 		#------------------------------------------------------
 		# 如果地图技不为空
@@ -131,18 +128,18 @@ class Scene_Map < Scene_Base
 		end
 	end
 	#--------------------------------------------------------------------------
-		# ● 显示玩家信息
-		#
-		#    重写覆盖
-		#
+	# ● 显示玩家信息
+	#
+	#    重写覆盖
+	#
 	#--------------------------------------------------------------------------
 	def show_player_info
-	# 首先更新信息更新
-	@pinfo_window.refresh
-	# 窗口的初试位置
-	@pinfo_window.x = 640.0
-	@pinfo_window.visible = true  
-	$game_system.show_info = true
+		# 首先更新信息更新
+		@pinfo_window.refresh
+		# 窗口的初试位置
+		@pinfo_window.x = 640.0
+		@pinfo_window.visible = true  
+		$game_system.show_info = true
 	end
 	#--------------------------------------------------------------------------
 	# ● 隐藏玩家信息
@@ -212,6 +209,9 @@ class Scene_Map < Scene_Base
 			$battle_panel_player_window = Window_BattlePanel_Player.new(320, 80, 300, 320, 640, 80, 0.05, 0)
 			$battle_panel_player_window.setup($game_party.active, $game_monstor_battle)
 			
+			$battle_status_enemy_window = Window_BattleStatusEnemy.new(20,-8,600,64+32,20,-(64+32),0,0.04)
+			$battle_status_enemy_window.setup($game_monstor_battle)
+			
 		# 否则战斗状态已经开始,只需要更新
 		elsif $game_switches[103] == true
 			if $battle_panel_enemy_window.visible == false or $battle_panel_enemy_window.active == false
@@ -226,8 +226,13 @@ class Scene_Map < Scene_Base
 				$battle_back_window.visible = true
 				$battle_back_window.active = true
 			end
+			if $battle_status_enemy_window.visible == false or $battle_status_enemy_window.active == false
+				$battle_status_enemy_window.visible = true
+				$battle_status_enemy_window.active = true
+			end
 			$battle_panel_enemy_window.update
 			$battle_panel_player_window.update
+			$battle_status_enemy_window.update
 			# 不再更新玩家信息窗口
 			@pinfo_window.visible = false
 			@pinfo_window.x = 640
@@ -248,13 +253,18 @@ class Scene_Map < Scene_Base
 				$battle_back_window.dispose
 				$battle_back_window = nil
 			end
+			# 释放敌人头像窗口
+			if $battle_status_enemy_window != nil
+				$battle_status_enemy_window.dispose
+				$battle_status_enemy_window = nil
+			end
 		end
 	end
 	#--------------------------------------------------------------------------
-		# ● 更新战斗信息
-		#
-		#         新加
-		#
+	# ● 更新战斗信息
+	#
+	#         新加
+	#
 	#--------------------------------------------------------------------------
 	def update_battle_show1
 		# 如果是战斗状态,且是刚刚开始

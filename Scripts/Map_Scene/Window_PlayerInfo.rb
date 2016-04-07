@@ -18,11 +18,12 @@ class Window_PlayerInfo < Window_Base
   # ● 初始化对象
   #--------------------------------------------------------------------------
   def initialize(x,y)
-	  super(x, y, 192, 480)
-    self.windowskin = Cache.system("Window3")
+	super(x, y, 192, 480)
+	self.windowskin = Cache.system("Window3")
     self.opacity = 255
     self.back_opacity = 128
     self.contents.font.size = 16
+	@refresh_timer = 0
   end
   #--------------------------------------------------------------------------
   # ● 配置
@@ -66,6 +67,8 @@ class Window_PlayerInfo < Window_Base
   #--------------------------------------------------------------------------
   def refresh
     self.contents.clear
+	# 清空refresh_timer
+	@refresh_timer = 0
     
     # 获得层数
     @layer = $game_variables[42]
@@ -229,8 +232,8 @@ class Window_PlayerInfo < Window_Base
     
     
     color = Color.new(0, 255, 0)
-    draw_a_line(color, 0, y+WLH, 150, WLH, Fround(@hp, 2), 2 )
-    draw_a_line(color, 0, y+WLH*3, 150, WLH, Fround(@pow, 2), 2)
+    draw_a_line(color, 0, y+WLH, 150, WLH, @hp.ceil, 2 )
+    draw_a_line(color, 0, y+WLH*3, 150, WLH, @pow.ceil, 2)
     draw_a_line(color, 0, y+WLH*5, 150, WLH, Fround(@atk, 1), 2)
     draw_a_line(color, 0, y+WLH*7, 150, WLH, Fround(@def, 1), 2)
     draw_a_line(color, 0, y+WLH*9, 150, WLH, Fround(@atkspeed, 1), 2)
@@ -246,19 +249,29 @@ class Window_PlayerInfo < Window_Base
   #--------------------------------------------------------------------------
   def update
     if $game_system.show_info == true and self.visible == true
+	  @refresh_timer += 1
       # 更新画面效果
       self.contents_opacity = [self.contents_opacity + 4.25, 255.0].min
       # 本窗口一直保持在448处
       self.x += (448.0 - self.x)  if self.x<447 or self.x>449
       # 更新内容
-      refresh if need_refresh?
+      if need_refresh?
+		refresh
+	  end
     end
   end
   #--------------------------------------------------------------------------
   # ● 判断是否需要重新获取数据
   #--------------------------------------------------------------------------
   def need_refresh?
-    return true if @hp != @actor.hp
+    if @hp != @actor.hp
+		# 如果是HP 变化，最快0.1秒刷新一次
+		if @refresh_timer < Graphics.frame_rate / 10.0
+			return false
+		else
+			return true
+		end
+	end
     return true if @pow != @actor.mp
     return true if @atk != @actor.atk
     return true if @def != @actor.def

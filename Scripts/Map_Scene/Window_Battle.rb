@@ -96,6 +96,151 @@ class Window_Animated < Window_Base
 end
 
 ##==========================================================================
+# ■ Window_BattleStatusEnemy
+#---------------------------------------------------------------------------
+# 	Display the status of enemy.  
+#   Display HP.
+# 	Display the name and show the face.
+#===========================================================================
+class Window_BattleStatusEnemy < Window_Animated
+	#--------------------------------------------------------------------------
+	# ● 初始化对象
+	#--------------------------------------------------------------------------
+	def initialize(x=20,y=-8,w=600,h=64+32,xi=20,yi=-(64+32),dx=0,dy=0.04)
+		super(x,y,w,h,xi,yi,dx,dy)
+		@ymoving = true
+		@wlh = 20
+	end
+	#--------------------------------------------------------------------------
+	# ● 设置显示参数
+	#--------------------------------------------------------------------------
+	def setup(m)
+		@monster = m
+		@new_values = [
+			@maxhp = @monster.maxhp,
+			@hp = @monster.hp,
+			@name = @monster.name,
+			@face_name = @monster.character_name,
+		]
+		refresh
+	end
+	#--------------------------------------------------------------------------
+	# ● 是否需要刷新
+	#--------------------------------------------------------------------------
+	def need_refresh?
+		if @maxhp != @monster.maxhp
+			return true
+		end
+		if @hp != @monster.hp
+			return true
+		end
+		if @name != @monster.name
+			return true
+		end
+		if @face_name != @monster.character_name
+			return true
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 刷新画面
+	#--------------------------------------------------------------------------
+	def refresh
+		self.contents.clear
+		@new_values = [
+			@maxhp = @monster.maxhp,
+			@hp = @monster.hp,
+			@name = @monster.name,
+			@face_name = @monster.character_name,
+		]
+		# 绘制头像
+		@face_bitmap = FrameFactory.getBitmapWithSize(40,40,"Graphics/Battlers/", @face_name, 0)
+		rect = Rect.new(0, 0, @face_bitmap.width, @face_bitmap.height)
+		self.contents.blt(12, 12, @face_bitmap, rect)
+		# 绘制名字
+		color = Color.new(255, 255, 255)
+		draw_a_line(color, 64, self.height-32-@wlh, 108, @wlh, @name, 1)
+		# 绘制HP槽
+		rate = @hp / @maxhp
+		gw = Integer((self.contents.width-64) * rate)
+		if rate < 0.5
+			gc1 = Color.new(255,Integer(255*rate*2),0)
+		else
+			gc1 = Color.new(0, 255, 0)
+		end
+		gc2 = Color.new(0,0,0)
+		# 填满指定的颜色
+		self.contents.fill_rect(64, self.contents.height - 2.5*@wlh, self.contents.width-64, @wlh, gc2)
+		self.contents.fill_rect(64, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
+		draw_a_line(color, 64, self.contents.height - 2.5*@wlh, self.contents.width-64, @wlh, "125667/234567", 1)
+		
+	end
+	#--------------------------------------------------------------------------
+	# ● 跟新窗口
+	#--------------------------------------------------------------------------
+	def update
+		super
+		# 判断是否需要刷新
+		if need_refresh?
+			refresh
+		end
+	end
+end
+
+
+##==========================================================================
+# ■ Window_BattleStatusEnemy
+#---------------------------------------------------------------------------
+# 	Display the status of enemy.  
+#   Display HP.
+# 	Display the name and show the face.
+#===========================================================================
+class Window_BattleStatusPlayer < Window_Animated
+	#--------------------------------------------------------------------------
+	# ● 初始化对象
+	#--------------------------------------------------------------------------
+	def initialize(x=20,y=400-8,w=600,h=64+32,xi=20,yi=480+8,dx=0,dy=0.04)
+		super(x,y,w,h,xi,yi,dx,dy)
+		@ymoving = true
+		@wlh = 20
+	end
+	#--------------------------------------------------------------------------
+	# ● 设置显示参数
+	#--------------------------------------------------------------------------
+	def setup(m)
+		@player = m
+		# 设置角色脸部名字
+		@face_name = actor.face_name
+		# 设置角色脸部索引
+		@face_index = actor.face_index
+		@new_values = [
+			@maxhp = @player.maxhp,
+			@hp = @player.hp,
+			@name = @player.name,
+			@face_name = @player.character_name,
+		]
+		refresh
+	end
+	#--------------------------------------------------------------------------
+	# ● 是否需要刷新
+	#--------------------------------------------------------------------------
+	def need_refresh?
+		if @maxhp != @player.maxhp
+			return true
+		end
+		if @hp != @player.hp
+			return true
+		end
+		if @name != @player.name
+			return true
+		end
+		if @face_name != @player.character_name
+			return true
+		end
+	end
+end
+
+
+##==========================================================================
 # ■ Window_BattlePanel_Enemy
 #---------------------------------------------------------------------------
 #  Battle Panel shows the status of the enemy.
@@ -113,16 +258,12 @@ class Window_BattlePanel < Window_Animated
 	attr_accessor 		:monster
 	attr_accessor 		:appearing 			# 是否正在打开
 	attr_accessor 		:disappearing 		# 是否正在关闭
-	attr_accessor 		:still_timer 		# 碰撞之后等待的时间，然后开始隐去背景	
+	attr_accessor 		:still_timer 		# 碰撞之后等待的时间，然后开始隐去背景
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#--------------------------------------------------------------------------
 	def initialize(x,y,w,h,xi,yi,dx,dy)
 		super(x,y,w,h,xi,yi,dx,dy)
-		#@player = $game_battle_players[0]
-		#@monster = $game_battle_monsters[0]
-		#setup(@player, @monster)
-		#refresh
 		@xmoving = true
 		# 计时器清零,然后才能进行背景隐去
 		@still_timer = 0.0
@@ -175,35 +316,7 @@ class Window_BattlePanel < Window_Animated
 	def refresh
 		# 基类首先清除内容
 		self.contents.clear
-	end
-	#--------------------------------------------------------------------------
-	# ● 判断是否需要更新，比较费时
-	#--------------------------------------------------------------------------
-	def need_refresh?
-		# 保存旧属性
-		@old_monstor_attributs = [
-			@old_matk = @matk,
-			@old_mdef = @mdef,
-			@old_mstrength = @mstrength,
-			@old_mcelerity = @mcelerity,
-			@old_mhpcover = @mhpcover,
-			@old_mdestroy = @mdestroy,
-			@old_matkspeed = @matkspeed,
-			@old_mhit = @mhit,
-			@old_meva = @meva,
-		]
-		@old_player_attributs = [
-			@old_patk = @patk,
-			@old_pdef = @pdef,
-			@old_pstrength = @pstrength,
-			@old_pcelerity = @pcelerity,
-			@old_phpcover = @phpcover,
-			@old_pdestroy = @pdestroy,
-			@old_patkspeed = @patkspeed,
-			@old_phit = @phit,
-			@old_peva = @peva,
-		]
-		# 这一部分很费时,尽量少执行
+		# 赋予新值
 		@monster_attributes = [
 			@matk = @monster.atk,
 			@mdef = @monster.def,
@@ -226,33 +339,62 @@ class Window_BattlePanel < Window_Animated
 			@phit = @player.final_hit,
 			@peva = @player.final_eva,
 		]
+	end
+	#--------------------------------------------------------------------------
+	# ● 判断是否需要更新，比较费时
+	#--------------------------------------------------------------------------
+	def need_refresh?
+		# 保存旧属性
+		# @old_monstor_attributs = [
+			# @old_matk = @matk,
+			# @old_mdef = @mdef,
+			# @old_mstrength = @mstrength,
+			# @old_mcelerity = @mcelerity,
+			# @old_mhpcover = @mhpcover,
+			# @old_mdestroy = @mdestroy,
+			# @old_matkspeed = @matkspeed,
+			# @old_mhit = @mhit,
+			# @old_meva = @meva,
+		# ]
+		# @old_player_attributs = [
+			# @old_patk = @patk,
+			# @old_pdef = @pdef,
+			# @old_pstrength = @pstrength,
+			# @old_pcelerity = @pcelerity,
+			# @old_phpcover = @phpcover,
+			# @old_pdestroy = @pdestroy,
+			# @old_patkspeed = @patkspeed,
+			# @old_phit = @phit,
+			# @old_peva = @peva,
+		# ]
+
 		
 		# 判断是否需要重新绘制
-		if @old_matk != @matk or @old_patk != @patk
+		if @monster.atk != @matk or @player.atk != @patk
 			return true
 		end
-		if @old_mdef != @mdef or @old_pdef != @pdef
+		if @monster.def != @mdef or @player.def != @pdef
 			return true
 		end
-		if @old_mhpcover != @mhpcover or @old_phpcover != @phpcover
+		if @monster.final_hpcover != @mhpcover or @player.final_hpcover != @phpcover
 			return true
 		end
-		if @old_mdestroy != @mdestroy or @old_pdestroy != @pdestroy
+		if @monster.final_destroy != @mdestroy or @player.final_destroy != @pdestroy
 			return true
 		end
-		if @old_matkspeed != @matkspeed or @old_patkspeed != @patkspeed
+		if @monster.final_atkspeed != @matkspeed or @player.final_atkspeed != @patkspeed
 			return true
 		end
-		if @old_mhit != @mhit or @old_phit != @phit
+		if @monster.final_hit != @mhit or @player.final_hit != @phit
 			return true
 		end
-		if @old_meva != @meva or @old_peva != @peva
+		if @monster.final_eva != @meva or @player.final_eva != @peva
 			return true
 		end
-		if @old_mstrength != @mstrength or @old_pstrength != @pstrength
+		if @monster.final_strength != @mstrength or @player.final_strength != @pstrength
 			return true
 		end
-		if @old_mcelerity != @mcelerity or @old_pcelerity != @pcelerity
+		if @monster.final_celerity != @mcelerity or @player.final_celerity != @pcelerity
 			return true
 		end
 		return false

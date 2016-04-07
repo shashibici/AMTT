@@ -458,7 +458,24 @@ class Game_Battler
   #  final 系列的参数，最终战斗的时候表现出来的参数
   #
   #========================================================================= 
-  
+  #--------------------------------------------------------------------------
+  # ● 获取 MaxHP 的限制值
+  #--------------------------------------------------------------------------
+  def maxhp_limit
+    return 99999999
+  end
+  #--------------------------------------------------------------------------
+  # ● 获取 MaxHP
+  #--------------------------------------------------------------------------
+  def maxhp
+    return [[base_maxhp + @maxhp_plus, 1].max, maxhp_limit].min
+  end
+  #--------------------------------------------------------------------------
+  # ● 获取 MaxMP
+  #--------------------------------------------------------------------------
+  def maxmp
+    return [[base_maxmp + @maxmp_plus, 0].max, 99999999].min
+  end
   #--------------------------------------------------------------------------
   # ● 获取生命值
   #
@@ -467,15 +484,17 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def hp
     return @hp if @hp <= 0
-    # 如果过了至少1秒
-    if (temp = Graphics.frame_count - @fcounthp) >= Graphics.frame_rate
+    # 间隔设为0.1秒
+	hpcover_interval = Graphics.frame_rate / 30.0
+	# 每次超过间隔都会更新一下
+    if (temp = Graphics.frame_count - @fcounthp) >= hpcover_interval
       # 更新fcounthp
       @fcounthp = Graphics.frame_count
       # 过了超过一秒
-      temp /= (Graphics.frame_rate+0.0)
+      temp /= Graphics.frame_rate.to_f
       # 非战斗状态，回血快
       if $game_switches[103] == false
-        @hp = [@hp + temp * self.maxhp * 0.1, self.maxhp].min
+        @hp = [@hp + temp * self.maxhp * 0.1 * 1.0 / hpcover_interval, self.maxhp].min
       # 战斗状态，回血慢
       else
         @hp = [@hp + temp * self.final_hpcover, self.maxhp].min
