@@ -158,10 +158,10 @@ class Window_BattleStatusEnemy < Window_Animated
 		self.contents.blt(12, 12, @face_bitmap, rect)
 		# 绘制名字
 		color = Color.new(255, 255, 255)
-		draw_a_line(color, 64, self.height-32-@wlh, 108, @wlh, @name, 1)
+		draw_a_line(color, 64, self.contents.height-@wlh, 200, @wlh, @name, 0)
 		# 绘制HP槽
 		rate = @hp / @maxhp
-		gw = Integer((self.contents.width-64) * rate)
+		gw = Integer((self.contents.width-(64+16)) * rate)
 		if rate < 0.5
 			gc1 = Color.new(255,Integer(255*rate*2),0)
 		else
@@ -169,9 +169,9 @@ class Window_BattleStatusEnemy < Window_Animated
 		end
 		gc2 = Color.new(0,0,0)
 		# 填满指定的颜色
-		self.contents.fill_rect(64, self.contents.height - 2.5*@wlh, self.contents.width-64, @wlh, gc2)
-		self.contents.fill_rect(64, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
-		draw_a_line(color, 64, self.contents.height - 2.5*@wlh, self.contents.width-64, @wlh, "125667/234567", 1)
+		self.contents.fill_rect(64+16, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, gc2)
+		self.contents.fill_rect(64+16, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
+		draw_a_line(color, 64+16, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, @hp.ceil.to_s+"/"+@maxhp.ceil.to_s, 1)
 		
 	end
 	#--------------------------------------------------------------------------
@@ -209,14 +209,14 @@ class Window_BattleStatusPlayer < Window_Animated
 	def setup(m)
 		@player = m
 		# 设置角色脸部名字
-		@face_name = actor.face_name
+		@face_name = @player.face_name
 		# 设置角色脸部索引
-		@face_index = actor.face_index
+		@face_index = @player.face_index
+		@face_name = @player.character_name
 		@new_values = [
 			@maxhp = @player.maxhp,
 			@hp = @player.hp,
 			@name = @player.name,
-			@face_name = @player.character_name,
 		]
 		refresh
 	end
@@ -235,6 +235,57 @@ class Window_BattleStatusPlayer < Window_Animated
 		end
 		if @face_name != @player.character_name
 			return true
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 刷新界面
+	#--------------------------------------------------------------------------	
+	def refresh
+		self.contents.clear		
+		# 设置角色脸部名字
+		@face_name = @player.face_name
+		# 设置角色脸部索引
+		@face_index = @player.face_index
+		@face_name = @player.character_name
+		@new_values = [
+			@maxhp = @player.maxhp,
+			@hp = @player.hp,
+			@name = @player.name,
+		]
+		# 绘制脸部
+		bitmap = Cache.face(@face_name)
+		rect = Rect.new(0, 0, 0, 0)
+		rect.x = @face_index % 4 * 96 + (96 - 64) / 2
+		rect.y = @face_index / 4 * 96 + (96 - 64) / 2
+		rect.width = 64
+		rect.height = 64
+		self.contents.blt(self.contents.width - 64, 0, bitmap, rect)
+		# 绘制名字
+		color = Color.new(255, 255, 255)
+		draw_a_line(color, self.contents.width-(64+16)-200, self.contents.height-@wlh, 200, @wlh, @name, 2)
+		# 绘制HP槽
+		rate = @hp / @maxhp
+		gw = Integer((self.contents.width-(64+16)) * rate)
+		if rate < 0.5
+			gc1 = Color.new(255,Integer(255*rate*2),0)
+		else
+			gc1 = Color.new(0, 255, 0)
+		end
+		gc2 = Color.new(0,0,0)
+		# 填满指定的颜色
+		self.contents.fill_rect(0, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, gc2)
+		self.contents.fill_rect(self.contents.width-(64+16)-gw, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
+		draw_a_line(color, 0, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, @hp.ceil.to_s+"/"+@maxhp.ceil.to_s, 1)
+		
+	end
+	#--------------------------------------------------------------------------
+	# ● 跟新窗口
+	#--------------------------------------------------------------------------
+	def update
+		super
+		# 判断是否需要刷新
+		if need_refresh?
+			refresh
 		end
 	end
 end

@@ -211,6 +211,8 @@ class Scene_Map < Scene_Base
 			
 			$battle_status_enemy_window = Window_BattleStatusEnemy.new(20,-8,600,64+32,20,-(64+32),0,0.04)
 			$battle_status_enemy_window.setup($game_monstor_battle)
+			$battle_status_player_window = Window_BattleStatusPlayer.new(20,480-80-8,600,64+32,20,480+64+32,0,0.04)
+			$battle_status_player_window.setup($game_party.active)
 			
 		# 否则战斗状态已经开始,只需要更新
 		elsif $game_switches[103] == true
@@ -230,9 +232,14 @@ class Scene_Map < Scene_Base
 				$battle_status_enemy_window.visible = true
 				$battle_status_enemy_window.active = true
 			end
+			if $battle_status_player_window.visible == false or $battle_status_player_window.active == false
+				$battle_status_player_window.visible = true
+				$battle_status_player_window.active = true
+			end
 			$battle_panel_enemy_window.update
 			$battle_panel_player_window.update
 			$battle_status_enemy_window.update
+			$battle_status_player_window.update
 			# 不再更新玩家信息窗口
 			@pinfo_window.visible = false
 			@pinfo_window.x = 640
@@ -257,6 +264,11 @@ class Scene_Map < Scene_Base
 			if $battle_status_enemy_window != nil
 				$battle_status_enemy_window.dispose
 				$battle_status_enemy_window = nil
+			end
+			# 释放玩家头像窗口
+			if $battle_status_player_window != nil
+				$battle_status_player_window.dispose
+				$battle_status_player_window = nil
 			end
 		end
 	end
