@@ -24,6 +24,9 @@ class Game_Battler
   attr_accessor   :maxmp_plus
   attr_accessor   :fcounthp          # 记录帧数，计算恢复HP
   attr_accessor   :fcountmp          # 记录帧数，计算恢复MP
+  attr_accessor		:screen_x 		# 战斗sprite 的位置 
+  attr_accessor 	:screen_y		# 战斗sprite 的位置 
+  attr_accessor 	:screen_z		# 战斗sprite 的位置 
   #-------------------------------------------------------------
   
   

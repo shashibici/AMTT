@@ -8,6 +8,7 @@
 class Window_BattleBack < Window_Base
 	def initialize(x, y, h, w)
 		super(x, y, h, w)
+		self.contents.fill_rect(self.contents.width/2-1, 80, 3, self.contents.height-160, Color.new(255, 255, 255))
 	end
 end
 
@@ -110,6 +111,7 @@ class Window_BattleStatusEnemy < Window_Animated
 		super(x,y,w,h,xi,yi,dx,dy)
 		@ymoving = true
 		@wlh = 20
+		@still_timer = 0
 	end
 	#--------------------------------------------------------------------------
 	# ● 设置显示参数
@@ -179,13 +181,26 @@ class Window_BattleStatusEnemy < Window_Animated
 	#--------------------------------------------------------------------------
 	def update
 		super
+		if @xmoving == false and @still_timer <= 1.0
+			@disappearing = false
+			# still for 0.4 second
+			@still_timer += (1.0/0.5) / Graphics.frame_rate.to_f
+			if @still_timer >= 1.0
+				@disappearing = true
+			end
+		end
+		if @disappearing == true
+			self.opacity -= 15
+			if self.opacity <= 0
+				@disappearing = false
+			end
+		end
 		# 判断是否需要刷新
 		if need_refresh?
 			refresh
 		end
 	end
 end
-
 
 ##==========================================================================
 # ■ Window_BattleStatusEnemy
@@ -202,6 +217,7 @@ class Window_BattleStatusPlayer < Window_Animated
 		super(x,y,w,h,xi,yi,dx,dy)
 		@ymoving = true
 		@wlh = 20
+		@still_timer = 0
 	end
 	#--------------------------------------------------------------------------
 	# ● 设置显示参数
@@ -283,6 +299,20 @@ class Window_BattleStatusPlayer < Window_Animated
 	#--------------------------------------------------------------------------
 	def update
 		super
+		if @xmoving == false and @still_timer <= 1.0
+			@disappearing = false
+			# still for 0.4 second
+			@still_timer += (1.0/0.5) / Graphics.frame_rate.to_f
+			if @still_timer >= 1.0
+				@disappearing = true
+			end
+		end
+		if @disappearing == true
+			self.opacity -= 15
+			if self.opacity <= 0
+				@disappearing = false
+			end
+		end
 		# 判断是否需要刷新
 		if need_refresh?
 			refresh
@@ -468,7 +498,22 @@ end
 #
 #===========================================================================
 class Window_BattlePanel_Enemy < Window_BattlePanel
-
+	attr_accessor 			:w_1
+	attr_accessor 			:w_2
+	attr_accessor 			:w_3
+	attr_accessor 			:w_4
+	attr_accessor 			:sw_1
+	attr_accessor 			:sw_2
+	attr_accessor 			:sw_3
+	attr_accessor 			:sw_4
+	attr_accessor 			:h_1
+	attr_accessor 			:h_2
+	attr_accessor 			:h_3
+	attr_accessor 			:h_4
+	attr_accessor 			:sh_1
+	attr_accessor 			:sh_2
+	attr_accessor 			:sh_3
+	attr_accessor 			:sh_4
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#--------------------------------------------------------------------------
@@ -525,6 +570,22 @@ end
 #  
 #===========================================================================
 class Window_BattlePanel_Player < Window_BattlePanel
+	attr_accessor 			:w_1
+	attr_accessor 			:w_2
+	attr_accessor 			:w_3
+	attr_accessor 			:w_4
+	attr_accessor 			:sw_1
+	attr_accessor 			:sw_2
+	attr_accessor 			:sw_3
+	attr_accessor 			:sw_4
+	attr_accessor 			:h_1
+	attr_accessor 			:h_2
+	attr_accessor 			:h_3
+	attr_accessor 			:h_4
+	attr_accessor 			:sh_1
+	attr_accessor 			:sh_2
+	attr_accessor 			:sh_3
+	attr_accessor 			:sh_4
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#--------------------------------------------------------------------------
