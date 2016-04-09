@@ -228,7 +228,6 @@ class Window_BattleStatusPlayer < Window_Animated
 		@face_name = @player.face_name
 		# 设置角色脸部索引
 		@face_index = @player.face_index
-		@face_name = @player.character_name
 		@new_values = [
 			@maxhp = @player.maxhp,
 			@hp = @player.hp,
@@ -262,7 +261,6 @@ class Window_BattleStatusPlayer < Window_Animated
 		@face_name = @player.face_name
 		# 设置角色脸部索引
 		@face_index = @player.face_index
-		@face_name = @player.character_name
 		@new_values = [
 			@maxhp = @player.maxhp,
 			@hp = @player.hp,
