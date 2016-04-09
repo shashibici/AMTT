@@ -337,6 +337,8 @@ class Window_BattlePanel < Window_Animated
 	def setup(p, m)
 		@player = p
 		@monster = m
+		@pname = @player.name
+		@mname = @monster.name
 		@monster_attributes = [
 			@matk = @monster.atk,
 			@mdef = @monster.def,
@@ -390,36 +392,13 @@ class Window_BattlePanel < Window_Animated
 			@phit = @player.final_hit,
 			@peva = @player.final_eva,
 		]
+		@mname = @monster.name
+		@pname = @player.name
 	end
 	#--------------------------------------------------------------------------
 	# ● 判断是否需要更新，比较费时
 	#--------------------------------------------------------------------------
-	def need_refresh?
-		# 保存旧属性
-		# @old_monstor_attributs = [
-			# @old_matk = @matk,
-			# @old_mdef = @mdef,
-			# @old_mstrength = @mstrength,
-			# @old_mcelerity = @mcelerity,
-			# @old_mhpcover = @mhpcover,
-			# @old_mdestroy = @mdestroy,
-			# @old_matkspeed = @matkspeed,
-			# @old_mhit = @mhit,
-			# @old_meva = @meva,
-		# ]
-		# @old_player_attributs = [
-			# @old_patk = @patk,
-			# @old_pdef = @pdef,
-			# @old_pstrength = @pstrength,
-			# @old_pcelerity = @pcelerity,
-			# @old_phpcover = @phpcover,
-			# @old_pdestroy = @pdestroy,
-			# @old_patkspeed = @patkspeed,
-			# @old_phit = @phit,
-			# @old_peva = @peva,
-		# ]
-
-		
+	def need_refresh?		
 		# 判断是否需要重新绘制
 		if @monster.atk != @matk or @player.atk != @patk
 			return true
@@ -446,6 +425,9 @@ class Window_BattlePanel < Window_Animated
 			return true
 		end
 		if @monster.final_celerity != @mcelerity or @player.final_celerity != @pcelerity
+			return true
+		end
+		if @mname != @monster.name or @pname != @player.name
 			return true
 		end
 		return false
@@ -496,7 +478,7 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 		@sw_1 = 0 								# 属性到左边框的距离
 		@w_2 = 300 - 32 - @w_1					# 技能列表宽度
 		@sw_2 = @sw_1 + @w_1					# 技能到左边框的距离
-		@sw_3 = @sw_2							# 名字高度
+		@sw_3 = @sw_2							# 名字到左边框的距离
 		@w_3 = @w_2								# 名字宽度
 		@sw_4 = @sw_1 + @w_1 + 48 				# 图片左边到左边框的距离
 		@w_4 = 64 								# 图片宽度
@@ -529,6 +511,8 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*(24+8), @w_1, @h_1, @attributes_string[i],  0)
 			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*(24+8), @w_1-40, @h_1, @monster_attributes[i].ceil.to_s,  2)
 		end
+		# 打印名字
+		draw_a_line(getColor("white"), @sw_3, @sh_3, @w_3, @h_3, @mname,  1)
 	end
 end
 ##==========================================================================
@@ -583,6 +567,8 @@ class Window_BattlePanel_Player < Window_BattlePanel
 			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*(24+8), @w_1, @h_1, @attributes_string[i],  0)
 			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*(24+8), @w_1-40, @h_1, @player_attributes[i].ceil.to_s,  2)
 		end
+		# 打印名字
+		draw_a_line(getColor("white"), @sw_3, @sh_3, @w_3, @h_3, @pname,  1)
 	end
 end
 

@@ -126,6 +126,12 @@ class Scene_Map < Scene_Base
 		if $battle_panel_player_window != nil
 			$battle_panel_player_window.visible = $battle_panel_player_window.active = false
 		end
+		if $battle_status_enemy_window != nil
+			$battle_status_enemy_window.visible = $battle_status_enemy_window.active = false
+		end
+		if $battle_status_player_window != nil
+			$battle_status_player_window.visible = $battle_status_player_window.active = false
+		end
 	end
 	#--------------------------------------------------------------------------
 	# ● 显示玩家信息
