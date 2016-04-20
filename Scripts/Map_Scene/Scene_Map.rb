@@ -176,16 +176,16 @@ class Scene_Map < Scene_Base
 		@pinfo_window.dispose
 		@target_sprite.dispose if @target_sprite
 		
-		if $scene.is_a?(Scene_Battle)     # 正在切换战斗画面的情况下
+		if $scene.is_a?(Scene_Battle)       # 正在切换战斗画面的情况下
 			perform_battle_transition       # 执行战斗前变换
 		end
 	end
 	
 	#--------------------------------------------------------------------------
-		# ● 更新战斗信息
-		#
-		#         新加
-		#
+	# ● 更新战斗信息
+	#
+	#         新加
+	#
 	#--------------------------------------------------------------------------
 	def update_battle_panel
 		# 如果是战斗状态,且是刚刚开始
@@ -251,6 +251,7 @@ class Scene_Map < Scene_Base
 			$battle_panel_player_window.update
 			$battle_status_enemy_window.update
 			$battle_status_player_window.update
+			# 刷新战斗图，显示动画等等都在这里面完成
 			$Spriteset_Battle.update
 			# 不再更新玩家信息窗口
 			@pinfo_window.visible = false

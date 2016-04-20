@@ -762,7 +762,7 @@ class Game_Monstor < Game_Actor
 		end
 	 end
      # 获得金钱
-     
+     $game_party.gold += self.money
      $game_variables[90] = self.money
      
      # 获得经验
