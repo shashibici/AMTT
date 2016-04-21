@@ -115,14 +115,19 @@ class Sprite_Battler < Sprite_Base
 			@battler_visible = false
 		end
 		# 第一次刷新动画
-		if @battler.animation_id != 0
-			# 获得动画
-			animation = $data_animations[@battler.animation_id]
-			mirror = @battler.animation_mirror
-			# 开始显示动画
-			start_animation(animation, mirror)
-			# 显示完毕,所以直到下一次再别的地方修改了animation_id才会再进来
-			@battler.animation_id = 0
+		keys = @battler.animation_id.keys.sort
+		for key in keys
+			if @battler.animation_id[key][0] <= 0
+				# 获得动画
+				animation = $data_animations[@battler.animation_id[key][1]]
+				mirror = @battler.animation_mirror
+				# 开始显示动画
+				start_animation(animation, mirror)
+				@battler.animation_id.delete(key)
+			else
+				# 继续倒计时
+				@battler.animation_id[key][0] -= 1
+			end
 		end
 	end
 	#--------------------------------------------------------------------------

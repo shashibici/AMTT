@@ -5,6 +5,12 @@
 #==============================================================================
 class Sprite_Base < Sprite
 	#--------------------------------------------------------------------------
+	# ● 类变量
+	#--------------------------------------------------------------------------
+	@@animations = []
+	@@_reference_count = {}
+	attr_accessor		:animation_counter		# 记录同时有多少个动画在播放
+	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#
 	#       重定义
@@ -19,6 +25,15 @@ class Sprite_Base < Sprite
 		@_damage_sprite = []         # 记录每一个动画
 		@_damage_type = []           # 记录伤害类型，不同类型有不同显示方式
 		@bom_x = []                  # 记录暴击的初试倾向
+		@animation = {}					# 记录一个动画对象
+		@animation_duration = {}		# 记录动画剩余时间
+		@animation_mirror = {}			# value是bool值，记录动画是否镜像
+		@animation_sprites = {}			# value是一个数组，记录动画的所有sprites
+		@animation_ox = {}				# value是一个实数，记录动画相对位置
+		@animation_oy = {}				# value是一个实数，记录动画相对位置
+		@animation_bitmap1 = {}			# value是一个bitmap对象，记录动画引用的bitmap
+		@animation_bitmap2 = {}			# value是一个bitmap对象，记录动画引用的bitmap
+		@animation_counter = 0			# 累加器，用作动画的key
 		# 如果需要支持新的显示效果，在这里添加
 		@style = {
 			# 普通字体
@@ -105,17 +120,200 @@ class Sprite_Base < Sprite
 	def update
 		super
 		# 更新主动画
-		if @animation != nil
-			# 每次向前推进一帧的时间
-			@animation_duration -= 1
-			# 没四帧更新一次动画（动画向前推进一帧）
-			if @animation_duration % 4 == 0
-				update_animation
+		for i in @animation.keys
+			if @animation[i] != nil
+				# 每次向前推进一帧的时间
+				@animation_duration[i] -= 1
+				# 没四帧更新一次动画（动画向前推进一帧）
+				if @animation_duration[i] % 4 == 0
+					update_animation(i)
+				end
 			end
 		end
 		@@animations.clear
 		# 更新对话动画
 		update_damage
+	end
+	#--------------------------------------------------------------------------
+	# ● 判断动画是否正在显示
+	#--------------------------------------------------------------------------
+	def animation?
+		for i in @animation.keys
+			if @animation[i] != nil 
+				return true
+			end
+		end
+		return false
+	end
+	#--------------------------------------------------------------------------
+	# ● 开始播放动画
+	#--------------------------------------------------------------------------
+	def start_animation(animation, mirror = false)
+		# dispose_animation
+		if nil == animation
+			return 
+		end
+		@animation_counter += 1
+		@animation[@animation_counter] = animation
+		@animation_mirror[@animation_counter] = mirror
+		@animation_duration[@animation_counter] = @animation[@animation_counter].frame_max * 4 + 1
+		load_animation_bitmap
+		@animation_sprites[@animation_counter] = []
+		if @animation[@animation_counter].position != 3 or not @@animations.include?(animation)
+			if @use_sprite
+				for i in 0..15
+					sprite = ::Sprite.new(viewport)
+					sprite.visible = false
+					@animation_sprites[@animation_counter].push(sprite)
+				end
+				unless @@animations.include?(animation)
+					@@animations.push(animation)
+				end
+			end
+		end
+		if @animation[@animation_counter].position == 3
+			if viewport == nil
+				# 修改过
+				@animation_ox[@animation_counter] = Graphics.width / 2
+				@animation_oy[@animation_counter] = Graphics.height / 2
+			else
+				@animation_ox[@animation_counter] = viewport.rect.width / 2
+				@animation_oy[@animation_counter] = viewport.rect.height / 2
+			end
+		else
+			@animation_ox[@animation_counter] = x - ox + width / 2
+			@animation_oy[@animation_counter] = y - oy + height / 2
+			if @animation[@animation_counter].position == 0
+				@animation_oy[@animation_counter] -= height / 2
+			elsif @animation[@animation_counter].position == 2
+				@animation_oy[@animation_counter] += height / 2
+			end
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 读取动画图像
+	#--------------------------------------------------------------------------
+	def load_animation_bitmap
+		animation1_name = @animation[@animation_counter].animation1_name
+		animation1_hue = @animation[@animation_counter].animation1_hue
+		animation2_name = @animation[@animation_counter].animation2_name
+		animation2_hue = @animation[@animation_counter].animation2_hue
+		@animation_bitmap1[@animation_counter] = Cache.animation(animation1_name, animation1_hue)
+		@animation_bitmap2[@animation_counter] = Cache.animation(animation2_name, animation2_hue)
+		if @@_reference_count.include?(@animation_bitmap1[@animation_counter])
+			@@_reference_count[@animation_bitmap1[@animation_counter]] += 1
+		else
+			@@_reference_count[@animation_bitmap1[@animation_counter]] = 1
+		end
+		if @@_reference_count.include?(@animation_bitmap2[@animation_counter])
+			@@_reference_count[@animation_bitmap2[@animation_counter]] += 1
+		else
+			@@_reference_count[@animation_bitmap2[@animation_counter]] = 1
+		end
+		Graphics.frame_reset
+	end
+	#--------------------------------------------------------------------------
+	# ● 释放动画
+	#--------------------------------------------------------------------------
+	def dispose_animation(key)
+		if @animation_bitmap1[key] != nil
+			@@_reference_count[@animation_bitmap1[key]] -= 1
+			if @@_reference_count[@animation_bitmap1[key]] == 0
+				@animation_bitmap1[key].dispose
+			end
+		end
+		if @animation_bitmap2[key] != nil
+			@@_reference_count[@animation_bitmap2[key]] -= 1
+			if @@_reference_count[@animation_bitmap2[key]] == 0
+				@animation_bitmap2[key].dispose
+			end
+		end
+		if @animation_sprites[key] != nil
+			for sprite in @animation_sprites[key]
+				sprite.dispose
+			end
+			@animation_sprites.delete(key)
+			@animation.delete(key)
+			@animation_duration.delete(key)
+			@animation_mirror.delete(key)
+			@animation_ox.delete(key)
+			@animation_oy.delete(key)
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 更新动画
+	#--------------------------------------------------------------------------
+	def update_animation(key)
+		if @animation_duration[key] > 0
+			frame_index = @animation[key].frame_max - (@animation_duration[key] + 3) / 4
+			animation_set_sprites(@animation[key].frames[frame_index], key)
+			for timing in @animation[key].timings
+				if timing.frame == frame_index
+					animation_process_timing(timing)
+				end
+			end
+		else
+			dispose_animation(key)
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 设置动画活动块
+	#     frame : 画面数据 (RPG::Animation::Frame)
+	#--------------------------------------------------------------------------
+	def animation_set_sprites(frame, key)
+		cell_data = frame.cell_data
+		for i in 0..15
+			sprite = @animation_sprites[key][i]
+			next if sprite == nil
+			pattern = cell_data[i, 0]
+			if pattern == nil or pattern == -1
+				sprite.visible = false
+				next
+			end
+			if pattern < 100
+				sprite.bitmap = @animation_bitmap1[key]
+			else
+				sprite.bitmap = @animation_bitmap2[key]
+			end
+			sprite.visible = true
+			sprite.src_rect.set(pattern % 5 * 192,
+			pattern % 100 / 5 * 192, 192, 192)
+			if @animation_mirror[key]
+				sprite.x = @animation_ox[key] - cell_data[i, 1]
+				sprite.y = @animation_oy[key] - cell_data[i, 2]
+				sprite.angle = (360 - cell_data[i, 4])
+				sprite.mirror = (cell_data[i, 5] == 0)
+			else
+				sprite.x = @animation_ox[key] + cell_data[i, 1]
+				sprite.y = @animation_oy[key] + cell_data[i, 2]
+				sprite.angle = cell_data[i, 4]
+				sprite.mirror = (cell_data[i, 5] == 1)
+			end
+			sprite.z = self.z + 300
+			sprite.ox = 96
+			sprite.oy = 96
+			sprite.zoom_x = cell_data[i, 3] / 100.0
+			sprite.zoom_y = cell_data[i, 3] / 100.0
+			sprite.opacity = cell_data[i, 6] * self.opacity / 255.0
+			sprite.blend_type = cell_data[i, 7]
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● SE 与闪烁时间处理
+	#     timing : 时间数据 (RPG::Animation::Timing)
+	#--------------------------------------------------------------------------
+	def animation_process_timing(timing)
+		timing.se.play
+		case timing.flash_scope
+		when 1
+			self.flash(timing.flash_color, timing.flash_duration * 4)
+		when 2
+			if viewport != nil
+				viewport.flash(timing.flash_color, timing.flash_duration * 4)
+			end
+		when 3
+			self.flash(nil, timing.flash_duration * 4)
+		end
 	end
 	#--------------------------------------------------------------------------
 	# ● 释放
@@ -125,7 +323,9 @@ class Sprite_Base < Sprite
 	#--------------------------------------------------------------------------
 	def dispose
 		super
-		dispose_animation
+		for key in @animation.keys
+			dispose_animation(key)
+		end
 		dispose_damages
 	end
 	#--------------------------------------------------------------------------
@@ -268,12 +468,4 @@ class Sprite_Base < Sprite
 		end
 	end
 end
-
-
-
-
-
-
-
-
 

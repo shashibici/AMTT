@@ -148,13 +148,15 @@ module Battle
 				$Spriteset_Battle.enemy.set_talk_text($game_variables[34].to_i.to_s+"!", Color.new(255,0,0),1)
 				# 播放怪物暴击声音
 				# MySound.play_bom($game_variables[45])
-				$Spriteset_Battle.actor.battler.animation_id=$game_variables[45]
+				$Spriteset_Battle.actor.battler.animation_id[0] = [0,$game_variables[45]]
+				$Spriteset_Battle.actor.battler.animation_id[1] = [5,109]
 			# 如果没有暴击
 			else
 				# 显示伤害
 				$Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
 				# 播放伤害动画 - 自带音效
-				$Spriteset_Battle.actor.battler.animation_id=107
+				$Spriteset_Battle.actor.battler.animation_id[0] = [0,107]
+				$Spriteset_Battle.actor.battler.animation_id[1] = [10,109]
 			end
 		end
 	end
@@ -322,12 +324,12 @@ module Battle
 				$Spriteset_Battle.actor.set_talk_text($game_variables[35].to_i.to_s+"!", Color.new(255,0,0),1)
 				# 播放玩家暴击声音
 				# MySound.play_bom(3)
-				$Spriteset_Battle.enemy.battler.animation_id = 111
+				$Spriteset_Battle.enemy.battler.animation_id[0] = [0,111]
 			# 如果没有暴击
 			else
 				# 显示伤害
 				$Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,255,0))
-				$Spriteset_Battle.enemy.battler.animation_id = 110
+				$Spriteset_Battle.enemy.battler.animation_id[0] = [0,110]
 			end
 			
 		end
