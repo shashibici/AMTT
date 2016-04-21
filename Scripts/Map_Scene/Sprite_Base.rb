@@ -24,30 +24,78 @@ class Sprite_Base < Sprite
 			# 普通字体
 			# type = 0
 			0 => {
+				# 位图宽度，-32为实际显示宽度
 				"bitmap_width" 		=>	160,
+				# 位图高度，-32为实际显示高度
 				"bitmap_height" 	=> 	64,
+				# 位图x方向上的位置调整
+				"sprite_x"			=> 	0,
+				# 位图y方向上的位置调整
+				"sprite_y"			=>	0,
+				# 位图z方向上的位置调整,越大显示在越前面
+				"sprite_z"			=>	2000,
+				# 显示字体
 				"font_name"			=>	"黑体",
+				# 字体大小
 				"font_size"			=>	24,
+				# 底字体颜色，推荐黑色
 				"font_color"		=> 	Color.new(0,0,0),
+				# 字体显示框在位图中的相对位置x分量
 				"text_x"			=> 	0,
+				# 字体显示框在位图中的相对位置y分量 
 				"text_y"			=> 	12,
+				# 字体显示框宽度-推荐和位图一样宽
 				"text_width"		=> 	160,
+				# 字体显示框高度-推荐比位图小一些
 				"text_height"		=> 	52,
+				# 字体对齐方式，0-左对齐，1-居中，2-右对齐
 				"text_align"		=> 	1,
+				# 显示多少帧
+				"duration"			=> 	80,
+				# 每一帧在[x,y]上的移动量
 				"movement" 			=> 	{
 					75..80	=>	[0,-3],
 					60..74	=> 	[0,-1],
 				},
+				# 消失效果
 				"fade_out"			=>	{
+					# 越大消失出现得越明显
 					"base" 	=>	51,
+					# 越大消失越快
 					"speed"	=> 	5,
 				}
 			},
 			# 暴击
-			# type = 1
-			1 => {},
+			1 => {
+				"bitmap_width" 		=>	240,
+				"bitmap_height" 	=> 	96,
+				"sprite_x"			=> 	0,
+				"sprite_y"			=> 	-16,
+				"sprite_z"			=>	2001,
+				"font_name"			=>	"Tahoma",
+				"font_size"			=>	28,
+				"font_color"		=> 	Color.new(0,0,0),
+				"text_x"			=> 	0,
+				"text_y"			=> 	12,
+				"text_width"		=> 	240,
+				"text_height"		=> 	78,
+				"text_align"		=> 	1,
+				"duration"			=> 	Graphics.frame_rate,
+				"movement" 			=> 	{
+					[Graphics.frame_rate   , Graphics.frame_rate-2 , Graphics.frame_rate-4 ,
+					 Graphics.frame_rate-6 , Graphics.frame_rate-8 , Graphics.frame_rate-10,
+					 Graphics.frame_rate-12, Graphics.frame_rate-14, Graphics.frame_rate-16,
+					 Graphics.frame_rate-18, Graphics.frame_rate-20, Graphics.frame_rate-22,
+					 Graphics.frame_rate-22, Graphics.frame_rate-26, Graphics.frame_rate-28,
+					 Graphics.frame_rate-30, Graphics.frame_rate-32, Graphics.frame_rate-34,
+					 Graphics.frame_rate-36, Graphics.frame_rate-38, Graphics.frame_rate-40,]	=>	[0,-1],
+				},
+				"fade_out"			=>	{
+					"base" 	=>	44,
+					"speed"	=> 	6,
+				}
+			},
 			# 技能
-			# type = 2
 			2 => {}
 		}
 	end 
@@ -108,52 +156,32 @@ class Sprite_Base < Sprite
 			damage_string = value.to_s
 		end
 		# 新建一个画布，宽160高64
-		bitmap = Bitmap.new(160, 64)
+		bitmap = Bitmap.new(@style[type]["bitmap_width"], @style[type]["bitmap_height"])
 		# 设置字体
-		bitmap.font.name = "黑体"#"Tahoma"#"Arial Black"
+		bitmap.font.name = @style[type]["font_name"]
 		# 设置字号
-		bitmap.font.size = 24
+		bitmap.font.size = @style[type]["font_size"]
 		# 设置颜色为黑
 		bitmap.font.color.set(0, 0, 0)
-		# 判断是否暴击
-		if type == 1
-			bitmap.font.name = "Tahoma"
-			bitmap.font.size = 28
-			damage_string += "!!"
-		end
 		
-		case type
-			# 一般的
-			when 0         
-			# 绘制粗体效果
-			# 这是函数签名：draw_text(x, y, width, height, str[, align])
-			bitmap.draw_text(-1, 12-1, 160, 52, damage_string, 1)
-			bitmap.draw_text(+1, 12-1, 160, 52, damage_string, 1)
-			bitmap.draw_text(-1, 12+1, 160, 52, damage_string, 1)
-			bitmap.draw_text(+1, 12+1, 160, 52, damage_string, 1)
-			bitmap.font.color = color
-			bitmap.draw_text(0, 12, 160, 52, damage_string, 1)
-			# 暴击  
-			when 1         
-			bitmap.draw_text(-1, -1, 160, 52, damage_string, 1)
-			bitmap.draw_text(+1, -1, 160, 52, damage_string, 1)
-			bitmap.draw_text(-1, +1, 160, 52, damage_string, 1)
-			bitmap.draw_text(+1, +1, 160, 52, damage_string, 1)
-			bitmap.font.color = color
-			bitmap.draw_text(0, 0, 160, 52, damage_string, 1)
-		end
+		bitmap.draw_text(@style[type]["text_x"]-1, @style[type]["text_y"]-1, @style[type]["text_width"], @style[type]["text_height"], damage_string, @style[type]["text_align"])
+		bitmap.draw_text(@style[type]["text_x"]+1, @style[type]["text_y"]-1, @style[type]["text_width"], @style[type]["text_height"], damage_string, @style[type]["text_align"])
+		bitmap.draw_text(@style[type]["text_x"]-1, @style[type]["text_y"]+1, @style[type]["text_width"], @style[type]["text_height"], damage_string, @style[type]["text_align"])
+		bitmap.draw_text(@style[type]["text_x"]+1, @style[type]["text_y"]+1, @style[type]["text_width"], @style[type]["text_height"], damage_string, @style[type]["text_align"])
+		bitmap.font.color = color
+		bitmap.draw_text(@style[type]["text_x"], @style[type]["text_y"], @style[type]["text_width"], @style[type]["text_height"], damage_string, @style[type]["text_align"])
 		
 		# 将文字真正贴上去，并实现上浮效果
 		@_damage_sprite1 = Sprite.new(self.viewport)
 		@_damage_sprite1.bitmap = bitmap
 		@_damage_sprite1.ox = bitmap.width / 2
 		@_damage_sprite1.oy = bitmap.height / 2
-		@_damage_sprite1.x = self.x + self.width / 2
-		@_damage_sprite1.y = self.y
-		@_damage_sprite1.z = 3000
+		@_damage_sprite1.x = self.x + self.width / 2 + @style[type]["sprite_x"]
+		@_damage_sprite1.y = self.y + @style[type]["sprite_y"]
+		@_damage_sprite1.z = @style[type]["sprite_z"]
 		@_damage_sprite1.opacity = 0
 		@_damage_sprite.push(@_damage_sprite1)
-		@_damage_duration.push(80)
+		@_damage_duration.push(@style[type]["duration"])
 		@_damage_type.push(type)
 		@bom_x.push(0)
 	end
@@ -170,7 +198,6 @@ class Sprite_Base < Sprite
 		if 0 == @_damage_duration.size
 			return
 		end
-		
 		# 否则所有的精灵都要平移一个距离
 		for i in 0...@_damage_type.size
 			# 对应的伤害精灵剩余时间>0则继续更新
@@ -183,49 +210,6 @@ class Sprite_Base < Sprite
 					end
 				end
 				@_damage_sprite[i].opacity = 256 - (@style[@_damage_type[i]]["fade_out"]["base"] - @_damage_duration[i])*@style[@_damage_type[i]]["fade_out"]["speed"]
-			
-				# case @_damage_type[i]
-				#伤害
-				# when 0
-					# @_damage_duration[i] -= 1
-					# case @_damage_duration[i]
-						# when 75..80               # 38 39 40
-						# @_damage_sprite[i].y -= 3
-						# when 60..74              # 36 37
-						# @_damage_sprite[i].y -= 1
-					# end
-					#渐渐退去
-					# @_damage_sprite[i].opacity = 256 - (51 - @_damage_duration[i])*5
-				# 暴击
-				# when 1
-					# @_damage_duration[i] -= 1
-					# 刚开始不可见
-					# @_damage_sprite[i].opacity = 0
-					# if @bom_x[i] > 0
-						# @bom_x[i] = 1
-					# elsif @bom_x[i] < 0
-						# @bom_x[i] = -1
-					# else
-						# @bom_x[i] = rand(3) - 1
-					# end
-					
-					# case @_damage_duration[i]
-						# when 73..79                
-						# @_damage_sprite[i].y -= 4
-						# return
-						# when 62..73               
-						# @_damage_sprite[i].y -= 2
-						# @_damage_sprite[i].x -= @bom_x[i] if @_damage_duration[i]%3 == 0
-						# when 30..61
-						# @_damage_sprite[i].y -= 1
-						# @_damage_sprite[i].x -= @bom_x[i] if @_damage_duration[i]%4 == 0
-						# when 0..30 
-						# @_damage_sprite[i].y -= 1
-						# @_damage_sprite[i].x -= @bom_x[i] if @_damage_duration[i]%2 == 0
-					# end
-					#渐渐退去
-					# @_damage_sprite[i].opacity = 256 - (44 - @_damage_duration[i])*6
-				# end
 			end
 		end
 		refresh_durations
@@ -268,8 +252,7 @@ class Sprite_Base < Sprite
 			@_damage_type.delete_at(i)
 			@bom_x.delete_at(i)
 		end
-	end    
-	
+	end
 	#--------------------------------------------------------------------------
 	# ● 释放所有文字
 	#

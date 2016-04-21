@@ -235,7 +235,6 @@ class Game_Monstor < Game_Actor
     @evarate               = @level**([1.2, ((x-1)*0.01)+1.0].min) * 1.85
     @bom                   = 0
     @bomrate               = 0
-    @bomatk                = 100 + @level**([1.2, ((x-1)*0.01)+1.0].min) * 2.15
     @hitrate               = 0
     @hprate                = 0
     @mprate                = 0
@@ -315,6 +314,7 @@ class Game_Monstor < Game_Actor
       @hmaxhp *= 1.75
       @destroy *= 1.1
       @hpcover *= 1.5
+	  @bomatk  = 200 + @level**([1.2, ((x-1)*0.01)+1.0].min) * 2.15
     when 2  # 敏捷
       @strength *= 1.2
       @celerity *= 1.5 
@@ -322,6 +322,7 @@ class Game_Monstor < Game_Actor
       @hdef *= 1.75
       @atkspeed *= 1.25
       @hit *= 1.25
+	  @bomatk  = 150 + @level**([1.2, ((x-1)*0.01)+1.0].min) * 2.15
     when 3  # 智力
       @strength *= 1.2
       @celerity *= 1.2
@@ -329,6 +330,7 @@ class Game_Monstor < Game_Actor
       @bom *= 1.75
       @mdestroy *= 1.25
       @hmaxmp *= 1.25
+	  @bomatk  = 175 + @level**([1.2, ((x-1)*0.01)+1.0].min) * 2.15
     end
     
     case @type
@@ -376,9 +378,8 @@ class Game_Monstor < Game_Actor
     
     # 暴击技巧不受影响
 #~     @bom                   *= $game_variables[92] / 1000.0
-    # 暴击倍率不受影响
-#~     @bomatk                *= $game_variables[92] / 1000.0
 
+	@bomatk                *= $game_variables[92] / 1000.0
     @hit                   *= $game_variables[92] / 1000.0
     @hpcover               *= $game_variables[92] / 1000.0
     @hprate                *= $game_variables[92] / 1000.0

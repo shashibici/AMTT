@@ -1,11 +1,10 @@
 #==============================================================================
-	# ■ Scene_Map
-	#------------------------------------------------------------------------------
-	# 　处理地图画面的类。
+# ■ Scene_Map
+#------------------------------------------------------------------------------
+# 　处理地图画面的类。
 #==============================================================================
 
 class Scene_Map < Scene_Base
-	
 	#--------------------------------------------------------------------------
 	# ● 开始处理
 	#
@@ -18,45 +17,27 @@ class Scene_Map < Scene_Base
 		$game_map.refresh
 		# 新建精灵
 		@spriteset = Spriteset_Map.new
-		
-		#------------------------------------------------------
-		# 如果地图技不为空
-		if @mapskill
-			if @mapskill_range
-				set_range_effect(@mapskill_range,8)
-			else
-				set_range_effect(@mapskill_effectrange,8)
-			end
-			set_range_position($game_player.x, $game_player.y)
-		end
-		# 否则不是地图技，继续执行
-		#-------------------------------------------------------
-		
-		
 		# 玩家信息窗口=========================================
 		@message_window = Window_Message.new
 		# 右边的玩家信息窗口
 		@pinfo_window = Window_PlayerInfo.new(448,0)
 		# 默认战斗为false
 		@territory_active = false
-		
 		# 先创建玩家信息窗口，避免到时候出问题
 		@pinfo_window.setup($game_heros[$player_type])
 		@pinfo_window.contents_opacity = 0
-		
 		# 根据系统要求显示或隐藏玩家信息
 		if $game_system.show_info
 			show_player_info
 		else
 			hide_player_info
 		end
-		
 	end  
 	#--------------------------------------------------------------------------
-		# ● フレーム更新
-		#
-		#      重定义
-		#
+	# ● フレーム更新
+	#
+	#      重定义
+	#
 	#--------------------------------------------------------------------------
 	def update
 		super
@@ -65,37 +46,26 @@ class Scene_Map < Scene_Base
 		$game_system.update               # 更新计时器
 		@message_window.update            # 更新消息窗口
 		@spriteset.update                 # 更新活动块元件
-		
 		update_player_info                # 更新玩家信息
-		
 		#-----------------------------------------------
 		#----- 显示战斗面板 battle panel --------------
 		update_battle_panel
 		#-----------------------------------------------
-		
-		
 		unless $game_message.visible      # 正在显示消息以外的情况
             # 更新玩家
             $game_player.update               
-			
             update_transfer_player
-            
             # 侦测是否呼唤了菜单
             update_call_menu
-            
             # 侦测是否跳跃楼层
             update_call_skip
-            
             # 侦测是否调用调试，可以不用
             update_call_debug
-            
             # 侦测是否切换了角色
             update_switch_player
-            
             # 侦测是否场景转换
             update_scene_change 
 		end
-		
 	end
 	 #--------------------------------------------------------------------------
 	# ● 切换至菜单画面
@@ -151,10 +121,10 @@ class Scene_Map < Scene_Base
 		$game_system.show_info = false
 	end
 	#--------------------------------------------------------------------------
-		# ● 更新玩家信息
-		#
-		#        重定义写
-		#
+	# ● 更新玩家信息
+	#
+	#        重定义写
+	#
 	#--------------------------------------------------------------------------
 	def update_player_info  
 		@pinfo_window.update
@@ -175,7 +145,6 @@ class Scene_Map < Scene_Base
 		@message_window.dispose
 		@pinfo_window.dispose
 		@target_sprite.dispose if @target_sprite
-		
 		if $scene.is_a?(Scene_Battle)       # 正在切换战斗画面的情况下
 			perform_battle_transition       # 执行战斗前变换
 		end
@@ -291,16 +260,16 @@ class Scene_Map < Scene_Base
 		end
 	end
 	#--------------------------------------------------------------------------
-		# ● 判断调用怪物手册
-		#
-		#     重定义覆盖，废弃不用
-		#
+	# ● 判断调用怪物手册
+	#
+	#     重定义覆盖，废弃不用
+	#
 	#--------------------------------------------------------------------------
 	def update_call_handbook
 	end 
 	
 	#--------------------------------------------------------------------------
-		# ● 判断是否按了跳跃键
+	# ● 判断是否按了跳跃键
 	#--------------------------------------------------------------------------
 	def update_call_skip
 		# 下楼
@@ -315,9 +284,7 @@ class Scene_Map < Scene_Base
 			end
 			# 否则不是最低楼层,可以传送，直接激活当层的下楼事件
 			$game_map.events[$game_variables[111]].start
-			
 		end
-		
 		# 上楼
 		if Input.trigger?(Input::L)
 			return if $game_map.interpreter.running?        # 正在执行事件？
@@ -331,8 +298,7 @@ class Scene_Map < Scene_Base
 			# 否则不是最高楼层,可以传送，直接激活当层的上楼事件
 			$game_map.events[$game_variables[110]].start    
 		end    
-	end  
-	
+	end
 end
 
 

@@ -78,7 +78,6 @@ module Battle
 		
 		return ret
 	end
-	
 	#--------------------------------------------------------------------------
 	# ●  攻击开始前
 	#--------------------------------------------------------------------------
@@ -136,28 +135,26 @@ module Battle
 		# 判断怪物是否丢失
 		if true == $game_switches[106]
 			# 播放闪避音效
-			MySound.play_evasion
+			# MySound.play_evasion
 			# 显示丢失
-			$Spriteset_Battle.actor.set_talk_text("eva", Color.new(255,255,255))
+			$Spriteset_Battle.enemy.set_talk_text("miss", Color.new(255,255,255))
 		# 如果没有丢失
 		else
 			# 判断怪物是否暴击
 			if true == $game_switches[110]
 				$game_switches[110] = false
 				# 显示暴击
-				#$game_player.damage_talk($game_variables[34].to_i)
-				#$game_map.events[$game_variables[37]].bom_talk($game_variables[34].to_i)
-				$Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
-				$Spriteset_Battle.enemy.set_talk_text($game_variables[34].to_i, Color.new(255,0,0))
+				# $Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
+				$Spriteset_Battle.enemy.set_talk_text($game_variables[34].to_i.to_s+"!", Color.new(255,0,0),1)
 				# 播放怪物暴击声音
-				MySound.play_bom($game_variables[45])
+				# MySound.play_bom($game_variables[45])
+				$Spriteset_Battle.actor.battler.animation_id=$game_variables[45]
 			# 如果没有暴击
 			else
 				# 显示伤害
-				#$game_player.damage_talk($game_variables[34].to_i)
 				$Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
 				# 播放伤害动画 - 自带音效
-				$Spriteset_Battle.actor.battler.animation_id=81
+				$Spriteset_Battle.actor.battler.animation_id=107
 			end
 		end
 	end
@@ -312,29 +309,27 @@ module Battle
 		# 判断玩家是否丢失
 		if true == $game_switches[105]
 			# 播放闪避音效
-			MySound.play_evasion
+			# MySound.play_evasion
 			# 显示丢失
-			#$game_map.events[$game_variables[37]].talk("eva")
-			$Spriteset_Battle.enemy.set_talk_text("eva", Color.new(255,255,255))
+			$Spriteset_Battle.actor.set_talk_text("miss", Color.new(255,255,255))
 		# 如果没有丢失
 		else
 			# 判断玩家是否暴击
 			if true == $game_switches[109]
 				$game_switches[109] = false
 				# 显示暴击
-				#$game_map.events[$game_variables[37]].damage_talk($game_variables[35].to_i)
-				#$game_player.bom_talk($game_variables[35].to_i)
-				$Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,0,0))
-				$Spriteset_Battle.actor.set_talk_text($game_variables[35].to_i, Color.new(255,255,0))
+				# $Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,0,0))
+				$Spriteset_Battle.actor.set_talk_text($game_variables[35].to_i.to_s+"!", Color.new(255,0,0),1)
 				# 播放玩家暴击声音
-				MySound.play_bom(3)
+				# MySound.play_bom(3)
+				$Spriteset_Battle.enemy.battler.animation_id = 111
 			# 如果没有暴击
 			else
 				# 显示伤害
-				#$game_map.events[$game_variables[37]].damage_talk($game_variables[35].to_i)
 				$Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,255,0))
-				$Spriteset_Battle.enemy.battler.animation_id = 92
+				$Spriteset_Battle.enemy.battler.animation_id = 110
 			end
+			
 		end
 	end
 	#--------------------------------------------------------------------------

@@ -252,7 +252,6 @@ class Scene_Equip2 < Scene_Base
 	  @status_window1.setup(temp_actor, 3)
 	  @status_window2.setup(temp_actor, 3)
     end
-
   end
   #--------------------------------------------------------------------------
   # ● 更新选择装备部位

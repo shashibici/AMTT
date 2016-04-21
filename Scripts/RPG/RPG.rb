@@ -17,8 +17,8 @@ module RPG
 			@colstr = newColor
 		end
 		#--------------------------------------------------------------------------
-			# ●  用来初始化增强装备的属性，在游戏开始前运行
-			#
+		# ●  用来初始化增强装备的属性，在游戏开始前运行
+		#
 		#--------------------------------------------------------------------------
 		def initMe
 			@attrs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -40,15 +40,14 @@ module RPG
 				# 写入数据结构
 				GAME_INIT::Equip_Descriptions[locate][self.id.to_s] = GAME_INIT.getSuitAttr(tid, "", @colstr) 
 			end
-			
 		end
 		#--------------------------------------------------------------------------
-			# ● 递归获取一个装备的所有组件,包括自己的id
-			#
-			#     equip    : 装备对象,使用的时候传入自己就能获得自己的。
-			#
-			#     如果装备是套装，就返回它的所有子套装及其组件，否则返回自己
-			#
+		# ● 递归获取一个装备的所有组件,包括自己的id
+		#
+		#     equip    : 装备对象,使用的时候传入自己就能获得自己的。
+		#
+		#     如果装备是套装，就返回它的所有子套装及其组件，否则返回自己
+		#
 		#--------------------------------------------------------------------------
 		def getAllComponentId(equip)
 			# 为空，直接返回空
@@ -56,7 +55,6 @@ module RPG
 			# 层序遍历
 			queue = []
 			result = []
-			
 			if equip.is_a?(RPG::Item)
 				queue.push(equip.id)
 			elsif equip.is_a?(RPG::Weapon)
@@ -64,7 +62,6 @@ module RPG
 			else
 				queue.push(equip.id+2000)
 			end
-			
 			while queue.size > 0
 				tid = queue.pop
 				result.push(tid)
@@ -89,28 +86,21 @@ module RPG
 					end
 				end
 			end
-			
 			# 最后返回一个装备对象列表
 			return result
-			
 		end
 		#-----------------------------------------------------------------------
-			# ● 获得一个装备指定的属性
-			#     
-			#   input   : 属性的名字 e.g. "strength"
-			#   return  : 该属性在数据库中对应的值
-			#
+		# ● 获得一个套装指定的属性
+		#     
+		#   input   : 属性的名字 e.g. "strength"
+		#   return  : 该属性在数据库中对应的值
+		#
 		#-----------------------------------------------------------------------
 		def read_suit_attr(session)
-			#~         if read_note('suit_id') == nil
-			#~           return nil
-			#~         end
-			res = 0
-			
+			res = 0	
 			# 获得所有套装组件id，包括自己！
 			suit_component = getAllComponentId(self)
 			return nil if suit_component == nil
-			
 			for sc in suit_component 
 				# 如果不是一个合法id 直接跳过
 				next if sc <= 1000 or sc >= 3000 or sc == 2000
@@ -129,13 +119,11 @@ module RPG
 					end
 				end
 			end
-			
 			if 0 == res 
 				return nil
 			else
 				return res
 			end
-			
 		end
 		#-----------------------------------------------------------------------
 		# ● 获得一个装备的所有属性值
@@ -157,10 +145,8 @@ module RPG
 				@attrs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 			end
-			
 			# 获得所有套装组件id，包括自己！
 			suit_component = getAllComponentId(self)
-			
 			for sc in suit_component 
 				# 如果不是一个合法id 直接跳过
 				next if sc <= 1000 or sc >= 3000 or sc == 2000
@@ -171,7 +157,6 @@ module RPG
 				else
 					e = nil
 				end
-				
 				# 如果item 存在
 				if nil != e
 					## maxhp
@@ -298,8 +283,6 @@ module RPG
 					end
 				end # end of e!=nil
 			end  # end of for
-			
-		end
-	end
-	
-end
+		end # end of read_suit_all function
+	end # end of class
+end # end of module

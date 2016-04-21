@@ -205,8 +205,8 @@ class Game_Hero < Game_Actor
     # 初始化生命值等等
     recover_all
     
-    # 初始化恢复速度
-    recover_change
+    # 初始化恢复速度 -- 废弃不用
+    # recover_change
     
   end
   #--------------------------------------------------------------------------
@@ -301,7 +301,7 @@ class Game_Hero < Game_Actor
     if true == flag
 	  # 设置装备变更指示器
       @is_equip_changed = 1
-	  # 获得更换装备之前的就装备（包括虚拟装备）
+	  # 获得更换装备之前的就旧备（包括虚拟的套装部件）
       old_equips = @myequip_kits.clone
 	  # 考虑虚拟套装，因为失去虚拟套装也是需要改变属性的
       new_equips = self.equips(true).clone
@@ -429,18 +429,18 @@ class Game_Hero < Game_Actor
         p30 -= val[13]
       end
       
-    # 并没有真正换装备，只需要重新计算装备的影响效果.
-    # 目前只对maxhp有影响,如果对其他有影响，用到的时候再添加
+    # 当仅仅需要重新计算hpcover却不更新装备的时候flag == false
+	# 例如捡东西的时候 -- 现在已经不用了
     else
       # 重新计算p0、p24 其它值不变
-      p0 = 0
-	  p24 = 0
-      for e in equips
-        next if e == nil
-        val = e.attrs
-        p0 += val[0]
-        p24 += val[1]
-      end
+      # p0 = 0
+	  # p24 = 0
+      # for e in equips
+        # next if e == nil
+        # val = e.attrs
+        # p0 += val[0]
+        # p24 += val[1]
+      # end
     end
     
     # 0
@@ -487,8 +487,8 @@ class Game_Hero < Game_Actor
 	@xmaxstrengthrate		= p28
 	@xmaxcelerityrate		= p29
 	@xmaxwisdomrate			= p30
-    # 换了装备之后更新恢复率
-    recover_change
+    # 换了装备之后更新恢复率 -- 废弃不用
+    # recover_change
   end  
    
 #===========================================================================
@@ -641,8 +641,8 @@ class Game_Hero < Game_Actor
       clear_extra_values
       # 初始化生命值等等
       recover_all
-      # 初始化恢复速度
-      recover_change      
+      # 初始化恢复速度 -- 废弃不用
+      # recover_change      
       
       # 设置传送到第一层的相应变量
       tower = GAME_CONF::Tower_Layer[0]

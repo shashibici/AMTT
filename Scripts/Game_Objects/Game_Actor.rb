@@ -234,7 +234,7 @@ class Game_Actor < Game_Battler
 		}
 	end
 	#--------------------------------------------------------------------------
-	# ● 获取虚拟套装（将所有部件装在身上就能获得一个相应的‘虚拟套装'效果）
+	# ● 获取虚拟套装部件（将所有部件装在身上就能获得一个相应的‘虚拟套装'效果）
 	#
 	#    
 	#--------------------------------------------------------------------------
@@ -373,13 +373,14 @@ class Game_Actor < Game_Battler
 		res = weapons + armors
 		# 清空原有缓存
 		@myequips = res
-		# 更新虚拟套装的缓存(集齐散装后获得的虚拟部件)
+		# 更新虚拟套装的缓存(集齐散装后获得的虚拟套装部件)
 		@myequip_kits = @myequips + kits
-		# 更新虚拟套装的缓存(通过实体部件获得虚拟散装部件)
-		for e in @myequips
-			next if nil == e
-			@myequip_kits += getAllComponents(e)
-		end
+		# 更新虚拟套装的缓存(通过实体部件获得虚拟散装部件) -- 已经废弃不需要获得虚拟散装部件
+		# 装备那边的脚本已经能通过套装返回：套装的真实实力，即套装部件+所有散装部件的实力
+		# for e in @myequips
+			# next if nil == e
+			# @myequip_kits += getAllComponents(e)
+		# end
 		# 如果需要考虑虚拟套装
 		if flag == true
 			return @myequip_kits

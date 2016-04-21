@@ -17,18 +17,16 @@
 
 class Game_Battler
   include GAME_CONF
-  
-  attr_accessor   :bomflag           # 是否暴击
-  attr_accessor   :hitflag           # 是否命中 
-  attr_accessor   :maxhp_plus
-  attr_accessor   :maxmp_plus
-  attr_accessor   :fcounthp          # 记录帧数，计算恢复HP
-  attr_accessor   :fcountmp          # 记录帧数，计算恢复MP
-  attr_accessor		:screen_x 		# 战斗sprite 的位置 
-  attr_accessor 	:screen_y		# 战斗sprite 的位置 
-  attr_accessor 	:screen_z		# 战斗sprite 的位置 
+  attr_accessor   	:bomflag           	# 是否暴击
+  attr_accessor   	:hitflag           	# 是否命中 
+  attr_accessor   	:maxhp_plus
+  attr_accessor   	:maxmp_plus
+  attr_accessor   	:fcounthp          	# 记录帧数，计算恢复HP
+  attr_accessor   	:fcountmp          	# 记录帧数，计算恢复MP
+  attr_accessor		:screen_x 			# 战斗sprite 的位置 
+  attr_accessor 	:screen_y			# 战斗sprite 的位置 
+  attr_accessor 	:screen_z			# 战斗sprite 的位置 
   #-------------------------------------------------------------
-  
   
   #=========================================================================
   #  self 系列的参数，是自身条件产生的，没有依靠任何装备  
@@ -38,21 +36,17 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def self_maxhp
     n = @hmaxhp
-    # n += @strength * GAME_CONF::BONUS_STRENGTH_MAXHP
 	n += base_strength * GAME_CONF::BONUS_STRENGTH_MAXHP
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身maxmp
   #--------------------------------------------------------------------------
   def self_maxmp
     n = @hmaxmp
-    # n += @wisdom * GAME_CONF::BONUS_WISDOM_MAXMP
 	n += base_wisdom * GAME_CONF::BONUS_WISDOM_MAXMP
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身atk
   #--------------------------------------------------------------------------
@@ -69,7 +63,6 @@ class Game_Battler
     end
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身def
   #
@@ -82,7 +75,6 @@ class Game_Battler
     n += base_celerity * GAME_CONF::BONUS_CELERITY_DEF
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身力量
   #
@@ -93,7 +85,6 @@ class Game_Battler
     n = @strength
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身敏捷
   #
@@ -104,7 +95,6 @@ class Game_Battler
     n = @celerity
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身智力
   #
@@ -115,11 +105,10 @@ class Game_Battler
     n = @wisdom
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身物理破坏因子
   #
-  #      物理伤害+系统初始值
+  #      物理伤害+系统初始值+带装备力量奖励
   #
   #--------------------------------------------------------------------------
   def self_destroy
@@ -127,11 +116,10 @@ class Game_Battler
     n += base_strength * BONUS_STRENGTH_DESTROY
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身魔法破坏因子
   #
-  #       魔法伤害+系统初始值
+  #       魔法伤害+系统初始值+带装备智力奖励
   #
   #--------------------------------------------------------------------------
   def self_mdestroy
@@ -139,11 +127,10 @@ class Game_Battler
     n += base_wisdom * BONUS_WISDOM_MDESTROY
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身攻速因子
   #
-  #       攻速因子+系统初始值+敏捷奖励
+  #       攻速因子+带装备敏捷奖励
   #
   #--------------------------------------------------------------------------
   def self_atkspeed
@@ -151,11 +138,11 @@ class Game_Battler
     n += base_celerity * GAME_CONF::BONUS_CELERITY_ATKSPEED
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身闪避因子
   #
-  #    闪避因子+扩张率
+  #    (闪避因子+敏捷奖励)*扩张率 -- 扩张率目前没有定义任何武器装备会导致该值上涨
+  #		不排除一些技能会暂时改变@evarate的值
   #
   #--------------------------------------------------------------------------
   def self_eva
@@ -165,7 +152,8 @@ class Game_Battler
   #--------------------------------------------------------------------------
   # ● 获得自身命中因子
   #
-  #    命中因子+扩张率
+  #    (命中因子+敏捷奖励)*扩张率 -- 扩张率目前没有任何武器能够增加
+  # 	不排除一些技能会暂时改变@hitrate的值
   #
   #--------------------------------------------------------------------------
   def self_hit
@@ -175,18 +163,19 @@ class Game_Battler
   #--------------------------------------------------------------------------
   # ● 获得自身暴击因子
   #
-  #        暴击因子+扩张率
+  #        (暴击因子+力量奖励)*扩张率 -- 扩张率目前没有任何武器能够增加
+  #			不排除一些技能会暂时改变@bomrate的值
   #
   #--------------------------------------------------------------------------
   def self_bom
     n = (@bom + base_strength * BONUS_STRENGTH_BOM) * (1 + @bomrate/100.0)
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身暴击威力
   #
-  #        暴击威力  
+  #        暴击威力 -- 非常直接的暴击威力值，一般都是100(%)
+  # 		不排除有些技能可以暂时改变@bomatk的值
   #
   #--------------------------------------------------------------------------
   def self_bomatk
@@ -197,20 +186,23 @@ class Game_Battler
   #--------------------------------------------------------------------------
   # ● 获得自身生命恢复
   #
-  #      生命恢复+力量奖励+生命百分比恢复
+  #      生命恢复+力量奖励+生命百分比恢复 -- self_maxhp 受到躶体maxhp 和 带装备力量的影响
   #
   #--------------------------------------------------------------------------
   def self_hpcover
+	# 自身hpcover -- 通过加点获得
     n = @hpcover
+	# 带装备力量奖励
     n += base_strength * GAME_CONF::BONUS_STRENGTH_HPCOVER
+	# 自身maxhp按百分比恢复， hprate 通常为0，表示一般都不会按比例增加
+	# 这个hprate主要是给monster用的，可以通过数据库指定某个BOSS的hprate,从而该BOSS生命恢复很快。
     n += self_maxhp * @hprate / 100.0
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身魔法恢复
   #
-  #    魔法恢复+智力奖励+魔法百分比恢复
+  #    魔法恢复+智力奖励+魔法百分比恢复 -- self_maxmp 受到躶体maxmp 和 带装备智力的影响
   #
   #--------------------------------------------------------------------------
   def self_mpcover
@@ -219,7 +211,7 @@ class Game_Battler
     n += self_maxmp * @mprate / 100.0
     return n
   end  
-  
+
   #=========================================================================
   #  base 系列的参数，有了装备之后的参数，不考虑技能、实战的影响。
   #
@@ -233,13 +225,19 @@ class Game_Battler
   #     其实最后到battler类中还有一个状态加成，例如“攻击力上升”状态
   #--------------------------------------------------------------------------
   def base_maxhp
-    # n初始为自身maxhp
+    # self_maxhp 只受躶体maxhp和带装备力量影响
     n = self_maxhp
-	# 装备百分比加成
+	# 装备百分比加成 -- 装备按照百分比扩张,例如2个150%的装备,xmaxhprate=50
 	n *= (@xmaxhprate + 100.0) / 100.0
     # 装备加成
     n += @xhmaxhp
-    
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.maxhp_rate / 100.0
+		delta += state.maxhp
+	end
+	n += delta
     # 类型加成 -- 暂时不实现
     return n
   end
@@ -256,9 +254,14 @@ class Game_Battler
 	n *= (@xmaxmprate + 100.0) / 100.0
     # 装备加成
     n += @xhmaxmp
-
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.maxmp_rate / 100.0
+		delta += state.maxmp
+	end
+	n += delta
     # 类型加成 -- 暂时不实现
-    
     return n
   end
     
@@ -269,15 +272,20 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_atk
-    # n初始为自身hatk
+    # self_atk为裸体atk + 带装备主属性加成
     n = self_atk
 	# 装备百分比加成
 	n *= (@xmaxatkrate + 100.0) / 100.0
-    # 装备加成
+	# 装备加成
     n += @xhatk
-    
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.atk_rate / 100.0
+		delta += state.atk
+	end
+	n += delta
     # 类型加成 -- 暂时不实现
-    
     return n
   end
   
@@ -288,18 +296,22 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_def
-    # n初始为自身hatk
+    # self_def为裸体def + 带装备敏捷加成
     n = self_def
 	# 装备百分比加成
 	n *= (@xmaxdefrate + 100.0) / 100.0
     # 每一件装备增加的防御力
     n += @xhdef
-
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.def_rate / 100.0
+		delta += state.def
+	end
+	n += delta
     # 类型加成 -- 暂时不实现
-    
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取基本力量
   #
@@ -310,7 +322,15 @@ class Game_Battler
     n = self_strength
 	# 装备百分比加成
 	n *= (@xmaxstrengthrate + 100.0) / 100.0
+	# 装备加成的力量
     n += @xstrength
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.strength_rate / 100.0
+		delta += state.strength
+	end
+	n += delta
     return n
   end  
   
@@ -324,7 +344,15 @@ class Game_Battler
     n = self_wisdom
 	# 装备百分比加成
 	n *= (@xmaxwisdomrate + 100.0) / 100.0
+	# 装备加成的智力
     n += @xwisdom
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.wisdom_rate / 100.0
+		delta += state.wisdom
+	end
+	n += delta
     return n
   end  
   
@@ -338,7 +366,15 @@ class Game_Battler
     n = self_celerity
 	# 装备百分比加成
 	n *= (@xmaxcelerityrate + 100.0) / 100.0
+	# 装备加成的敏捷
     n += @xcelerity
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.celerity_rate / 100.0
+		delta += state.celerity
+	end
+	n += delta
     return n
   end
   
@@ -349,7 +385,15 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_destroy
+	# self_destroy为裸体destroy + 带装备力量奖励
     n = self_destroy + @xdestroy
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.destroy_rate / 100.0
+		delta += state.destroy
+	end
+	n += delta
     return n
   end  
   
@@ -362,6 +406,13 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def base_mdestroy
     n = self_mdestroy + @xmdestroy
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.mdestroy_rate / 100.0
+		delta += state.mdestroy
+	end
+	n += delta
     return n    
   end  
   
@@ -373,7 +424,15 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_atkspeed
+	# self_atkspeed为裸体攻速 + 带装备敏捷奖励
     n = self_atkspeed + @xatkspeed
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.atkspeed_rate / 100.0
+		delta += state.atkspeed
+	end
+	n += delta
     return n    
   end   
   
@@ -384,11 +443,19 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_eva
+	# self_eva为裸体闪避 + 带装备敏捷奖励
     n = self_eva
     # 扩张
     n *= (100.0 + @xevarate) / 100.0
     # 装备加成
     n += @xeva
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.eva_rate / 100.0
+		delta += state.eva
+	end
+	n += delta
     return n    
   end
   
@@ -399,9 +466,17 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_hit
+	# self_hit为躶体命中 + 带装备敏捷奖励
     n = self_hit
     n *= (100.0 + @xhitrate) / 100.0
     n += @xhit
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.hit_rate / 100.0
+		delta += state.hit
+	end
+	n += delta
     return n    
   end
   
@@ -412,11 +487,18 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_bom
+	# self_bom为躶体暴击技巧 + 带装备力量奖励
     n = self_bom
     n = n * (100.0 + @xbomrate) / 100.0 + @xbom
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.bom_rate / 100.0
+		delta += state.bom
+	end
+	n += delta
     return n    
-  end  
-  
+  end
   #--------------------------------------------------------------------------
   # ● 获得基本暴击威力
   #
@@ -424,10 +506,17 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_bomatk
+	# self_bomatk为躶体暴击威力，通常为100%，只有技能或者状态能够改变这个值
     n = self_bomatk + @xbomatk
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.bomatk_rate / 100.0
+		delta += state.bomatk
+	end
+	n += delta
     return n
   end  
-  
   #--------------------------------------------------------------------------
   # ● 获得自身生命恢复
   #
@@ -435,13 +524,21 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def base_hpcover
+	# self_hpcover为躶体hpcover + 带装备力量奖励 + self_hp*hprate -- 通常hprate就是0
     n = self_hpcover
+	# 装备增加
     n += @xhpcover 
-	# 按百分比回复
+	# 按百分比回复 -- 有些装备能够按照百分比回血，但只能是self_maxhp的百分比
     n += self_maxhp * @xhprate / 100.0
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.hpcover_rate / 100.0
+		delta += state.hpcover
+	end
+	n += delta
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获得自身魔法恢复
   #
@@ -453,10 +550,15 @@ class Game_Battler
     n += @xmpcover
 	# 按百分比回复
     n += self_maxmp * @xmprate / 100.0
+	# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+	delta = 0
+	for state in states
+		delta += n * state.mpcover_rate / 100.0
+		delta += state.mpcover
+	end
+	n += delta
     return n
-  end 
-  
-  
+  end
   #=========================================================================
   #  final 系列的参数，最终战斗的时候表现出来的参数
   #
@@ -471,6 +573,7 @@ class Game_Battler
   # ● 获取 MaxHP
   #--------------------------------------------------------------------------
   def maxhp
+	# @maxhp_plus为状态对maxhp的影响提供了可能
     return [[base_maxhp + @maxhp_plus, 1].max, maxhp_limit].min
   end
   #--------------------------------------------------------------------------
@@ -478,6 +581,20 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def maxmp
     return [[base_maxmp + @maxmp_plus, 0].max, 99999999].min
+  end
+  #--------------------------------------------------------------------------
+  # ● 更改 HP
+  #     hp : 新的 HP
+  #--------------------------------------------------------------------------
+  def hp=(hp)
+    @hp = [[hp, maxhp].min, 0].max
+  end
+  #--------------------------------------------------------------------------
+  # ● 更改 MP
+  #     mp : 新的 MP
+  #--------------------------------------------------------------------------
+  def mp=(mp)
+    @mp = [[mp, maxmp].min, 0].max
   end
   #--------------------------------------------------------------------------
   # ● 获取生命值
@@ -504,7 +621,6 @@ class Game_Battler
       end
       # 返回新的hp
       return @hp
-    
     # 否则直接返回
     else
       return @hp
@@ -514,7 +630,7 @@ class Game_Battler
   # ● 获取生命值
   #
   #    屏蔽Game_Battler的mp属性，为了每次获取的时候能够修改
-  #
+  #	   暂时不管MP恢复问题	
   #--------------------------------------------------------------------------
   def mp
     return @mp if @mp <= 0
@@ -526,13 +642,11 @@ class Game_Battler
       @mp = [@mp + temp * self.final_mpcover, self.maxmp].min
       # 返回新的hp
       return @mp
-    
     # 否则直接返回
     else
       return @mp
     end
-  end  
-  
+  end
   #--------------------------------------------------------------------------
   # ● 获取攻击力
   #
@@ -541,7 +655,6 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def atk
     n = [[base_atk + @atk_plus, 1].max, 9999999].min
-    for state in states do n *= state.atk_rate / 100.0 end
     n = [[n, 1].max, 9999999].min
     return n
   end
@@ -553,7 +666,6 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def def
     n = [[base_def + @def_plus, 1].max, 9999999].min
-    for state in states do n *= state.def_rate / 100.0 end
     n = [[n, 1].max, 9999999].min
     return n
   end
@@ -563,14 +675,12 @@ class Game_Battler
   def final_strength
     return base_strength
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取敏捷
   #--------------------------------------------------------------------------
   def final_celerity
     return base_celerity
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取智力
   #--------------------------------------------------------------------------
@@ -585,15 +695,15 @@ class Game_Battler
     n *= final_destroyrate / 100.0
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取最终物理伤害比率 
   #    
   #    通常，物理伤害比率 % 可以为200%、150%、50% 等等
-  #    刚开始的时候是1%，通过装备等等措施可以提高此参数  
+  #    刚开始的时候是100%，通过装备等等措施可以提高此参数  
   #
   #--------------------------------------------------------------------------
   def final_destroyrate
+	# @destroyrate=100,可以通过吃药提升;通过装备提升的直接提升
     return @destroyrate + @xdestroyrate
   end
   
@@ -605,7 +715,6 @@ class Game_Battler
     n *= final_mdestroyrate / 100.0
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取最终魔法伤害比率 
   #    
@@ -616,17 +725,15 @@ class Game_Battler
   def final_mdestroyrate
     return @mdestroyrate + @xmdestroyrate
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取最终攻击速度因子
   #--------------------------------------------------------------------------
   def final_atkspeed
     n = base_atkspeed
-    n *= (@atkrate + @xatkrate ) / 100.0
+    n *= final_atkrate / 100.0
     n += CONST_BASE_ATKSPEED
     return n 
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取最终攻击速度率
   #
@@ -634,9 +741,9 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def final_atkrate
+    # @atkrate=100,可通过药物提升; @xatkrate=0,可通过装备提升
     return (@atkrate + @xatkrate)
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取最终闪避因子
   #
@@ -647,12 +754,11 @@ class Game_Battler
     n = base_eva
     return n
   end
-  
   #--------------------------------------------------------------------------
   # ● 获取最终闪避增加率
   #
   #   是额外增加率，例如20则增加20%，变为120%
-  #
+  #   没有被调用，留作以后扩展 -- 例如有能够增加闪避率的药物...
   #--------------------------------------------------------------------------
   def final_evarate
     return (self.evarate + self.xevarate)
@@ -671,6 +777,7 @@ class Game_Battler
   # ● 获取最终命中增加率
   #
   #     是额外增加率，例如20则增加20%，变为120%
+  # 	没有被调用，留作以后扩展 -- 例如有能够增加命中率的药物...
   #
   #--------------------------------------------------------------------------
   def final_hitrate
@@ -752,12 +859,14 @@ class Game_Battler
   #--------------------------------------------------------------------------
   # ● 最终每秒生命恢复量
   #
-  #      会根据状态动态的修改real_hpcover这个变量
-  #      修改real_hpcover时用到 base_hpcover
+  # 	 为了提高速度，用一个专门的变量来存储hpcover.
+  # 	 这在可扩展性上产生了问题 -- 只要修改了maxhp, hpcover, 等等
+  # 	 就要调用 recover_change从新计算real_hpcover.
   #
   #--------------------------------------------------------------------------
   def final_hpcover
-    return self.real_hpcover
+	return base_hpcover
+    #return self.real_hpcover
   end
   #--------------------------------------------------------------------------
   # ● 获取最终魔法恢复量
@@ -767,13 +876,16 @@ class Game_Battler
   #
   #--------------------------------------------------------------------------
   def final_mpcover
-    return self.real_mpcover
+	return base_mpcover
+    #return self.real_mpcover
   end
   
   #--------------------------------------------------------------------------
   # ● 当恢复信息变更的时候
   #    
   #     升级、更换装备、状态改变，等等都需要调用此函数。
+  #
+  # 	 -- 已经废弃 --
   #
   #--------------------------------------------------------------------------  
   def recover_change
@@ -790,27 +902,25 @@ class Game_Battler
   end
   #--------------------------------------------------------------------------
   # ● 因为状态改变而改变恢复值
+  #
+  #   	-- 已经废弃 --
   #--------------------------------------------------------------------------
   def recover_change_by_state
     # 记录恢复率的修正值
     hpr = 0
     mpr = 0
-    
     # 遍历状态
-    for state in states do
-      next if state == nil
-      hpr += state.read_note('add_hpcover') if state.read_note('add_hpcover') != nil
-      hpr += state.read_note('add_hprate')*maxhp/100.0 if state.read_note('add_hprate') != nil
-      mpr += state.read_note('add_mpcover') if state.read_note('add_mpcover') != nil
-      mpr += state.read_note('add_mprate')*maxmp/100.0 if state.read_note('add_mprate') != nil
-    end
-    
+    # for state in states do
+      # next if state == nil
+      # hpr += state.read_note('add_hpcover') if state.read_note('add_hpcover') != nil
+      # hpr += state.read_note('add_hprate')*maxhp/100.0 if state.read_note('add_hprate') != nil
+      # mpr += state.read_note('add_mpcover') if state.read_note('add_mpcover') != nil
+      # mpr += state.read_note('add_mprate')*maxmp/100.0 if state.read_note('add_mprate') != nil
+    # end
     # hpr 可以 <0 例如中毒
     @real_hpcover += hpr
     @real_mpcover += mpr
   end 
-  
-  
   #========================================================================
   #  下面是各个参数在实战中最终的应用。
   #
@@ -1073,7 +1183,7 @@ class Game_Battler
 		diff = (@level * 2) - target.level
 	end
 	diff = [[diff, 4].min, -4].max
-	effect = LEVEL_EFFECT[diff+4]
+	effect = GAME_CONF::LEVEL_EFFECT[diff+4]
 	final_dmg *= effect
     # 制造随机伤害
     final_dmg = final_dmg * (190 + rand(21)) / 200.00
@@ -1213,6 +1323,4 @@ class Game_Battler
       return 
     end
   end
-  
-  
 end
