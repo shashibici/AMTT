@@ -36,6 +36,8 @@ module Battle
 			$game_variables[181] = $game_monstor_battle.armor12_id
 		end
 		$game_switches[160] = false
+		$Battle_animation_counter_enemy = 0
+		$Battle_animation_counter_player = 0
 	end
 	#--------------------------------------------------------------------------
 	# ●  一个战斗回合 （攻击一次）
@@ -135,9 +137,9 @@ module Battle
 		# 判断怪物是否丢失
 		if true == $game_switches[106]
 			# 播放闪避音效
-			# MySound.play_evasion
+			MySound.play_fail
 			# 显示丢失
-			$Spriteset_Battle.enemy.set_talk_text("miss", Color.new(255,255,255))
+			$Spriteset_Battle.enemy.set_talk_text("丢失", Color.new(255,255,255))
 		# 如果没有丢失
 		else
 			# 判断怪物是否暴击
@@ -148,15 +150,15 @@ module Battle
 				$Spriteset_Battle.enemy.set_talk_text($game_variables[34].to_i.to_s+"!", Color.new(255,0,0),1)
 				# 播放怪物暴击声音
 				# MySound.play_bom($game_variables[45])
-				$Spriteset_Battle.actor.battler.animation_id[0] = [0,$game_variables[45]]
-				$Spriteset_Battle.actor.battler.animation_id[1] = [5,109]
+				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_enemy] = [0,$game_variables[45]]
+				$Battle_animation_counter_enemy += 1
 			# 如果没有暴击
 			else
 				# 显示伤害
-				$Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
+				# $Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
 				# 播放伤害动画 - 自带音效
-				$Spriteset_Battle.actor.battler.animation_id[0] = [0,107]
-				$Spriteset_Battle.actor.battler.animation_id[1] = [10,109]
+				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_enemy] = [0,107]
+				$Battle_animation_counter_enemy += 1
 			end
 		end
 	end
@@ -311,9 +313,9 @@ module Battle
 		# 判断玩家是否丢失
 		if true == $game_switches[105]
 			# 播放闪避音效
-			# MySound.play_evasion
+			MySound.play_fail
 			# 显示丢失
-			$Spriteset_Battle.actor.set_talk_text("miss", Color.new(255,255,255))
+			$Spriteset_Battle.actor.set_talk_text("丢失", Color.new(255,255,255))
 		# 如果没有丢失
 		else
 			# 判断玩家是否暴击
@@ -324,12 +326,14 @@ module Battle
 				$Spriteset_Battle.actor.set_talk_text($game_variables[35].to_i.to_s+"!", Color.new(255,0,0),1)
 				# 播放玩家暴击声音
 				# MySound.play_bom(3)
-				$Spriteset_Battle.enemy.battler.animation_id[0] = [0,111]
+				$Spriteset_Battle.enemy.battler.animation_id[$Battle_animation_counter_enemy] = [0,111]
+				$Battle_animation_counter_enemy += 1
 			# 如果没有暴击
 			else
 				# 显示伤害
-				$Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,255,0))
-				$Spriteset_Battle.enemy.battler.animation_id[0] = [0,110]
+				# $Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,255,0))
+				$Spriteset_Battle.enemy.battler.animation_id[$Battle_animation_counter_enemy] = [0,110]
+				$Battle_animation_counter_enemy += 1
 			end
 			
 		end

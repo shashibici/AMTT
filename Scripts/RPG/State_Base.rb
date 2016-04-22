@@ -2,8 +2,10 @@ module RPG
 	class State_Base < State
 		# 每一个state都知道自己的battler.
 		attr_accessor		:battler
-		# 每一个state都有一个timer. timer为0则移除
+		# 每一个state都有一个timer. timer为0则移除,单位是帧
 		attr_accessor		:timer
+		# 状态考虑的顺序，从小打到
+		attr_accessor 		:priority
 		#--------------------------------------------------------------------------
 		# ● 初始化
 		#
@@ -12,7 +14,7 @@ module RPG
 		# 		Monster可以有一个"无敌"state,id=1,增加防御1000
 		# 		Player也可以有一个"无敌"state,id=2,增加防御100
 		#--------------------------------------------------------------------------
-		def initialize(battler = nil)
+		def initialize(battler = nil, priority = 0, timer = 99999)
 			super
 			@battler = battler
 		end

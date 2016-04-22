@@ -60,7 +60,7 @@ module GAME_CONF
 		$TIME_POST_PRE_DAMAGE					=	6,	# predamage 执行之后
 		# dodamage 直接
 		$TIME_PRE_DO_DAMAGE						=	7,	# dodamage 执行之前
-		$TIME_POST_DO_DAMAGE					=	8, 	# dodamage 执行之前
+		$TIME_POST_DO_DAMAGE					=	8, 	# dodamage 执行之后
 		$TIME_PRE_POST_DAMAGE					=	9,	# postdamage 执行之前
 		$TIME_POST_POST_DAMAGE					=	10	# postdamage 执行之后
 	]

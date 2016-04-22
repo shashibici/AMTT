@@ -29,7 +29,7 @@ module RPG
 		# ● 设置对象	
 		#	attacker		: 	使用者 
 		# 	target 			: 	目标者 
-		# 	subscriber 		: 	攻击时机，在GAME_CONF中定义
+		# 	subscriber 		: 	攻击时机列表，在GAME_CONF中定义
 		#--------------------------------------------------------------------------
 		def setup(attacker, target, subscriber, priority = 0)
 			@attacker = attacker
@@ -46,6 +46,12 @@ module RPG
 			@subscriber = s
 		end
 		#--------------------------------------------------------------------------
+		# ●  动态修改优先级
+		#--------------------------------------------------------------------------
+		def set_priority(p)
+			@priority = p
+		end	
+		#--------------------------------------------------------------------------
 		# ● 锁定技函数
 		# 		在技能被添加的时候或者战斗开始的时候被调用，一般是添加状态
 		#--------------------------------------------------------------------------
@@ -55,10 +61,11 @@ module RPG
 		# ● 触发技函数
 		# 		在每个事件发生的时候都会调用一次
 		# 		事件包括攻击事件和阶段切换事件
+		# 		args 是一个 hash 结构，用来传递参数
 		#--------------------------------------------------------------------------
-		def trigger_func
-			if can_trigger?
-				effect_func
+		def trigger_func(args)
+			if can_trigger?(args)
+				effect_func(args)
 			end
 		end
 		#--------------------------------------------------------------------------
@@ -79,7 +86,7 @@ module RPG
 		#		此函数由子类具体实现,必要的时候定义内部属性传参数
 		# 		这个函数在播放动画的时候会调用 -- 依据技能优先级显示动画
 		#--------------------------------------------------------------------------
-		def animation_func
+		def animation_func(args)
 		end				
 		#--------------------------------------------------------------------------
 		# ● 被触发,必须在每个技能中都有实现
@@ -99,64 +106,71 @@ module RPG
 	# ■ 示例1  反弹
 	#------------------------------------------------------------------------------
 	# 	有20%几率将对方造成的伤害的 技能等级 X 5% 以纯粹伤害反弹
-	#===============================================================
+	#==============================================================================
 	class Fantan < Skill
 		include GAME_CONF
 		#--------------------------------------------------------------------------
 		# ● 初始化
 		#--------------------------------------------------------------------------
-		def initialize
-			super
+		def initialize(name, level)
+			super(name, level)
 		end
 		#--------------------------------------------------------------------------
 		# ● 设置对象	
 		#	attacker	: 	使用者 (影响调用者)
 		# 	target 		: 	目标者 (影响调用者)
-		# 	time 		: 	默认为 $TIME_POST_PRE_DAMAGE （最终伤害已经出来）
+		# 	time 		: 	默认为 空
 		# 	priority	: 	默认为1，一般就不修改了
 		#--------------------------------------------------------------------------
-		def setup(attacker, target, time = $TIME_POST_PRE_DAMAGE, priority = 1)
-			@attacker = attacker
-			@target = target
-			@time = time
-			@priority = priority
+		def setup(attacker, target, subscriber = [], priority = 1)
+			# 伤害都结算完了之后调用
+			subscriber = [$TIME_POST_PRE_DAMAGE]
+			super(attacker, target, subscriber, priority)
 		end
 		#--------------------------------------------------------------------------
-		# ● 被触发,必须在每个技能中都有实现
-		#	
-		#	
-		#
-		#
-		#
+		# ● 这是一个触发技能，需要实现can_trigger?
 		#--------------------------------------------------------------------------
-		def triggered(brate = 0, drate = 0, dmg = 0, pure = 0, hitflag = true, bomflag = false)
-			if hitflag == false
-				return [brate, drate, dmg, pure]
+		def can_trigger?(args)
+			ret = super
+			for event in @subscriber
+				if event == $NOW_TIME
+					ret = ret & true
+					break
+				end
 			end
-			if $TIME_POST_PRE_DAMAGE != $NOW_TIME or !@target.has_skill?(self.id)
-				return [brate, drate, dmg, pure]
+			ret = ret & (args["target"].hp > 0)
+			ret = ret & (args["source"].hp > 0)
+			return ret
+		end
+		#--------------------------------------------------------------------------
+		# ● 这是一个触发技能，需要实现effect_func触发效果
+		#--------------------------------------------------------------------------
+		def effect_func(args)
+			if rand(100) < 20
+				damage = args["damage"]
+				bounce = @level * 0.05 * damage
+				args["target"].pureDamage(args["source"])
 			end
-			if 20 < rand(101) 
-				return [brate, drate, dmg, pure]
-			end
-			# 获得反弹伤害
-			d = dmg * (@target.my_skills)[self.id]["level"] * 0.05
-			# 实施纯粹伤害
-			@target.dodamage(@attacker, d)
-			if @target.hero?
-				# 显示伤害 - 目标是英雄，被反弹的是怪物
-				$game_map.events[$game_variables[37]].damage_talk(d.to_i)
-				$game_map.events[$game_variables[37]].animation_id = 110
+			# 例如，需要给对方增加一个减速效果,持续5秒
+			state = State_Base.new(args["source"], 5, Graphics.frame_rate*5)
+			args["source"].add_state(state)
+		end
+		#--------------------------------------------------------------------------
+		# ● 这是一个触发技能，需要实现effect_func触发效果
+		#--------------------------------------------------------------------------
+		def animation_func(args)
+			super(args)
+			animation = {}
+			if args["target"].hero?
+				animation["seq"] = $Battle_animation_counter_player
+				animation["value"] = [4, 121]
+				$Battle_animation_counter_player += 1
 			else
-				# 显示伤害
-				$game_player.damage_talk(d.to_i)
-				# 显示动画-纯粹伤害
-				$game_player.animation_id = 110
+				animation["seq"] = $Battle_animation_counter_enemy
+				animation["value"] = [4, 121]
+				$Battle_animation_counter_enemy += 1
 			end
-			
-			return [brate, drate, dmg, pure]
+			args["target"].add_animation(animation)
 		end
 	end
-	
-	
 end
