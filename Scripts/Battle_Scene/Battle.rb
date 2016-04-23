@@ -150,14 +150,14 @@ module Battle
 				$Spriteset_Battle.enemy.set_talk_text($game_variables[34].to_i.to_s+"!", Color.new(255,0,0),1)
 				# 播放怪物暴击声音
 				# MySound.play_bom($game_variables[45])
-				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_enemy] = [0,$game_variables[45]]
+				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_player] = [0,$game_variables[45]]
 				$Battle_animation_counter_enemy += 1
 			# 如果没有暴击
 			else
 				# 显示伤害
 				# $Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
 				# 播放伤害动画 - 自带音效
-				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_enemy] = [0,107]
+				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_player] = [0,107]
 				$Battle_animation_counter_enemy += 1
 			end
 		end

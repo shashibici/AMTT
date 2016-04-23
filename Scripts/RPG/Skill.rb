@@ -93,10 +93,10 @@ module RPG
 		end
 		#--------------------------------------------------------------------------
 		# ● 设置对象	
-		#	attacker	: 	使用者 (影响调用者)
-		# 	target 		: 	目标者 (影响调用者)
-		# 	time 		: 	默认为 空
-		# 	priority	: 	默认为1，一般就不修改了
+		#	name		:	技能名字
+		#	level		:	技能等级
+		# 	battler		:	技能拥有者
+		# 	priority	:	优先级 - 越低越优先
 		#--------------------------------------------------------------------------
 		def setup(name, level, battler, priority = 0)
 			super(name, level, battler, priority)
@@ -123,10 +123,11 @@ module RPG
 					damage = args["damage"]
 					bounce = @level * 0.05 * damage
 					args["target"].pureDamage(args["source"], bounce)
+					animation_func(args)
 				end
-				# 例如，需要给对方增加一个减速效果,持续5秒
-				state = Frozen_State.new
-				state.setup(args["source"], 5, Graphics.frame_rate*5)
+				# 例如，需要给对方增加一个减速效果,持续5秒，结算顺序为1
+				state = Single_Frozen_State.new
+				state.setup(args["source"], 1, 4.5)
 				args["source"].add_state(state)
 			end
 		end
@@ -135,17 +136,21 @@ module RPG
 		#--------------------------------------------------------------------------
 		def animation_func(args)
 			super(args)
+			animations = []
 			animation = {}
 			if args["target"].hero?
 				animation["seq"] = $Battle_animation_counter_player
-				animation["value"] = [4, 121]
+				animation["value"] = [1, 124]
 				$Battle_animation_counter_player += 1
+				animations.push(animation)
 			else
 				animation["seq"] = $Battle_animation_counter_enemy
-				animation["value"] = [4, 121]
+				animation["value"] = [1, 124]
 				$Battle_animation_counter_enemy += 1
+				animations.push(animation)
 			end
-			args["target"].add_animation(animation)
+			args["target"].add_animations(animations)
+			
 		end
 	end
 end

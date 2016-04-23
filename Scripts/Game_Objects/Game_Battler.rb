@@ -100,11 +100,31 @@ class Game_Battler
 	#	@states = {priority => [state, state, ...]}
 	#--------------------------------------------------------------------------
 	def add_state(state)
-		if @states[state.priority] != nil
-			@states[state.priority].push(state)
-		else
-			@states[state.priority] = []
+		num = state_num(state)
+		if (!state.can_accumulate? and 0 == num) or (state.can_accumulate? and num < state.max_accumulate)
+			if @states[state.priority] != nil
+				@states[state.priority].push(state)
+			else
+				@states[state.priority] = []
+				@states[state.priority].push(state)
+			end
 		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 返回角色包含该state的重数，没有改state则返回0
+	#--------------------------------------------------------------------------
+	def state_num(state)
+		ret = 0
+		for key in @states.keys
+			if @states[key] != nil
+				for s in @states[state.priority]
+					if s.instance_of?(state.class)
+						ret += 1
+					end
+				end
+			end
+		end
+		return ret
 	end
 	#--------------------------------------------------------------------------
 	# ● 移除所有状态
@@ -1444,23 +1464,15 @@ class Game_Battler
 	#--------------------------------------------------------------------------
 	def pureDamage(target, damage)
 		dodamage(target, damage)
-		animation = {}
-		if self.hero?
-			animation["seq"] = $Battle_animation_counter_player
-			$Battle_animation_counter_player += 1
-		else
-			animation["seq"] = $Battle_animation_counter_enemy
-			$Battle_animation_counter_enemy += 1
-		end
-		animation["value"] = [4, 99]
-		target.add_animation(animation)
 	end
 	#--------------------------------------------------------------------------
 	# ● 添加动画
 	#
 	#--------------------------------------------------------------------------
-	def add_animation(animation)
-		self.animation_id[animation["seq"]] = animation["value"]
+	def add_animations(animations)
+		for animation in animations
+			self.animation_id[animation["seq"]] = animation["value"]
+		end
 	end
 	#--------------------------------------------------------------------------
 	# ● 回调技能函数

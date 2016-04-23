@@ -111,7 +111,21 @@ class Sprite_Base < Sprite
 				}
 			},
 			# 技能
-			2 => {}
+			2 => {
+				"bitmap_width" 		=>	160,
+				"bitmap_height" 	=> 	96,
+				"sprite_x"			=> 	0,
+				"sprite_y"			=>	0,
+				"sprite_z"			=>	2002,
+				"font_name"			=>	"黑体",
+				"font_size"			=>	32,
+				"font_color"		=> 	Color.new(0,0,0),
+				"text_x"			=> 	0,
+				"text_y"			=> 	0,
+				"text_width"		=> 	160,
+				"text_height"		=> 	80,
+				"text_align"		=> 	1,
+			}
 		}
 	end 
 	#--------------------------------------------------------------------------
