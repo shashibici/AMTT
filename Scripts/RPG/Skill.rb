@@ -11,19 +11,15 @@ module RPG
 #==============================================================================
 	class Skill_Base < UsableItem
 		include GAME_CONF
-		attr_accessor :attacker			# 攻击者
-		attr_accessor :target 			# 目标
-		attr_accessor :subscriber		# 订阅攻击时机
+		attr_accessor :battler			# 指向技能所属者
 		attr_accessor :priority			# 优先级
 		attr_accessor :level			# 等级
 		attr_accessor :name 			# 名字 -- 同一战斗者而言，名字+等级唯一识别一个技能
 		#--------------------------------------------------------------------------
 		# ● 初始化
 		#--------------------------------------------------------------------------
-		def initialize(name, level)
+		def initialize
 			super
-			@name = name
-			@level = level
 		end
 		#--------------------------------------------------------------------------
 		# ● 设置对象	
@@ -31,19 +27,12 @@ module RPG
 		# 	target 			: 	目标者 
 		# 	subscriber 		: 	攻击时机列表，在GAME_CONF中定义
 		#--------------------------------------------------------------------------
-		def setup(attacker, target, subscriber, priority = 0)
-			@attacker = attacker
-			@target = target
-			@subscriber = subscriber
+		def setup(name, level, battler, priority = 0)
+			@name = name
+			@level = level
+			@battler = battler
 			@priority = priority
 			compulsory_func
-		end
-		#--------------------------------------------------------------------------
-		# ● 设置 subscriber 
-		# 		不同技能触发的时机不同，订阅不一样时机
-		#--------------------------------------------------------------------------
-		def set_subscriber(s)
-			@subscriber = s
 		end
 		#--------------------------------------------------------------------------
 		# ●  动态修改优先级
@@ -72,7 +61,7 @@ module RPG
 		# ● 判断触发条件
 		# 		此函数由子类具体实现
 		#--------------------------------------------------------------------------
-		def can_trigger?
+		def can_trigger?(args)
 			return true
 		end
 		#--------------------------------------------------------------------------
@@ -87,19 +76,6 @@ module RPG
 		# 		这个函数在播放动画的时候会调用 -- 依据技能优先级显示动画
 		#--------------------------------------------------------------------------
 		def animation_func(args)
-		end				
-		#--------------------------------------------------------------------------
-		# ● 被触发,必须在每个技能中都有实现
-		# 	
-		# 	brate	: 	暴击倍数， 0-没暴击
-		#	pre_dmg	:	计算护甲之前。 攻击者产生的伤害
-		#	dmg 	: 	计算护甲之后。实际作用伤害
-		# 	pure	: 	纯粹伤害，如果有
-		#	hitflg	:	是否命中
-		# 	bomflg	:	是否暴击
-		#--------------------------------------------------------------------------
-		def triggered(brate = 0, pre_dmg = 0, dmg = 0, pure = 0, hitflag = true, bomflag = false)
-			return [brate, pre_dmg, dmg, pure]
 		end
 	end
 	#==============================================================================
@@ -107,13 +83,13 @@ module RPG
 	#------------------------------------------------------------------------------
 	# 	有20%几率将对方造成的伤害的 技能等级 X 5% 以纯粹伤害反弹
 	#==============================================================================
-	class Fantan < Skill
+	class Fantan_Skill < Skill_Base
 		include GAME_CONF
 		#--------------------------------------------------------------------------
 		# ● 初始化
 		#--------------------------------------------------------------------------
-		def initialize(name, level)
-			super(name, level)
+		def initialize
+			super
 		end
 		#--------------------------------------------------------------------------
 		# ● 设置对象	
@@ -122,38 +98,37 @@ module RPG
 		# 	time 		: 	默认为 空
 		# 	priority	: 	默认为1，一般就不修改了
 		#--------------------------------------------------------------------------
-		def setup(attacker, target, subscriber = [], priority = 1)
-			# 伤害都结算完了之后调用
-			subscriber = [$TIME_POST_PRE_DAMAGE]
-			super(attacker, target, subscriber, priority)
+		def setup(name, level, battler, priority = 0)
+			super(name, level, battler, priority)
 		end
 		#--------------------------------------------------------------------------
 		# ● 这是一个触发技能，需要实现can_trigger?
 		#--------------------------------------------------------------------------
 		def can_trigger?(args)
-			ret = super
-			for event in @subscriber
-				if event == $NOW_TIME
-					ret = ret & true
-					break
+			if self.battler.hero? == args["target"].hero?
+				if super(args)
+					if $TIME_POST_PRE_DAMAGE == $NOW_TIME
+						return true
+					end
 				end
 			end
-			ret = ret & (args["target"].hp > 0)
-			ret = ret & (args["source"].hp > 0)
-			return ret
+			return false
 		end
 		#--------------------------------------------------------------------------
 		# ● 这是一个触发技能，需要实现effect_func触发效果
 		#--------------------------------------------------------------------------
 		def effect_func(args)
-			if rand(100) < 20
-				damage = args["damage"]
-				bounce = @level * 0.05 * damage
-				args["target"].pureDamage(args["source"])
+			if (args["target"].hp > 0) and (args["source"].hp > 0)
+				if rand(100) < 100
+					damage = args["damage"]
+					bounce = @level * 0.05 * damage
+					args["target"].pureDamage(args["source"], bounce)
+				end
+				# 例如，需要给对方增加一个减速效果,持续5秒
+				state = Frozen_State.new
+				state.setup(args["source"], 5, Graphics.frame_rate*5)
+				args["source"].add_state(state)
 			end
-			# 例如，需要给对方增加一个减速效果,持续5秒
-			state = State_Base.new(args["source"], 5, Graphics.frame_rate*5)
-			args["source"].add_state(state)
 		end
 		#--------------------------------------------------------------------------
 		# ● 这是一个触发技能，需要实现effect_func触发效果

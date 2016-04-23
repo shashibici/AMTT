@@ -26,6 +26,7 @@ class Game_Battler
 	attr_accessor 		:screen_y			# 战斗sprite 的位置 
 	attr_accessor 		:screen_z			# 战斗sprite 的位置 
 	attr_accessor		:animation_id		# 记录即将执行的动画{播放顺序如果同时生效 => [距离生效时间,动画编号]}
+	attr_accessor 		:my_skills 			# 战斗者的技能列表{priority => {[name, level] => skill}}
 	#-------------------------------------------------------------
 	#--------------------------------------------------------------------------
 	# ● 初始化对像
@@ -37,6 +38,7 @@ class Game_Battler
 		new_battler_initialize
 		animation_id = {}
 		@states = {}
+		@my_skills = {}
 	end
 	#--------------------------------------------------------------------------
 	# ● 清理能力值增加值
@@ -89,12 +91,13 @@ class Game_Battler
 	def states
 		result = []
 		for key in @states.keys
-			result.push(@states[key])
+			result.concat(@states[key])
 		end
 		return result
 	end
 	#--------------------------------------------------------------------------
 	# ● 添加状态
+	#	@states = {priority => [state, state, ...]}
 	#--------------------------------------------------------------------------
 	def add_state(state)
 		if @states[state.priority] != nil
@@ -124,6 +127,68 @@ class Game_Battler
 				end
 			end
 		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 添加技能
+	#--------------------------------------------------------------------------
+	def add_skill(skill)
+		if @my_skills[skill.priority] != nil
+			unless @my_skills[skill.priority].keys.include?([skill.name, skill.level])
+				@my_skills[skill.priority][[skill.name, skill.level]] = skill
+			end
+		else
+			@my_skills[skill.priority] = {}
+			@my_skills[skill.priority][[skill.name, skill.level]] = skill
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 移除所有名字与所给名字相同的技能
+	#--------------------------------------------------------------------------	
+	def delete_skill_by_name(name)
+		for priority in @my_skills.keys
+			for key in @my_skills[priority]
+				if key.include?(name)
+					return @my_skills[priority].delete(key)
+				end
+			end
+		end
+		return nil
+	end
+	#--------------------------------------------------------------------------
+	# ● 移除所有名字与所给等级相同的技能
+	#--------------------------------------------------------------------------	
+	def delete_skill_by_level(level)
+		for priority in @my_skills.keys
+			for key in @my_skills[priority]
+				if key.include?(level)
+					return @my_skills[priority].delete(key)
+				end
+			end
+		end
+		return nil
+	end
+	#--------------------------------------------------------------------------
+	# ● 移除所有指定优先级的技能
+	#--------------------------------------------------------------------------	
+	def delete_skill_by_priority(priority)
+		return @my_skills.delete(priority)
+	end
+	#--------------------------------------------------------------------------
+	# ● 移除给定名字和等级的技能,返回被删除的技能
+	#--------------------------------------------------------------------------	
+	def delete_skill_by_name_level(name, level)
+		for priority in @my_skills.keys
+			if nil != (value = @my_skills[priority].delete([name, level]))
+				return value
+			end
+		end
+		return nil
+	end
+	#--------------------------------------------------------------------------
+	# ● 移除给技能,成功返回true,失败返回false
+	#--------------------------------------------------------------------------	
+	def delete_skill(skill)
+		return (nil != delete_skill_by_name_level(skill.name, skill.level))
 	end
 	#=========================================================================
 	#  self 系列的参数，是自身条件产生的，没有依靠任何装备  
@@ -1026,6 +1091,16 @@ class Game_Battler
 			target.doDead(flag)
 			return 
 		end
+		
+		args = {}
+		args["brate"] = 0
+		args["pre_dmg"] = 0
+		args["damage"] = 0
+		args["source"] = self
+		args["target"] = target
+		args["hitflag"] = @hitflag
+		args["bomflag"] = @bomflag
+		
 		$NOW_TIME = $TIME_PRE_ATTACK
 		## ---- 回调所有技能
     
@@ -1034,6 +1109,9 @@ class Game_Battler
 		
 		# 计算是否命中、是否暴击、暴击倍率
 		brate = preattack(target)
+		args["brate"] = brate
+		args["hitflag"] = @hitflag
+		args["bomflag"] = @bomflag
 		
 		$NOW_TIME = $TIME_POST_PRE_ATTACK
 		## ---- 回调所有技能
@@ -1043,6 +1121,9 @@ class Game_Battler
 		
 		# 获得攻击伤害 -- 物理伤害+攻击/4
 		pre_dmg =  doattack(target)
+		args["pre_dmg"] = pre_dmg
+		args["hitflag"] = @hitflag
+		args["bomflag"] = @bomflag
 		
 		$NOW_TIME = $TIME_POST_DO_ATTACK
 		## ---- 回调所有技能
@@ -1052,9 +1133,14 @@ class Game_Battler
 		
 		# 调整伤害 -- 运用攻防、将暴击效果添加到伤害上
 		dmg = predamage(brate, pre_dmg, target)
+		args["damage"] = dmg
+		args["hitflag"] = @hitflag
+		args["bomflag"] = @bomflag
 		
 		$NOW_TIME = $TIME_POST_PRE_DAMAGE
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
 		
 		$NOW_TIME = $TIME_PRE_DO_DAMAGE
 		## ---- 回调所有技能
@@ -1068,6 +1154,8 @@ class Game_Battler
 		end
 		# 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
 		dodamage(target, dmg, flag)
+		args["hitflag"] = @hitflag
+		args["bomflag"] = @bomflag
     
 		$NOW_TIME = $TIME_POST_DO_DAMAGE
 		## ---- 回调所有技能
@@ -1093,6 +1181,8 @@ class Game_Battler
 		end
 		# 伤害之后的处理——判断胜负
 		postdamage(target, flag)
+		args["hitflag"] = @hitflag
+		args["bomflag"] = @bomflag
 		
 		$NOW_TIME = $TIME_POST_POST_DAMAGE
 		## ---- 回调所有技能
@@ -1350,10 +1440,38 @@ class Game_Battler
 		end
 	end
 	#--------------------------------------------------------------------------
+	# ● 给target施加一个伤害damage
+	#--------------------------------------------------------------------------
+	def pureDamage(target, damage)
+		dodamage(target, damage)
+		animation = {}
+		if self.hero?
+			animation["seq"] = $Battle_animation_counter_player
+			$Battle_animation_counter_player += 1
+		else
+			animation["seq"] = $Battle_animation_counter_enemy
+			$Battle_animation_counter_enemy += 1
+		end
+		animation["value"] = [4, 99]
+		target.add_animation(animation)
+	end
+	#--------------------------------------------------------------------------
 	# ● 添加动画
 	#
 	#--------------------------------------------------------------------------
 	def add_animation(animation)
 		self.animation_id[animation["seq"]] = animation["value"]
+	end
+	#--------------------------------------------------------------------------
+	# ● 回调技能函数
+	#		回调battler的所有技能
+	#--------------------------------------------------------------------------
+	def update_skill_callback(battler, args)
+		callback_skill = battler.my_skills
+		for priority in callback_skill.keys.sort
+			for key in callback_skill[priority].keys
+				callback_skill[priority][key].trigger_func(args)
+			end
+		end
 	end
 end

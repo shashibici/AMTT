@@ -19,7 +19,6 @@ class Game_Actor < Game_Battler
 	attr_accessor   :myequips           # 保存当前装备的实体
 	# 实际上 @myequip_kits = @myequips + self.kits
 	attr_accessor   :myequip_kits       # 保存包含套装的实体（包括虚拟套装）
-	attr_accessor	:my_skills
 	attr_accessor   :weapon1_id 
 	attr_accessor   :weapon2_id  
 	attr_accessor   :armor1_id   
@@ -122,13 +121,20 @@ class Game_Actor < Game_Battler
 	attr_accessor   :xmaxcelerityrate		
 	attr_accessor   :xmaxwisdomrate
 	
-	
+	#--------------------------------------------------------------------------
+	# ● 获取特技对象列表
+	#
+	# 		重新定义
+	#--------------------------------------------------------------------------
+	def skills
+		return @skills
+	end
 	#--------------------------------------------------------------------------
 	# ● 是否有这个技能
 	#--------------------------------------------------------------------------
-	def has_skill?(skill_id)
-		return @my_skills.include?(skill_id)
-	end
+	# def has_skill?(skill_id)
+		# return @my_skills.include?(skill_id)
+	# end
 	#--------------------------------------------------------------------------
 		# ● 初始化对象
 		#     actor_id : 角色 ID
@@ -146,7 +152,6 @@ class Game_Actor < Game_Battler
 		@is_equip_changed = 1
 		@myequip_kits = []
 		@myequips = [] 
-		@my_skills = {}
 		# 设置角色
 		setup(actor_id)
 		@last_skill_id = 0
