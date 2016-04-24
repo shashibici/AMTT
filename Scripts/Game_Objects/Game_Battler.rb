@@ -117,8 +117,8 @@ class Game_Battler
 		ret = 0
 		for key in @states.keys
 			if @states[key] != nil
-				for s in @states[state.priority]
-					if s.instance_of?(state.class)
+				for s in @states[key]
+					if s.name == state.name and s.instance_of?(state.class)
 						ret += 1
 					end
 				end
@@ -1121,11 +1121,19 @@ class Game_Battler
 		args["hitflag"] = @hitflag
 		args["bomflag"] = @bomflag
 		
-		$NOW_TIME = $TIME_PRE_ATTACK
-		## ---- 回调所有技能
-    
 		$NOW_TIME = $TIME_PRE_PRE_ATTACK
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
+		
+		$NOW_TIME = $TIME_PRE_ATTACK
+		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
 		# 计算是否命中、是否暴击、暴击倍率
 		brate = preattack(target)
@@ -1135,9 +1143,17 @@ class Game_Battler
 		
 		$NOW_TIME = $TIME_POST_PRE_ATTACK
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
 		$NOW_TIME = $TIME_PRE_DO_ATTACK
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
 		# 获得攻击伤害 -- 物理伤害+攻击/4
 		pre_dmg =  doattack(target)
@@ -1147,9 +1163,17 @@ class Game_Battler
 		
 		$NOW_TIME = $TIME_POST_DO_ATTACK
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
 		$NOW_TIME = $TIME_PRE_PRE_DAMGE
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
 		# 调整伤害 -- 运用攻防、将暴击效果添加到伤害上
 		dmg = predamage(brate, pre_dmg, target)
@@ -1161,9 +1185,15 @@ class Game_Battler
 		## ---- 回调所有技能
 		update_skill_callback(self, args)
 		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
 		$NOW_TIME = $TIME_PRE_DO_DAMAGE
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
 		# 如果是怪物受伤
 		if !target.hero?
@@ -1179,9 +1209,17 @@ class Game_Battler
     
 		$NOW_TIME = $TIME_POST_DO_DAMAGE
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 	
 		$NOW_TIME = $TIME_PRE_POST_DAMAGE
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 	
 		# 修改命中状况
 		if @hitflag == false and self.hero?
@@ -1206,8 +1244,75 @@ class Game_Battler
 		
 		$NOW_TIME = $TIME_POST_POST_DAMAGE
 		## ---- 回调所有技能
+		update_skill_callback(self, args)
+		update_skill_callback(target, args)
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
 		
-	end  
+	end
+	#--------------------------------------------------------------------------
+	# ● 控制战斗流程  (一次反击的入口)
+	#    
+	#    preattack  
+	#    doattack 
+	#    predamage
+	#    dodamage
+	#    postdamage
+	# 
+	#    flag   :身份标识，0英雄或者怪物，1怪物分身1，2怪物分身2，3怪物分身3
+	#
+	#--------------------------------------------------------------------------
+	def strikeBack(target, flag = 0)   
+		# 判断死亡 首先判断自己是否死亡
+		if self.hp <= 0
+			self.doDead(flag)
+			return 
+		end
+		# 自己没死 再判断对方是否死亡
+		if target.hp <= 0
+			target.doDead(flag)
+			return 
+		end
+    
+		# 计算是否命中、是否暴击、暴击倍率
+		brate = preattack(target)
+		
+		# 获得攻击伤害 -- 物理伤害+攻击/4
+		pre_dmg =  doattack(target)
+		
+		# 调整伤害 -- 运用攻防、将暴击效果添加到伤害上
+		dmg = predamage(brate, pre_dmg, target)
+		
+		# 如果是怪物受伤
+		if !target.hero?
+			$game_variables[35] = dmg
+		# 否则是英雄受伤
+		else
+			$game_variables[34] = dmg
+		end
+		# 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
+		dodamage(target, dmg, flag)
+	
+		# 修改命中状况
+		if @hitflag == false and self.hero?
+			# 如果是hero并且丢失，修改hero命中开关
+			$game_switches[105] = true
+		elsif @hitflag == false and  !self.hero?
+			# 如果不是英雄并且丢失，修改怪物命中开关
+			$game_switches[106] = true
+		end
+		# 记录暴击状况
+		if @bomflag == true and self.hero?
+			# 英雄暴击
+			$game_switches[109] = true
+		elsif @bomflag == true and !self.hero?
+			# 怪物暴击
+			$game_switches[110] = true
+		end
+		# 伤害之后的处理——判断胜负
+		postdamage(target, flag)
+		
+	end
 	#------------------------------------------------------------------------
 	# ● 下面开始准备战斗函数
 	#

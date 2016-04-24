@@ -40,6 +40,169 @@ module Battle
 		$Battle_animation_counter_player = 0
 	end
 	#--------------------------------------------------------------------------
+	# ●  怪物一次反击，不能触发效果
+	#--------------------------------------------------------------------------
+	def self.Battle_strike_back_enemy
+		# 阶段计数器
+		$attack_strike_back_phase_enemy = 0
+		# 攻击初始化
+		attack_strike_back_pre_start_enemy
+		attack_strike_back_start_enemy
+		attack_strike_back_post_start_enemy
+		
+		# 执行攻击
+		attack_strike_back_pre_enemy
+		attack_strike_back_enemy
+		attack_strike_back_post_enemy
+		
+		# 播放动画
+		animation_strike_back_pre_enemy
+		animation_strike_back_enemy
+		animation_strike_back_post_enemy
+		
+		# 判断战斗是否结束
+		attack_strike_back_pre_judge_enemy
+		# 判断是否结束,true结束 false 没结束
+		ret = attack_strike_back_judge_enemy
+		attack_strike_back_post_judge_enemy
+		
+		# 本回合最后一个阶段
+		attack_strike_back_pre_end_enemy
+		attack_strike_back_end_enemy
+		attack_strike_back_post_end_enemy
+		return ret
+		
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击开始前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_start_enemy
+		$attack_strike_back_phase_enemy = 1
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击开始
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_start_enemy
+		$attack_strike_back_phase_enemy = 2
+		$game_switches[120] = false
+		$game_variables[156] = 0
+		$game_variables[157] = 0
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击开始后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_start_enemy
+		$attack_strike_back_phase_enemy = 3
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_enemy
+		$attack_strike_back_phase_enemy = 4
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_enemy
+		$attack_strike_back_phase_enemy = 5
+		# 执行攻击
+		$game_monstor_battle.strikeBack($game_party.active)
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_enemy
+		$attack_strike_back_phase_enemy = 6
+	end
+	#--------------------------------------------------------------------------
+	# ●  动画开始前
+	#--------------------------------------------------------------------------
+	def self.animation_strike_back_pre_enemy
+		$attack_strike_back_phase_enemy = 7
+	end
+	#--------------------------------------------------------------------------
+	# ●  动画开始
+	#--------------------------------------------------------------------------
+	def self.animation_strike_back_enemy
+		$attack_strike_back_phase_enemy = 8
+		# 判断怪物是否丢失
+		if true == $game_switches[120]
+			# 播放闪避音效
+			MySound.play_fail
+			# 显示丢失
+			$Spriteset_Battle.enemy.set_talk_text("丢失", Color.new(255,255,255))
+		# 如果没有丢失
+		else
+			# 判断怪物是否暴击
+			if true == $game_switches[122]
+				$game_switches[122] = false
+				# 显示暴击
+				# $Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
+				$Spriteset_Battle.enemy.set_talk_text($game_variables[156].to_i.to_s+"!", Color.new(255,0,0),1)
+				# 在玩家身上播放怪物暴击声音
+				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_player] = [0,$game_variables[45]]
+				$Battle_animation_counter_enemy += 1
+			# 如果没有暴击
+			else
+				# 在玩家身上播放伤害动画 - 自带音效
+				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_player] = [0,107]
+				$Battle_animation_counter_enemy += 1
+			end
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ●  动画开始后
+	#--------------------------------------------------------------------------
+	def self.animation_strike_back_post_enemy
+		$attack_strike_back_phase_enemy = 9
+	end
+	#--------------------------------------------------------------------------
+	# ●  判断战斗结束前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_judge_enemy
+		$attack_strike_back_phase_enemy = 10
+	end
+	#--------------------------------------------------------------------------
+	# ●  判断战斗结束
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_judge_enemy
+		$attack_strike_back_phase_enemy = 11
+		# 如果战斗结束
+		if true == $game_switches[104]
+			$game_switches[107] = false
+			$game_switches[103] = false
+			$game_switches[108] = false
+			# return true - 战斗结束
+			return true
+		else
+			return false
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ●  判断战斗结束后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_judge_enemy
+		$attack_strike_back_phase_enemy = 12
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击结束前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_end_enemy
+		$attack_strike_back_phase_enemy = 13
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击结束
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_end_enemy
+		$attack_strike_back_phase_enemy = 14
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击结束后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_end_enemy
+		$attack_strike_back_phase_enemy = 15
+	end	
+	#--------------------------------------------------------------------------
 	# ●  一个战斗回合 （攻击一次）
 	#
 	#    可能不会使用
@@ -148,15 +311,13 @@ module Battle
 				# 显示暴击
 				# $Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
 				$Spriteset_Battle.enemy.set_talk_text($game_variables[34].to_i.to_s+"!", Color.new(255,0,0),1)
-				# 播放怪物暴击声音
+				# 在玩家身上播放怪物暴击声音
 				# MySound.play_bom($game_variables[45])
 				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_player] = [0,$game_variables[45]]
 				$Battle_animation_counter_enemy += 1
 			# 如果没有暴击
 			else
-				# 显示伤害
-				# $Spriteset_Battle.actor.set_talk_text($game_variables[34].to_i, Color.new(255,255,0))
-				# 播放伤害动画 - 自带音效
+				# 在玩家身上播放伤害动画 - 自带音效
 				$Spriteset_Battle.actor.battler.animation_id[$Battle_animation_counter_player] = [0,107]
 				$Battle_animation_counter_enemy += 1
 			end
@@ -322,16 +483,14 @@ module Battle
 			if true == $game_switches[109]
 				$game_switches[109] = false
 				# 显示暴击
-				# $Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,0,0))
 				$Spriteset_Battle.actor.set_talk_text($game_variables[35].to_i.to_s+"!", Color.new(255,0,0),1)
-				# 播放玩家暴击声音
+				# 在怪物身上播放玩家暴击声音
 				# MySound.play_bom(3)
 				$Spriteset_Battle.enemy.battler.animation_id[$Battle_animation_counter_enemy] = [0,111]
 				$Battle_animation_counter_enemy += 1
 			# 如果没有暴击
 			else
-				# 显示伤害
-				# $Spriteset_Battle.enemy.set_talk_text($game_variables[35].to_i, Color.new(255,255,0))
+				# 在怪物身上显示伤害动画
 				$Spriteset_Battle.enemy.battler.animation_id[$Battle_animation_counter_enemy] = [0,110]
 				$Battle_animation_counter_enemy += 1
 			end
@@ -390,4 +549,166 @@ module Battle
 	def self.attack_post_end_player
 		$attack_phase_player = 15
 	end
+	#--------------------------------------------------------------------------
+	# ●  玩家一次反击，不能触发效果
+	#--------------------------------------------------------------------------
+	def self.Battle_strike_back_player
+		# 阶段计数器
+		$attack_strike_back_phase_player = 0
+		# 攻击初始化
+		attack_strike_back_pre_start_player
+		attack_strike_back_start_player
+		attack_strike_back_post_start_player
+		
+		# 执行攻击
+		attack_strike_back_pre_player
+		attack_strike_back_player
+		attack_strike_back_post_player
+		
+		# 播放动画
+		animation_strike_back_pre_player
+		animation_strike_back_player
+		animation_strike_back_post_player
+		
+		# 判断战斗是否结束
+		attack_strike_back_pre_judge_player
+		# 判断是否结束,true结束 false 没结束
+		ret = attack_strike_back_judge_player
+		attack_strike_back_post_judge_player
+		
+		# 本回合最后一个阶段
+		attack_strike_back_pre_end_player
+		attack_strike_back_end_player
+		attack_strike_back_post_end_player
+		return ret
+		
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击开始前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_start_player
+		$attack_strike_back_phase_player = 1
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击开始
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_start_player
+		$attack_strike_back_phase_player = 2
+		$game_switches[119] = false
+		$game_variables[156] = 0
+		$game_variables[157] = 0
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击开始后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_start_player
+		$attack_strike_back_phase_player = 3
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_player
+		$attack_strike_back_phase_player = 4
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_player
+		$attack_strike_back_phase_player = 5
+		# 执行攻击
+		$game_party.active.strikeBack($game_monstor_battle)
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_player
+		$attack_strike_back_phase_player = 6
+	end
+	#--------------------------------------------------------------------------
+	# ●  动画开始前
+	#--------------------------------------------------------------------------
+	def self.animation_strike_back_pre_player
+		$attack_strike_back_phase_player = 7
+	end
+	#--------------------------------------------------------------------------
+	# ●  动画开始
+	#--------------------------------------------------------------------------
+	def self.animation_strike_back_player
+		$attack_strike_back_phase_player = 8
+		# 判断玩家是否丢失
+		if true == $game_switches[119]
+			# 播放闪避音效
+			MySound.play_fail
+			# 显示丢失
+			$Spriteset_Battle.actor.set_talk_text("丢失", Color.new(255,255,255))
+		# 如果没有丢失
+		else
+			# 判断玩家是否暴击
+			if true == $game_switches[121]
+				$game_switches[121] = false
+				# 显示暴击
+				$Spriteset_Battle.actor.set_talk_text($game_variables[157].to_i.to_s+"!", Color.new(255,0,0),1)
+				# 在怪物身上播放玩家暴击声音
+				$Spriteset_Battle.enemy.battler.animation_id[$Battle_animation_counter_enemy] = [0,111]
+				$Battle_animation_counter_enemy += 1
+			# 如果没有暴击
+			else
+				# 在怪物身上播放伤害动画 - 自带音效
+				$Spriteset_Battle.enemy.battler.animation_id[$Battle_animation_counter_enemy] = [0,110]
+				$Battle_animation_counter_enemy += 1
+			end
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ●  动画开始后
+	#--------------------------------------------------------------------------
+	def self.animation_strike_back_post_player
+		$attack_strike_back_phase_player = 9
+	end
+	#--------------------------------------------------------------------------
+	# ●  判断战斗结束前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_judge_player
+		$attack_strike_back_phase_player = 10
+	end
+	#--------------------------------------------------------------------------
+	# ●  判断战斗结束
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_judge_player
+		$attack_strike_back_phase_player = 11
+		# 如果战斗结束
+		if true == $game_switches[104]
+			$game_switches[107] = false
+			$game_switches[103] = false
+			$game_switches[108] = false
+			# return true - 战斗结束
+			return true
+		else
+			return false
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ●  判断战斗结束后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_judge_player
+		$attack_strike_back_phase_player = 12
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击结束前
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_pre_end_player
+		$attack_strike_back_phase_player = 13
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击结束
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_end_player
+		$attack_strike_back_phase_player = 14
+	end
+	#--------------------------------------------------------------------------
+	# ●  攻击结束后
+	#--------------------------------------------------------------------------
+	def self.attack_strike_back_post_end_player
+		$attack_strike_back_phase_player = 15
+	end	
 end

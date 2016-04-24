@@ -71,7 +71,7 @@ class Game_Actor < Game_Battler
   
 	attr_accessor   :hit          # 命中因子
 	attr_accessor   :hitrate      # 命中率
-  
+	
 	attr_accessor   :hpcover      # 生命恢复因子
 	attr_accessor   :hprate       # 生命恢复率
 	attr_accessor   :mpcover      # 魔法恢复因子
