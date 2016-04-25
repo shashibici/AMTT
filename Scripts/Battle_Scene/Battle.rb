@@ -38,6 +38,19 @@ module Battle
 		$game_switches[160] = false
 		$Battle_animation_counter_enemy = 0
 		$Battle_animation_counter_player = 0
+		# 执行锁定技
+		callback_skill = $game_party.active.my_skills
+		for priority in callback_skill.keys.sort
+			for key in callback_skill[priority].keys
+				callback_skill[priority][key].compulsory_func
+			end
+		end
+		callback_skill = $game_monstor_battle.my_skills
+		for priority in callback_skill.keys.sort
+			for key in callback_skill[priority].keys
+				callback_skill[priority][key].compulsory_func
+			end
+		end
 	end
 	#--------------------------------------------------------------------------
 	# ●  怪物一次反击，不能触发效果

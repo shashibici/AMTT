@@ -149,9 +149,47 @@ class Game_Battler
 		end
 	end
 	#--------------------------------------------------------------------------
+	# ● 获得技能列表 - 按优先级从小到大排列
+	#--------------------------------------------------------------------------
+	def get_skills
+		ret = []
+		for priority in @my_skills.keys.sort
+			for key in @my_skills[priority].keys
+				ret.push(@my_skills[priority][key])
+			end
+		end
+		return ret
+	end
+	#--------------------------------------------------------------------------
+	# ● 返回技能列表中最大优先级数字最大的技能的优先级。
+	#	在创建新技能的时候会用到；新加入的技能优先级数字依次增大。
+	#--------------------------------------------------------------------------
+	def max_skill_priority
+		priorities = @my_skills.keys.sort
+		if priorities.size > 0
+			return priorities[priorities.size-1]
+		else
+			return 0
+		end
+	end
+	#--------------------------------------------------------------------------
+	# ● 判断技能是否存在 -- 名字、等级相同则是同一个技能；优先级不算
+	#--------------------------------------------------------------------------
+	def skill_exist?(skill)
+		for s in self.get_skills
+			if skill.name == s.name and skill.level == s.level
+				return true
+			end
+		end
+		return false
+	end
+	#--------------------------------------------------------------------------
 	# ● 添加技能
 	#--------------------------------------------------------------------------
 	def add_skill(skill)
+		if skill_exist?(skill)
+			return false
+		end
 		if @my_skills[skill.priority] != nil
 			unless @my_skills[skill.priority].keys.include?([skill.name, skill.level])
 				@my_skills[skill.priority][[skill.name, skill.level]] = skill
@@ -160,6 +198,7 @@ class Game_Battler
 			@my_skills[skill.priority] = {}
 			@my_skills[skill.priority][[skill.name, skill.level]] = skill
 		end
+		return true
 	end
 	#--------------------------------------------------------------------------
 	# ● 移除所有名字与所给名字相同的技能
@@ -1195,15 +1234,16 @@ class Game_Battler
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
 		
+		# 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
+		final_dmg = dodamage(target, dmg, brate, flag)
 		# 如果是怪物受伤
 		if !target.hero?
-			$game_variables[35] = dmg
+			$game_variables[35] = final_dmg
 		# 否则是英雄受伤
 		else
-			$game_variables[34] = dmg
+			$game_variables[34] = final_dmg
 		end
-		# 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
-		dodamage(target, dmg, flag)
+		args["final_dmg"] = final_dmg
 		args["hitflag"] = @hitflag
 		args["bomflag"] = @bomflag
     
@@ -1283,16 +1323,18 @@ class Game_Battler
 		# 调整伤害 -- 运用攻防、将暴击效果添加到伤害上
 		dmg = predamage(brate, pre_dmg, target)
 		
+
+		# 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
+		final_dmg = dodamage(target, dmg, brate, flag)
 		# 如果是怪物受伤
 		if !target.hero?
-			$game_variables[35] = dmg
+			$game_variables[35] = final_dmg
 		# 否则是英雄受伤
 		else
-			$game_variables[34] = dmg
+			$game_variables[34] = final_dmg
 		end
-		# 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
-		dodamage(target, dmg, flag)
-	
+		
+		
 		# 修改命中状况
 		if @hitflag == false and self.hero?
 			# 如果是hero并且丢失，修改hero命中开关
@@ -1451,23 +1493,27 @@ class Game_Battler
 		diff = [[diff, 4].min, -4].max
 		effect = GAME_CONF::LEVEL_EFFECT[diff+4]
 		final_dmg *= effect
-		# 制造随机伤害
-		final_dmg = final_dmg * (190 + rand(21)) / 200.00
-		# 如果暴击
-		final_dmg = final_dmg *  brate if bomflag == true and brate > 0
 		return final_dmg
 	end  
 	#--------------------------------------------------------------------------
 	# ● 执行伤害
+	# 	target		:	目标
+	# 	dmg			:	伤害
+	# 	brate 		:	暴击倍率
 	#--------------------------------------------------------------------------
-	def dodamage(target, dmg, flag = 0)
-		return if dmg == 0
+	def dodamage(target, dmg, brate, flag = 0)
+		return 0 if dmg == 0
+		# 制造随机伤害
+		final_dmg = dmg * (90 + rand(21)) / 100.00
+		# 如果暴击
+		final_dmg = final_dmg *  brate if @bomflag == true and brate > 0
 		# 首先是反弹——这里没有实现
 		# 然后是减少伤害——这里没有实现
 		# 然后是抵消伤害（格挡）——这里没有实现
 		# 然后是吸血(吸血之前应该判定自己是否死亡)——这里没有实现
 		# 修改hp
-		target.hp -= dmg
+		target.hp -= final_dmg
+		return final_dmg
 	end
 	#--------------------------------------------------------------------------
 	# ● 伤害之后

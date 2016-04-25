@@ -26,10 +26,8 @@ module RPG
 		#--------------------------------------------------------------------------
 		def can_trigger?(args)
 			if self.battler.hero? == args["target"].hero?
-				if super(args)
-					if $TIME_POST_PRE_DAMAGE == $NOW_TIME
-						return true
-					end
+				if $TIME_POST_PRE_DAMAGE == $NOW_TIME
+					return true
 				end
 			end
 			return false
@@ -40,8 +38,8 @@ module RPG
 		def effect_func(args)
 			if (args["target"].hp > 0) and (args["source"].hp > 0)
 				if rand(100) < 100
-					damage = args["damage"]
-					bounce = @level * 0.05 * damage
+					final_damage = args["final_damage"]
+					bounce = @level * 0.05 * final_damage
 					args["target"].pureDamage(args["source"], bounce)
 					animation_func(args)
 				end
@@ -103,10 +101,8 @@ module RPG
 		#--------------------------------------------------------------------------
 		def can_trigger?(args)
 			if self.battler.hero? == args["target"].hero?
-				if super(args)
-					if $TIME_POST_DO_DAMAGE == $NOW_TIME
-						return true
-					end
+				if $TIME_POST_DO_DAMAGE == $NOW_TIME
+					return true
 				end
 			end
 			return false
@@ -116,7 +112,7 @@ module RPG
 		#--------------------------------------------------------------------------
 		def effect_func(args)
 			if (args["target"].hp > 0) and (args["source"].hp > 0)
-				if rand(20) < 100
+				if rand(100) < 20
 					if args["target"].hero?
 						Battle.Battle_strike_back_player
 					else
@@ -153,10 +149,8 @@ module RPG
 		#--------------------------------------------------------------------------
 		def can_trigger?(args)
 			if self.battler.hero? != args["target"].hero?
-				if super(args)
-					if $TIME_POST_DO_ATTACK == $NOW_TIME
-						return true
-					end
+				if $TIME_POST_DO_ATTACK == $NOW_TIME
+					return true
 				end
 			end
 			return false
@@ -167,7 +161,7 @@ module RPG
 		def effect_func(args)
 			if (args["source"].hp > 0)
 				state = Single_Speed_Change_State.new
-				state.setup(args["target"], "冰冻", 1, 5)
+				state.setup(args["target"], "冰冻", 65536, 5)
 				state.speed_rate = -50
 				if args["target"].state_num(state) > 0
 					return
@@ -196,6 +190,39 @@ module RPG
 				animations.push(animation)
 			end
 			args["target"].add_animations(animations)
+		end
+	end
+	#==============================================================================
+	# ■ 坚守  -- 通过测试
+	#------------------------------------------------------------------------------
+	# 	锁定技，提升防御力，防御提升百分比为角色失去生命百分比的25%
+	#==============================================================================
+	class JianShou_Skill < Skill_Base
+		#--------------------------------------------------------------------------
+		# ● 初始化
+		#--------------------------------------------------------------------------
+		def initialize
+			super
+		end
+		#--------------------------------------------------------------------------
+		# ● 设置对象	
+		#	name		:	技能名字
+		#	level		:	技能等级
+		# 	battler		:	技能拥有者
+		# 	priority	:	优先级 - 越低越优先
+		#--------------------------------------------------------------------------
+		def setup(name, level, battler, priority = 0)
+			super(name, level, battler, priority)
+		end
+		#--------------------------------------------------------------------------
+		# ● 锁定技函数
+		# 		在技能被添加的时候或者战斗开始的时候被调用，一般是添加状态
+		#--------------------------------------------------------------------------
+		def compulsory_func
+			state = JianShou_State.new
+			state.setup(@battler, "坚守", 32768, 72000)
+			state.ratio = 50
+			@battler.add_state(state)
 		end
 	end
 end
