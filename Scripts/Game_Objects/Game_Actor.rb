@@ -33,6 +33,7 @@ class Game_Actor < Game_Battler
 	attr_accessor   :armor10_id  
 	attr_accessor   :armor11_id  
 	attr_accessor   :armor12_id 
+	attr_accessor 	:battler_name		# 战斗图名字
 	
 	#---------------------------------------------------
 	# 	能力属性值相关 - 装备相关

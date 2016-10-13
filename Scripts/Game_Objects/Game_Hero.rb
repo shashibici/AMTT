@@ -40,6 +40,8 @@ class Game_Hero < Game_Actor
     @name = actor.name
     # 设置角色位置名字（前锋等等）
     @character_name = actor.character_name
+	# 设置角色战斗图名字 -- 玩家战斗图都一样
+	@battler_name = "uncle"
     # 设置角色位置编号
     @character_index = actor.character_index
     # 设置角色脸部名字

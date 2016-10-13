@@ -130,9 +130,10 @@ class Game_Monstor < Game_Actor
     #===========================================================
     # 杂项设置--------------------------------------------
     # 怪物名字
-    @name                  =  monstor.name
+    @name                  	= monstor.name
     # 怪物战斗图
-    @character_name        =  monstor.battler_name
+    @character_name        	= monstor.battler_name
+	@battler_name 		  	= monstor.battler_name + "-big"
     
     # 设置正常金钱、经验
     @money = get_money
