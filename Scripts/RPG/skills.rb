@@ -37,9 +37,9 @@ module RPG
 		#--------------------------------------------------------------------------
 		def effect_func(args)
 			if (args["target"].hp > 0) and (args["source"].hp > 0)
-				if rand(100) < 100
+				if rand(100) < 20
 					final_damage = args["final_damage"]
-					bounce = @level * 0.05 * final_damage
+					bounce = @level *0.05 * final_damage
 					args["target"].pureDamage(args["source"], bounce)
 					animation_func(args)
 				end
