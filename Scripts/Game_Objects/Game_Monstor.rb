@@ -588,34 +588,34 @@ class Game_Monstor < Game_Actor
   #      重写覆盖         如果id为0 代表没有装备相应内容，对应位置可能为nil
   #
   #--------------------------------------------------------------------------
-  def weapons
-    result = []
-    result.push($data_weapons[@weapon1_id]) 
-    result.push($data_weapons[@weapon2_id]) 
-    return result
-  end  
+  #def weapons
+  #  result = []
+  #  result.push($data_weapons[@weapon1_id]) 
+  #  result.push($data_weapons[@weapon2_id]) 
+  #  return result
+  #end  
   #--------------------------------------------------------------------------
   # ● 获取防具对象列表
   #
   #    重写覆盖         如果id为0 代表没有装备相应内容，对应位置可能为nil
   #  
   #--------------------------------------------------------------------------
-  def armors
-    result = []
-    result.push($data_armors[@armor1_id])  
-    result.push($data_armors[@armor2_id]) 
-    result.push($data_armors[@armor3_id])  
-    result.push($data_armors[@armor4_id])  
-    result.push($data_armors[@armor5_id])  
-    result.push($data_armors[@armor6_id])  
-    result.push($data_armors[@armor7_id])  
-    result.push($data_armors[@armor8_id])  
-    result.push($data_armors[@armor9_id])  
-    result.push($data_armors[@armor10_id]) 
-    result.push($data_armors[@armor11_id])
-    result.push($data_armors[@armor12_id])
-    return result
-  end  
+  #def armors
+  #  result = []
+  #  result.push($data_armors[@armor1_id])  
+  #  result.push($data_armors[@armor2_id]) 
+  #  result.push($data_armors[@armor3_id])  
+  #  result.push($data_armors[@armor4_id])  
+  #  result.push($data_armors[@armor5_id])  
+  #  result.push($data_armors[@armor6_id])  
+  #  result.push($data_armors[@armor7_id])  
+  #  result.push($data_armors[@armor8_id])  
+  #  result.push($data_armors[@armor9_id])  
+  #  result.push($data_armors[@armor10_id]) 
+  #  result.push($data_armors[@armor11_id])
+  #  result.push($data_armors[@armor12_id])
+  #  return result
+  #end  
   #--------------------------------------------------------------------------
   # ● 生成金钱
   #

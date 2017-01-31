@@ -171,6 +171,16 @@ class Game_Actor < Game_Battler
 	# 		例如，不能有两个 A 装备，组成为一个 B 装备。 
 	#		必须由 A 装备和 B 装备 组合成 C 装备
 	#
+	#
+	#      这里是套装计算的精髓：
+	#      weapons 和 armors 返回的结果中包含某些套装的组件。
+	#      例如角色只装备了“嗜血套装”，那么角色应该视为装备了“嗜血套装本身”（+96力量）
+	#      和“嗜血面具”（+16力量）、“嗜血指环”、“嗜血胸坠”、“嗜血履”（+16力量）
+	#      一共增加96+16+16=128力量。
+	#  
+	#      于是需要一个标记flag。当flag为false时为特殊情况，即不考虑“组件”。
+	#      当flag为true(默认)时，返回“组件”。
+	#
 	#--------------------------------------------------------------------------
 	def set_suits	
 		# 首先清空原来的残留物
@@ -250,13 +260,19 @@ class Game_Actor < Game_Battler
 			id = @kit_ids[i]
 			if id >= 1 and id <= 999
 				# item类型的
-				result.push($data_items[id])
+				item = $data_items[id].clone
+				item.is_virtual = true
+				result.push(item)
 			elsif id >= 1001 and id <= 1999
 				# weapons类型的
-				result.push($data_weapons[id-1000])
+				item = $data_weapons[id-1000].clone
+				item.is_virtual = true
+				result.push(item)
 			elsif id >= 2001 and id <= 2999
 				# weapons类型的
-				result.push($data_armors[id-2000])
+				item = $data_armors[id-2000].clone
+				item.is_virtual = true
+				result.push(item)
 			end
 			# for循环结束  
 		end
@@ -301,7 +317,8 @@ class Game_Actor < Game_Battler
 	#
 	#     equip    : 装备对象。
 	#
-	#     如果装备是套装，就返回它的所有子套装及其组件，否则返回自己
+	#     如果是套装则返回套装的所有组件，以及组件的所有组件；
+	#     如果不是套装则返回空。
 	#
 	#--------------------------------------------------------------------------
 	def getAllComponents(equip)
@@ -347,7 +364,41 @@ class Game_Actor < Game_Battler
 		end
 		# 最后返回一个装备对象列表
 		return result
-		end
+	end
+#--------------------------------------------------------------------------
+  # ● 获取武器对象列表
+  #
+  #      重写覆盖         如果id为0 代表没有装备相应内容，对应位置可能为nil
+  #
+  #--------------------------------------------------------------------------
+  def weapons
+    result = []
+    result.push($data_weapons[@weapon1_id]) 
+    result.push($data_weapons[@weapon2_id]) 
+    return result
+  end  
+  #--------------------------------------------------------------------------
+  # ● 获取防具对象列表
+  #
+  #    重写覆盖         如果id为0 代表没有装备相应内容，对应位置可能为nil
+  #  
+  #--------------------------------------------------------------------------
+  def armors
+    result = []
+    result.push($data_armors[@armor1_id])  
+    result.push($data_armors[@armor2_id]) 
+    result.push($data_armors[@armor3_id])  
+    result.push($data_armors[@armor4_id])  
+    result.push($data_armors[@armor5_id])  
+    result.push($data_armors[@armor6_id])  
+    result.push($data_armors[@armor7_id])  
+    result.push($data_armors[@armor8_id])  
+    result.push($data_armors[@armor9_id])  
+    result.push($data_armors[@armor10_id]) 
+    result.push($data_armors[@armor11_id]) 
+    result.push($data_armors[@armor12_id]) 
+    return result
+  end  
 	#--------------------------------------------------------------------------
 	# ● 获取装备对象列表
 	#
@@ -375,10 +426,12 @@ class Game_Actor < Game_Battler
 		end
 		@is_equip_changed = 0
 		# 否则刚刚换过装备，需要重新计算
+		# 考虑“套装”itme递归计算出的组件们。
 		res = weapons + armors
 		# 清空原有缓存
 		@myequips = res
 		# 更新虚拟套装的缓存(集齐散装后获得的虚拟套装部件)
+		# kits仅仅包含虚拟套装部件。
 		@myequip_kits = @myequips + kits
 		# 更新虚拟套装的缓存(通过实体部件获得虚拟散装部件) -- 已经废弃不需要获得虚拟散装部件
 		# 装备那边的脚本已经能通过套装返回：套装的真实实力，即套装部件+所有散装部件的实力

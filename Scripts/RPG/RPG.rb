@@ -1,7 +1,9 @@
 module RPG
 	class BaseItem
-		attr_reader    :attrs
+		attr_reader    :attrs_all    # 递归计算的属性
+		attr_reader    :attrs_self   # 自身的属性
 		attr_reader    :colstr   # name colors: e.g. "light green"
+		attr_accessor  :is_virtual   # 指示是否为virtual装备
 		#--------------------------------------------------------------------------
 		# ●  返回	： 	string, e.g., "linght green"
 		#
@@ -21,8 +23,14 @@ module RPG
 		#
 		#--------------------------------------------------------------------------
 		def initMe
-			@attrs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			@is_virtual = false
+			# 递归属性
+			@attrs_all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+			# 自身属性
+			@attrs_self = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+			# 初始化递归属性和自身属性
 			read_suit_all
 			@colstr = read_note('color')
 			@colstr = "white" if nil == @colstr
@@ -42,24 +50,46 @@ module RPG
 			end
 		end
 		#--------------------------------------------------------------------------
+		# ● 返回一个装备的属性数据
+		#    flag = true 将此装备的组件属性也计算在内，一同返回
+		#    flag = false 紧紧返回次装备的属性。
+		#
+		#--------------------------------------------------------------------------\
+		def attrs
+			if true ==  @is_virtual 
+				return @attrs_self
+			else 
+				return @attrs_all
+			end
+		end
+		#--------------------------------------------------------------------------
 		# ● 递归获取一个装备的所有组件,包括自己的id
 		#
-		#     equip    : 装备对象,使用的时候传入自己就能获得自己的。
+		#     equip          : 装备对象,使用的时候传入自己就能获得自己的ID。
+		#     recursive     : 如果为true则递归返回所有组件和自己的ID，否则返回自己ID 
 		#
 		#     如果装备是套装，就返回它的所有子套装及其组件，否则返回自己
 		#
+		#
+		#    
+		#
 		#--------------------------------------------------------------------------
-		def getAllComponentId(equip)
+		def getAllComponentId(equip, recursive = true)
 			# 为空，直接返回空
 			return nil if nil == equip
+			# 不递归，直接返回自己。
+			
 			# 层序遍历
 			queue = []
 			result = []
 			if equip.is_a?(RPG::Item)
+				return equip.id if recursive ==  false
 				queue.push(equip.id)
 			elsif equip.is_a?(RPG::Weapon)
+				return equip.id+1000 if recursive ==  false
 				queue.push(equip.id+1000)
 			else
+				return equip.id+2000 if recursive ==  false
 				queue.push(equip.id+2000)
 			end
 			while queue.size > 0
@@ -96,10 +126,10 @@ module RPG
 		#   return  : 该属性在数据库中对应的值
 		#
 		#-----------------------------------------------------------------------
-		def read_suit_attr(session)
+		def read_suit_attr(session, recursive = true)
 			res = 0	
 			# 获得所有套装组件id，包括自己！
-			suit_component = getAllComponentId(self)
+			suit_component = getAllComponentId(self, recursive)
 			return nil if suit_component == nil
 			for sc in suit_component 
 				# 如果不是一个合法id 直接跳过
@@ -142,11 +172,139 @@ module RPG
 		#-----------------------------------------------------------------------
 		def read_suit_all(needclear = false)
 			if true == needclear
-				@attrs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				@attrs_all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+				@attrs_self = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 			end
+				e = self
+				# 如果item 存在
+				if nil != e
+					## maxhp
+					if (tmp=e.read_note('maxhp')) != nil
+						@attrs_self[0] += tmp
+					end
+					if (tmp=e.read_note('maxhprate')) != nil
+						@attrs_self[1] += tmp 
+					end
+					
+					### maxmp
+					if (tmp=e.read_note('maxmp')) != nil
+						@attrs_self[2] += tmp
+					end
+					if (tmp=e.read_note('maxmprate')) != nil
+						@attrs_self[3] += tmp 
+					end
+					
+					### atk
+					if (tmp=e.read_note('atk')) != nil
+						@attrs_self[4] += tmp
+					end         
+					if (tmp=e.read_note('atkrate')) != nil
+						@attrs_self[5] += tmp
+					end
+					
+					# def
+					if (tmp=e.read_note('ddef')) != nil
+						@attrs_self[6] += tmp
+					end
+					if (tmp=e.read_note('defrate')) != nil
+						@attrs_self[7] += tmp
+					end
+					
+					# strength
+					if (tmp=e.read_note('strength')) != nil
+						@attrs_self[8] += tmp
+					end
+					if (tmp=e.read_note('strengthrate')) != nil
+						@attrs_self[9] += tmp
+					end
+					
+					# celerity
+					if (tmp=e.read_note('celerity')) != nil
+						@attrs_self[10] += tmp
+					end
+					if (tmp=e.read_note('celerityrate')) != nil
+						@attrs_self[11] += tmp
+					end
+					
+					# wisdom
+					if (tmp=e.read_note('wisdom')) != nil
+						@attrs_self[12] += tmp 
+					end
+					if (tmp=e.read_note('wisdomrate')) != nil      
+						@attrs_self[13] += tmp
+					end
+					
+					# destroy
+					if (tmp=e.read_note('destroy')) != nil
+						@attrs_self[14] += tmp
+					end
+					if (tmp=e.read_note('destroyr')) != nil
+						@attrs_self[15] += tmp
+					end
+					
+					# mdestroy
+					if (tmp=e.read_note('mdestroy')) != nil
+						@attrs_self[16] += tmp
+					end
+					if (tmp=e.read_note('mdestroyr')) != nil
+						@attrs_self[17] += tmp
+					end
+					
+					# atkspeed
+					if (tmp=e.read_note('atkspeed')) != nil
+						@attrs_self[18] += tmp
+					end
+					if (tmp=e.read_note('atkspeedrate')) != nil
+						@attrs_self[19] += tmp
+					end
+					
+					#eva
+					if (tmp=e.read_note('eva')) != nil
+						@attrs_self[20] += tmp
+					end
+					if (tmp=e.read_note('evarate')) != nil
+						@attrs_self[21] += tmp
+					end
+					
+					# bom
+					if (tmp=e.read_note('bom')) != nil
+						@attrs_self[22] += tmp
+					end
+					if (tmp=e.read_note('bomrate')) != nil
+						@attrs_self[23] += tmp
+					end
+					if (tmp=e.read_note('bomatk')) != nil
+						@attrs_self[24] += tmp
+					end
+					
+					#hit
+					if (tmp=e.read_note('hit')) != nil
+						@attrs_self[25] += tmp
+					end
+					if (tmp=e.read_note('hitrate')) != nil
+						@attrs_self[26] += tmp
+					end
+					
+					# hpcover
+					if (tmp=e.read_note('hpcover')) != nil
+						@attrs_self[27] += tmp
+					end
+					if (tmp=e.read_note('hprate')) != nil
+						@attrs_self[28] += tmp
+					end
+					
+					# mpcover
+					if (tmp=e.read_note('mpcover')) != nil
+						@attrs_self[29] += tmp
+					end
+					if (tmp=e.read_note('mprate')) != nil 
+						@attrs_self[30] += tmp
+					end
+				end # end of e!=nil
 			# 获得所有套装组件id，包括自己！
-			suit_component = getAllComponentId(self)
+			suit_component = getAllComponentId(self, true)
 			for sc in suit_component 
 				# 如果不是一个合法id 直接跳过
 				next if sc <= 1000 or sc >= 3000 or sc == 2000
@@ -161,125 +319,125 @@ module RPG
 				if nil != e
 					## maxhp
 					if (tmp=e.read_note('maxhp')) != nil
-						attrs[0] += tmp
+						@attrs_all[0] += tmp
 					end
 					if (tmp=e.read_note('maxhprate')) != nil
-						attrs[1] += tmp 
+						@attrs_all[1] += tmp 
 					end
 					
 					### maxmp
 					if (tmp=e.read_note('maxmp')) != nil
-						attrs[2] += tmp
+						@attrs_all[2] += tmp
 					end
 					if (tmp=e.read_note('maxmprate')) != nil
-						attrs[3] += tmp 
+						@attrs_all[3] += tmp 
 					end
 					
 					### atk
 					if (tmp=e.read_note('atk')) != nil
-						attrs[4] += tmp
+						@attrs_all[4] += tmp
 					end         
 					if (tmp=e.read_note('atkrate')) != nil
-						attrs[5] += tmp
+						@attrs_all[5] += tmp
 					end
 					
 					# def
 					if (tmp=e.read_note('ddef')) != nil
-						attrs[6] += tmp
+						@attrs_all[6] += tmp
 					end
 					if (tmp=e.read_note('defrate')) != nil
-						attrs[7] += tmp
+						@attrs_all[7] += tmp
 					end
 					
 					# strength
 					if (tmp=e.read_note('strength')) != nil
-						attrs[8] += tmp
+						@attrs_all[8] += tmp
 					end
 					if (tmp=e.read_note('strengthrate')) != nil
-						attrs[9] += tmp
+						@attrs_all[9] += tmp
 					end
 					
 					# celerity
 					if (tmp=e.read_note('celerity')) != nil
-						attrs[10] += tmp
+						@attrs_all[10] += tmp
 					end
 					if (tmp=e.read_note('celerityrate')) != nil
-						attrs[11] += tmp
+						@attrs_all[11] += tmp
 					end
 					
 					# wisdom
 					if (tmp=e.read_note('wisdom')) != nil
-						attrs[12] += tmp 
+						@attrs_all[12] += tmp 
 					end
 					if (tmp=e.read_note('wisdomrate')) != nil      
-						attrs[13] += tmp
+						@attrs_all[13] += tmp
 					end
 					
 					# destroy
 					if (tmp=e.read_note('destroy')) != nil
-						attrs[14] += tmp
+						@attrs_all[14] += tmp
 					end
 					if (tmp=e.read_note('destroyr')) != nil
-						attrs[15] += tmp
+						@attrs_all[15] += tmp
 					end
 					
 					# mdestroy
 					if (tmp=e.read_note('mdestroy')) != nil
-						attrs[16] += tmp
+						@attrs_all[16] += tmp
 					end
 					if (tmp=e.read_note('mdestroyr')) != nil
-						attrs[17] += tmp
+						@attrs_all[17] += tmp
 					end
 					
 					# atkspeed
 					if (tmp=e.read_note('atkspeed')) != nil
-						attrs[18] += tmp
+						@attrs_all[18] += tmp
 					end
 					if (tmp=e.read_note('atkspeedrate')) != nil
-						attrs[19] += tmp
+						@attrs_all[19] += tmp
 					end
 					
 					#eva
 					if (tmp=e.read_note('eva')) != nil
-						attrs[20] += tmp
+						@attrs_all[20] += tmp
 					end
 					if (tmp=e.read_note('evarate')) != nil
-						attrs[21] += tmp
+						@attrs_all[21] += tmp
 					end
 					
 					# bom
 					if (tmp=e.read_note('bom')) != nil
-						attrs[22] += tmp
+						@attrs_all[22] += tmp
 					end
 					if (tmp=e.read_note('bomrate')) != nil
-						attrs[23] += tmp
+						@attrs_all[23] += tmp
 					end
 					if (tmp=e.read_note('bomatk')) != nil
-						attrs[24] += tmp
+						@attrs_all[24] += tmp
 					end
 					
 					#hit
 					if (tmp=e.read_note('hit')) != nil
-						attrs[25] += tmp
+						@attrs_all[25] += tmp
 					end
 					if (tmp=e.read_note('hitrate')) != nil
-						attrs[26] += tmp
+						@attrs_all[26] += tmp
 					end
 					
 					# hpcover
 					if (tmp=e.read_note('hpcover')) != nil
-						attrs[27] += tmp
+						@attrs_all[27] += tmp
 					end
 					if (tmp=e.read_note('hprate')) != nil
-						attrs[28] += tmp
+						@attrs_all[28] += tmp
 					end
 					
 					# mpcover
 					if (tmp=e.read_note('mpcover')) != nil
-						attrs[29] += tmp
+						@attrs_all[29] += tmp
 					end
 					if (tmp=e.read_note('mprate')) != nil 
-						attrs[30] += tmp
+						@attrs_all[30] += tmp
 					end
 				end # end of e!=nil
 			end  # end of for

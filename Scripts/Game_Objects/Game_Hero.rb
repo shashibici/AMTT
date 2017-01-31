@@ -516,41 +516,7 @@ class Game_Hero < Game_Actor
   #--------------------------------------------------------------------------
   def hero
     return $game_heros[@actor_id]
-  end 
-  #--------------------------------------------------------------------------
-  # ● 获取武器对象列表
-  #
-  #      重写覆盖         如果id为0 代表没有装备相应内容，对应位置可能为nil
-  #
-  #--------------------------------------------------------------------------
-  def weapons
-    result = []
-    result.push($data_weapons[@weapon1_id]) 
-    result.push($data_weapons[@weapon2_id]) 
-    return result
-  end  
-  #--------------------------------------------------------------------------
-  # ● 获取防具对象列表
-  #
-  #    重写覆盖         如果id为0 代表没有装备相应内容，对应位置可能为nil
-  #  
-  #--------------------------------------------------------------------------
-  def armors
-    result = []
-    result.push($data_armors[@armor1_id])  
-    result.push($data_armors[@armor2_id]) 
-    result.push($data_armors[@armor3_id])  
-    result.push($data_armors[@armor4_id])  
-    result.push($data_armors[@armor5_id])  
-    result.push($data_armors[@armor6_id])  
-    result.push($data_armors[@armor7_id])  
-    result.push($data_armors[@armor8_id])  
-    result.push($data_armors[@armor9_id])  
-    result.push($data_armors[@armor10_id]) 
-    result.push($data_armors[@armor11_id]) 
-    result.push($data_armors[@armor12_id]) 
-    return result
-  end  
+  end 	
   #--------------------------------------------------------------------------
   # ● 计算经验值
   #
@@ -707,7 +673,9 @@ class Game_Hero < Game_Actor
     # 如果真的要换装备，那么换下来的装备，应该存在队伍背包中
     # 同时换上去的物品应该重背包中失去
     if test == false
-      return if $game_party.item_number(item) == 0 if item != nil
+	  if item != nil 
+        return if $game_party.item_number(item) == 0
+	  end
       $game_party.gain_item(last_item, 1)
       $game_party.lose_item(item, 1)
     end
