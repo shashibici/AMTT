@@ -37,7 +37,6 @@ module GAME_INIT
 		$skill_base[name][level] = GAME_CONF::ALL_SKILLS[uid]["object"]
 	end
   end
-  
   #--------------------------------------------------------------------------
   # ●  获得武器的属性加成
   #

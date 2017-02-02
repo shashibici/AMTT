@@ -97,5 +97,26 @@ module RPG
 			return []
 		end
 	end
-
+#==============================================================================
+#==============================================================================
+	#--------------------------------------------------------------------------
+	# ● 返回技能对象
+	# 	根据名字、等级返回唯一的技能对象。使用时最好用.clone方法复制。
+	#
+	#	例如：
+	# 		skill = RPG.getSkill("反击", 1)
+	#       if nil != skill 
+	# 			skill  = skill.clone
+	# 		end
+	#--------------------------------------------------------------------------
+	def self.getSkill(name, level)
+		for skill_name in $skill_base.keys
+			next if skill_name != name
+			for skill_level in $skill_base[skill_name].keys
+				next if skill_level != level
+				return $skill_base[skill_name][skill_level]
+			end
+		end
+		return nil
+	end
 end

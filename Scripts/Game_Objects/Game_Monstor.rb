@@ -222,7 +222,26 @@ class Game_Monstor < Game_Actor
     # 初始化生命值等等
     recover_all
     # 初始化恢复速度
-    recover_change    
+    recover_change  
+	# 学习技能
+	skill_labels = monstor.read_note('skill') == nil ? [[]] : monstor.read_note('skill')
+	for skill_label in skill_labels
+		skill_name = skill_label[0]
+		skill_level = skill_label[1]
+		skill = RPG.getSkill(skill_name, skill_level)
+		if nil != skill 
+			skill_clone = skill.clone
+			skill_clone.set_priority(max_skill_priority+1)
+			skill_clone.set_battler(self)
+			if add_skill(skill_clone) == false
+				p "cannot add skill to monstor"
+				exit
+			end
+		else 
+			p "cannot find skill"
+			exit
+		end
+	end
     
   end
   
