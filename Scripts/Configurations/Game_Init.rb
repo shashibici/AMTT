@@ -5,7 +5,39 @@
 #   
 #==============================================================================
 
+$skill_base = {}
 module GAME_INIT
+  #--------------------------------------------------------------------------
+  # ●  初始化所有技能对象
+  #    $skill_base  = {
+  #                   		"反击"  => {
+  #                   			1   =>  object,    # level = 1
+  #                             2   =>  object,    # level = 2
+  #                         },
+  #					  }
+  #
+  #
+  #--------------------------------------------------------------------------
+  def self.initSkills
+	# 该技能在被学习的时候需要使用 clone函数
+	# 例如 skill = $skill_base["反击"][1].clone
+	#      skill.set_battler($game_party.active)
+	#      if !$game_party.active.skill_exist?(skill)
+	#         skill.set_priority($game_party.active.max_skill_priority+1)
+	# 	      $game_party.active.add_skill(skill)
+	#      end
+	for uid in GAME_CONF::ALL_SKILLS.keys
+		name = GAME_CONF::ALL_SKILLS[uid]["name"]
+		level = GAME_CONF::ALL_SKILLS[uid]["level"]
+		#没有角色学习该技能
+		GAME_CONF::ALL_SKILLS[uid]["object"].setup(name, level, nil, 0)
+		if !$skill_base.include?(name)
+			$skill_base[name] = {}
+		end
+		$skill_base[name][level] = GAME_CONF::ALL_SKILLS[uid]["object"]
+	end
+  end
+  
   #--------------------------------------------------------------------------
   # ●  获得武器的属性加成
   #
