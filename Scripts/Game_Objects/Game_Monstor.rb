@@ -224,7 +224,7 @@ class Game_Monstor < Game_Actor
     # 初始化恢复速度
     recover_change  
 	# 学习技能
-	skill_labels = monstor.read_note('skill') == nil ? [[]] : monstor.read_note('skill')
+	skill_labels = monstor.read_note('skill') == nil ? [] : monstor.read_note('skill')
 	for skill_label in skill_labels
 		skill_name = skill_label[0]
 		skill_level = skill_label[1]
