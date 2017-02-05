@@ -1,20 +1,20 @@
 #==============================================================================
-# ■ Window_SkillBuy
+# ■ Window_SkillSell
 #------------------------------------------------------------------------------
 #		重新定义覆盖之前定义
 #
 # 　拥有光标的移动以及滚动功能的窗口类。
 #==============================================================================
 
-class Window_SkillBuy < Window_Base
+class Window_SkillSell < Window_Base
 	#--------------------------------------------------------------------------
 	# ● 定义实例变量
 	#--------------------------------------------------------------------------
-	attr_reader   		:skill_max                 	# 项目数
-	attr_reader   		:column_max               	# 行数
-	attr_reader   		:index                    	# 光标位置
-	attr_accessor		:wlh						# 每个项目高度
-	attr_accessor 		:skills  					# [[名字,等级],[名字,等级]]
+	attr_reader   		:skill_max                 		# 项目数
+	attr_reader   		:column_max               		# 行数
+	attr_reader   		:index                    		# 光标位置
+	attr_accessor		:wlh							# 每个项目高度
+	attr_accessor		:actor							# 需要买技能的角色
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#     x       : 窗口的 X 坐标
@@ -23,14 +23,13 @@ class Window_SkillBuy < Window_Base
 	#     height  : 窗口的高
 	#     spacing : 与项目横向并立的空间
 	#--------------------------------------------------------------------------
-	def initialize(x, y, width, height, skill_list)
+	def initialize(x, y, width, height, actor)
 		@column_max = 1
 		@index = 0
 		@spacing = 32
 		@wlh = 90
-		@skills = []
-		@skill_list = skill_list
-		getSkills
+		@actor = actor
+		@skills = @actor.get_skills
 		@skill_max = @skills.size
 		super(x, y, width, height)
 		refresh
@@ -40,19 +39,6 @@ class Window_SkillBuy < Window_Base
 	#--------------------------------------------------------------------------
 	def refresh
 		refresh_skill_items
-	end
-	#--------------------------------------------------------------------------
-	# ● 获取技能对象
-	#--------------------------------------------------------------------------
-	def getSkills
-		for element in @skill_list
-			next if nil == element
-			skills_by_name = $skill_base[element[0]]
-			next if nil == skills_by_name
-			skill = skills_by_name[element[1]]
-			next if nil == skill
-			@skills.push(skill.clone)
-		end
 	end
 	#--------------------------------------------------------------------------
 	# ● 生成窗口内容
@@ -243,8 +229,7 @@ class Window_SkillBuy < Window_Base
 	# ● 刷新所有技能的显示 -- 重绘技能
 	#--------------------------------------------------------------------------
 	def refresh_skill_items
-		@skills = []
-		getSkills
+		@skills = @actor.get_skills
 		@skill_max = @skills.size
 		self.contents.clear
 		# ... 绘制所有项目 ...

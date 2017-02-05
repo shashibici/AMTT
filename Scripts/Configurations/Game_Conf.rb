@@ -13,20 +13,20 @@ module GAME_CONF
 		#uid => {name, level,object}
 		# -- 反击 --
 		1 => {
-				"name" 		=> 	"反击", 
+				"name" 		=> 	"反击III", 
 				"level" 	=> 	1, 
 				"object" 	=> 	RPG::FanJi_Skill.new
 		},
 				
 		# -- 冰冻 --
 		2 => {
-				"name" 		=> 	"冰冻", 
+				"name" 		=> 	"冰冻IV", 
 				"level" 	=> 	1, 
 				"object" 	=> 	RPG::BinDong_Skill.new
 		},	
 		# -- 坚守 --
 		3 => {
-				"name" 		=> 	"坚守", 
+				"name" 		=> 	"坚守III", 
 				"level" 	=> 	1, 
 				"object"	=>  RPG::JianShou_Skill.new
 		},			
