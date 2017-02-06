@@ -29,7 +29,7 @@ class Scene_Skill < Scene_Base
 	# ● 创建窗口
 	#--------------------------------------------------------------------------
 	def create_windows
-		@skill_window = Window_Skill.new(0, 0, 640, 480, @actor)
+		@skill_window = Window_Skill.new(0, 0, 106, 480, @actor)
 		@skill_window.refresh_skill_items
 		@options_window = Window_Command.new(172, ["调整", "删除"])
 		@confirmation_window = Window_Command.new(172, ["否", "是"])
@@ -39,6 +39,10 @@ class Scene_Skill < Scene_Base
 		@confirmation_window.y = @options_window.y + @options_window.height + 8
 		@options_window.active = @options_window.visible = false
 		@confirmation_window.active = @confirmation_window.visible = false
+		@des_window = Window_SkillDescription.new(106, 0, 640-106, 480)
+		@des_window.item = @skill_window.skill
+		@des_window.active = true
+		@des_window.visible = true
 	end
 	#--------------------------------------------------------------------------
 	# ● 结束处理
@@ -48,6 +52,7 @@ class Scene_Skill < Scene_Base
 		@skill_window.dispose
 		@options_window.dispose
 		@confirmation_window.dispose
+		@des_window.dispose
 	end
 	#--------------------------------------------------------------------------
 	# ● 还原至原来的画面
@@ -68,12 +73,10 @@ class Scene_Skill < Scene_Base
 		@confirmation_window.update
 		if @skill_window.active
 			update_skill_selection
-		
-		
+			@des_window.item = @skill_window.skill
+			@des_window.update
 		elsif @options_window.active
 			update_options
-		
-		
 		elsif @confirmation_window.active
 			update_confirmation
 		end	

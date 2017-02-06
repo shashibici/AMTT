@@ -40,7 +40,7 @@ class Game_Battler
 		animation_id = {}
 		@states = {}
 		@my_skills = {}
-		@skill_limit = 6
+		@skill_limit = 0
 	end
 	#--------------------------------------------------------------------------
 	# ● 清理能力值增加值
@@ -1350,18 +1350,18 @@ class Game_Battler
 		# 修改命中状况
 		if @hitflag == false and self.hero?
 			# 如果是hero并且丢失，修改hero命中开关
-			$game_switches[105] = true
+			$game_switches[119] = true
 		elsif @hitflag == false and  !self.hero?
 			# 如果不是英雄并且丢失，修改怪物命中开关
-			$game_switches[106] = true
+			$game_switches[120] = true
 		end
 		# 记录暴击状况
 		if @bomflag == true and self.hero?
 			# 英雄暴击
-			$game_switches[109] = true
+			$game_switches[121] = true
 		elsif @bomflag == true and !self.hero?
 			# 怪物暴击
-			$game_switches[110] = true
+			$game_switches[122] = true
 		end
 		# 伤害之后的处理——判断胜负
 		postdamage(target, flag)

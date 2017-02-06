@@ -239,8 +239,8 @@ class Window_Skill < Window_Base
 		#self.contents.clear_rect(rect)
 		item = @skills[index]
 		if item != nil
-			draw_icon(item.name, rect.x, rect.y, 64, 64, true)
-			draw_item_name(item.name, rect.x, rect.y+64, 64, @wlh-64, 1)
+			draw_icon(item.name, rect.x+3, rect.y+3, 64+3, 64+3, true)
+			draw_item_name(item.name, rect.x+3, rect.y+64+3, 64+3+3, @wlh-64-3, 1)
 			#self.contents.draw_text(rect, sprintf(":%2d", number), 2)
 		end
 	end
