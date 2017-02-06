@@ -261,9 +261,13 @@ class Window_SkillBuy < Window_Base
 		#self.contents.clear_rect(rect)
 		item = @skills[index]
 		if item != nil
-			draw_icon(item.name, rect.x+3, rect.y+3, 64+3, 64+3, true)
-			draw_item_name(item.name, rect.x+3, rect.y+64+3, 64+3+3, @wlh-64-3, 1)
-			#self.contents.draw_text(rect, sprintf(":%2d", number), 2)
+			if $game_party.active.can_add_skill?(item)
+				draw_icon(item.name, rect.x+3, rect.y+3, 64+3, 64+3, true)
+				draw_item_name(item.name, rect.x+3, rect.y+64+3, 64+3+3, @wlh-64-3, 1, true)
+			else
+				draw_icon(item.name, rect.x+3, rect.y+3, 64+3, 64+3, false)
+				draw_item_name(item.name, rect.x+3, rect.y+64+3, 64+3+3, @wlh-64-3, 1, true)
+			end
 		end
 	end
 	#--------------------------------------------------------------------------
@@ -287,10 +291,18 @@ class Window_SkillBuy < Window_Base
 	#     y          	: 描绘目标 Y 坐标
 	# 	  width			: 描绘目标宽度
 	# 	  height		: 描绘目标高度
-	#     enabled    	: 有效标志。false 为半透明显示
+	#     align    		: 对齐方式
+	#     enabled  		: 有效标志，false为半透明
 	#--------------------------------------------------------------------------
-	def draw_item_name(item_name, x, y, width, height, align = 1)
-		self.contents.draw_text(x, y, width, height, item_name, align)
+	def draw_item_name(item_name, x, y, width, height, align = 1, enabled=true)
+		if not enabled 
+			#font = self.contents.font.clone
+			#self.contents.font.color.alpha = 2
+			self.contents.draw_text(x, y, width, height, item_name, align)
+			#self.contents.font = font
+		else 
+			self.contents.draw_text(x, y, width, height, item_name, align)
+		end
 	end
 	#--------------------------------------------------------------------------
 	# ● 返回当前光标所在的技能对象

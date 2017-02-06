@@ -1,20 +1,20 @@
 #==============================================================================
-# ■ Window_Skill
+# ■ Window_Consult_Skill
 #------------------------------------------------------------------------------
 #		重新定义覆盖之前定义
 #
 # 　拥有光标的移动以及滚动功能的窗口类。
 #==============================================================================
 
-class Window_Skill < Window_Base
+class Window_Consult_Skill < Window_Base
 	#--------------------------------------------------------------------------
 	# ● 定义实例变量
 	#--------------------------------------------------------------------------
-	attr_reader   		:skill_max                 	# 项目数
-	attr_reader   		:column_max               	# 行数
-	attr_reader   		:index                    	# 光标位置
-	attr_accessor		:wlh						# 每个项目高度
-	attr_accessor		:actor						# 角色对象
+	attr_reader   		:skill_max                 		# 项目数
+	attr_reader   		:column_max               		# 行数
+	attr_reader   		:index                    		# 光标位置
+	attr_accessor		:wlh							# 每个项目高度
+	attr_accessor		:actor							# 需要买技能的角色
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#     x       : 窗口的 X 坐标
@@ -32,6 +32,13 @@ class Window_Skill < Window_Base
 		@skills = @actor.get_skills
 		@skill_max = @skills.size
 		super(x, y, width, height)
+		refresh
+	end
+	#--------------------------------------------------------------------------
+	# ● 刷新窗口内容
+	#--------------------------------------------------------------------------
+	def refresh
+		refresh_skill_items
 	end
 	#--------------------------------------------------------------------------
 	# ● 生成窗口内容
@@ -239,9 +246,8 @@ class Window_Skill < Window_Base
 		#self.contents.clear_rect(rect)
 		item = @skills[index]
 		if item != nil
-			draw_icon(item.name, rect.x, rect.y, 64, 64, true)
-			draw_item_name(item.name, rect.x, rect.y+64, 64, @wlh-64, 1)
-			#self.contents.draw_text(rect, sprintf(":%2d", number), 2)
+			draw_icon(item.name, rect.x+3, rect.y+3, 64+3, 64+3, true)
+			draw_item_name(item.name, rect.x+3, rect.y+64+3, 64+3+3, @wlh-64-3, 1)
 		end
 	end
 	#--------------------------------------------------------------------------

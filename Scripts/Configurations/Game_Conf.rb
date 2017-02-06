@@ -12,24 +12,76 @@ module GAME_CONF
 	ALL_SKILLS = {
 		#uid => {name, level,object}
 		# -- 反击 --
-		1 => {
-				"name" 		=> 	"反击III", 
+		4 => {
+				"name" 		=> 	"反击I", 
 				"level" 	=> 	1, 
+				"object" 	=> 	RPG::FanJi_Skill.new
+		},
+		5 => {
+				"name" 		=> 	"反击II", 
+				"level" 	=> 	2, 
+				"object" 	=> 	RPG::FanJi_Skill.new
+		},
+		6 => {
+				"name" 		=> 	"反击III", 
+				"level" 	=> 	3, 
 				"object" 	=> 	RPG::FanJi_Skill.new
 		},
 				
 		# -- 冰冻 --
-		2 => {
-				"name" 		=> 	"冰冻IV", 
+		34 => {
+				"name" 		=> 	"冰冻I", 
 				"level" 	=> 	1, 
 				"object" 	=> 	RPG::BinDong_Skill.new
 		},	
+		35 => {
+				"name" 		=> 	"冰冻II", 
+				"level" 	=> 	2, 
+				"object" 	=> 	RPG::BinDong_Skill.new
+		},	
+		36 => {
+				"name" 		=> 	"冰冻III", 
+				"level" 	=> 	3, 
+				"object" 	=> 	RPG::BinDong_Skill.new
+		},	
 		# -- 坚守 --
-		3 => {
-				"name" 		=> 	"坚守III", 
+		26 => {
+				"name" 		=> 	"坚守I", 
 				"level" 	=> 	1, 
 				"object"	=>  RPG::JianShou_Skill.new
-		},			
+		},	
+		27 => {
+				"name" 		=> 	"坚守II", 
+				"level" 	=> 	2, 
+				"object"	=>  RPG::JianShou_Skill.new
+		},	
+		28 => {
+				"name" 		=> 	"坚守III", 
+				"level" 	=> 	3, 
+				"object"	=>  RPG::JianShou_Skill.new
+		},	
+		# -- 疾风 --
+		1 => {
+				"name" 		=> 	"疾风I", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::JiFeng_Skill.new
+		},
+		2 => {
+				"name" 		=> 	"疾风II", 
+				"level" 	=> 	2, 
+				"object"	=>  RPG::JiFeng_Skill.new
+		},
+		3 => {
+				"name" 		=> 	"疾风III", 
+				"level" 	=> 	3, 
+				"object"	=>  RPG::JiFeng_Skill.new
+		},
+		# -- 复仇 --
+		1 => {
+				"name" 		=> 	"复仇", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::Fuchou_Skill.new
+		},		
 	}
 	#--------------------------------------------------------------------------
 	# 等级差对伤害造成的影响

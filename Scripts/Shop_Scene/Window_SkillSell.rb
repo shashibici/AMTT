@@ -231,7 +231,7 @@ class Window_SkillSell < Window_Base
 	def refresh_skill_items
 		@skills = @actor.get_skills
 		@skill_max = @skills.size
-		self.contents.clear
+		create_contents
 		# ... 绘制所有项目 ...
 		for i in 0...@skill_max
 			draw_item(i)
@@ -248,7 +248,6 @@ class Window_SkillSell < Window_Base
 		if item != nil
 			draw_icon(item.name, rect.x+3, rect.y+3, 64+3, 64+3, true)
 			draw_item_name(item.name, rect.x+3, rect.y+64+3, 64+3+3, @wlh-64-3, 1)
-			#self.contents.draw_text(rect, sprintf(":%2d", number), 2)
 		end
 	end
 	#--------------------------------------------------------------------------
@@ -282,5 +281,12 @@ class Window_SkillSell < Window_Base
 	#--------------------------------------------------------------------------
 	def skill
 		return @skills[@index]
+	end
+	#--------------------------------------------------------------------------
+	# ● 生成窗口内容
+	#--------------------------------------------------------------------------
+	def create_contents
+		self.contents.dispose
+		self.contents = Bitmap.new(width - 32, [height - 32, row_max * @wlh].max)
 	end
 end

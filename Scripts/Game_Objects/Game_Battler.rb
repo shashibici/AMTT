@@ -27,6 +27,7 @@ class Game_Battler
 	attr_accessor 		:screen_z			# 战斗sprite 的位置 
 	attr_accessor		:animation_id		# 记录即将执行的动画{播放顺序如果同时生效 => [距离生效时间,动画编号]}
 	attr_accessor 		:my_skills 			# 战斗者的技能列表{priority => {[name, level] => skill}}
+	attr_accessor       :skill_limit		# 可以学习的技能的上限，只能通过函数can_add_skill生效
 	#-------------------------------------------------------------
 	#--------------------------------------------------------------------------
 	# ● 初始化对像
@@ -39,6 +40,7 @@ class Game_Battler
 		animation_id = {}
 		@states = {}
 		@my_skills = {}
+		@skill_limit = 6
 	end
 	#--------------------------------------------------------------------------
 	# ● 清理能力值增加值
@@ -191,7 +193,7 @@ class Game_Battler
 			return false
 		end
 		if @my_skills[skill.priority] != nil
-			unless @my_skills[skill.priority].keys.include?([skill.name, skill.level])
+			if not (@my_skills[skill.priority].keys.include?([skill.name, skill.level]))
 				@my_skills[skill.priority][[skill.name, skill.level]] = skill
 			end
 		else
@@ -199,6 +201,15 @@ class Game_Battler
 			@my_skills[skill.priority][[skill.name, skill.level]] = skill
 		end
 		return true
+	end
+	#--------------------------------------------------------------------------
+	# ● 判断是否能添加技能添加技能
+	#    目前只考虑数量，以及重复问题。以后可以考虑其他。
+	#--------------------------------------------------------------------------
+	def can_add_skill?(skill)
+		return false if nil == skill
+		return false if skill_exist?(skill)
+		return (get_skills.size < @skill_limit)
 	end
 	#--------------------------------------------------------------------------
 	# ● 移除所有名字与所给名字相同的技能
@@ -679,6 +690,7 @@ class Game_Battler
 		n *= (100.0 + @xhitrate) / 100.0
 		n += @xhit
 		# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+		# 此加成包括装备加成
 		delta = 0
 		for state in states
 			delta += n * state.hit_rate / 100.0
@@ -735,12 +747,12 @@ class Game_Battler
 		n = self_hpcover
 		# 装备增加
 		n += @xhpcover 
-		# 按百分比回复 -- 有些装备能够按照百分比回血，但只能是self_maxhp的百分比
-		n += self_maxhp * @xhprate / 100.0
+		# 按百分比回复 -- 有些装备能够按照百分比回血，是算上装备的百分比
+		n += base_maxhp * @xhprate / 100.0
 		# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
 		delta = 0
 		for state in states
-			delta += n * state.hpcover_rate / 100.0
+			delta += base_maxhp * state.hpcover_rate / 100.0
 			delta += state.hpcover
 		end
 		n += delta
@@ -756,11 +768,11 @@ class Game_Battler
 		n = self_mpcover
 		n += @xmpcover
 		# 按百分比回复
-		n += self_maxmp * @xmprate / 100.0
+		n += base_maxmp * @xmprate / 100.0
 		# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
 		delta = 0
 		for state in states
-			delta += n * state.mpcover_rate / 100.0
+			delta += base_maxmp * state.mpcover_rate / 100.0
 			delta += state.mpcover
 		end
 		n += delta
@@ -774,7 +786,7 @@ class Game_Battler
 	# ● 获取 MaxHP 的限制值
 	#--------------------------------------------------------------------------
 	def maxhp_limit
-		return 99999999
+		return 999999999
 	end
 	#--------------------------------------------------------------------------
 	# ● 获取 MaxHP
@@ -1618,7 +1630,10 @@ class Game_Battler
 	end
 	#--------------------------------------------------------------------------
 	# ● 添加动画
-	#
+	#	animation["value"] = [time_to_start, id_of_animation_in_database]
+	#		e.g., [2, 125]  means 
+	#           Animation with "id=125", 两帧之后开始
+	#		
 	#--------------------------------------------------------------------------
 	def add_animations(animations)
 		for animation in animations
