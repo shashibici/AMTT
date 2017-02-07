@@ -35,8 +35,10 @@ class Scene_Skill < Scene_Base
 		@confirmation_window = Window_Command.new(172, ["否", "是"])
 		@options_window.x = (Graphics.width - @options_window.width) / 2.0
 		@options_window.y = (Graphics.height - @options_window.height) / 2.0
+		@options_window.z = 3000
 		@confirmation_window.x = (Graphics.width - @options_window.width) / 2.0
 		@confirmation_window.y = @options_window.y + @options_window.height + 8
+		@confirmation_window.z = 4000
 		@options_window.active = @options_window.visible = false
 		@confirmation_window.active = @confirmation_window.visible = false
 		@des_window = Window_SkillDescription.new(106, 0, 640-106, 480)

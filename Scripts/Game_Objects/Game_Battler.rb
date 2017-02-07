@@ -115,7 +115,7 @@ class Game_Battler
 					for s in @states[state.priority]
 						if s.name == state.name and s.instance_of?(state.class)
 							# 判断最高等级覆盖还是最低等级覆盖
-							if (most and state.level > s.level) or (false == most and state.level < s.level)
+							if (true == most and state.level > s.level) or (false == most and state.level < s.level)
 								@states[state.priority].delete(s)
 								@states[state.prioirty].push(state)
 								return 
@@ -787,11 +787,17 @@ class Game_Battler
 		n += @xhpcover 
 		# 按百分比回复 -- 有些装备能够按照百分比回血，是算上装备的百分比
 		n += base_maxhp * @xhprate / 100.0
-		# 状态加成，被动技能加成通过附加状态来实现 -- 这里的按比例加成较厉害，按数字加成效果较小
+		# 按照最大生命比例加血的状态
 		delta = 0
 		for state in states
 			delta += base_maxhp * state.hpcover_rate / 100.0
 			delta += state.hpcover
+		end
+		n += delta
+		# 按照当前恢复量比例加血的状态
+		delta = 0
+		for state in states
+			delta += n * state.hpcover_boost_rate / 100.0
 		end
 		n += delta
 		return n
