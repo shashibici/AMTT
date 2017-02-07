@@ -125,7 +125,7 @@ module RPG
 		def can_trigger?(args)
 			if self.battler.hero? == args["target"].hero?
 				if $TIME_POST_DO_DAMAGE == $NOW_TIME
-					return args["hitflag"] == true or args["bomflag"] == true
+					return (args["hitflag"] == true or args["bomflag"] == true)
 				end
 			end
 			return false
@@ -215,6 +215,7 @@ module RPG
 		def effect_func(args)
 			if (args["source"].hp > 0)
 				state = Single_Speed_Change_State.new
+				state.level = @level
 				case @level
 				when 1
 					state.speed_rate = -40
@@ -226,12 +227,8 @@ module RPG
 					state.speed_rate = -80
 					state.setup(args["target"], "冰冻", 65536, 10)
 				end
-				if args["target"].state_num(state) > 0
-					return
-				else
-					args["target"].add_state(state)
-					animation_func(args)
-				end
+				args["target"].add_state(state, true, true)
+				animation_func(args)
 			end
 		end
 		#--------------------------------------------------------------------------
@@ -307,18 +304,19 @@ module RPG
 		#--------------------------------------------------------------------------
 		def compulsory_func
 			state = JianShou_State.new
+			state.level = @level
 			case @level
 			when 1
 				state.ratio = 50
-				state.setup(@battler, "坚守I", 32768, 72000)
+				state.setup(@battler, "坚守", 32768, 72000)
 			when 2
 				state.ratio = 100
-				state.setup(@battler, "坚守II", 32768, 72000)
+				state.setup(@battler, "坚守", 32768, 72000)
 			when 3
 				state.ratio = 200
-				state.setup(@battler, "坚守III", 32768, 72000)
+				state.setup(@battler, "坚守", 32768, 72000)
 			end
-			@battler.add_state(state)
+			@battler.add_state(state, true, true)
 		end
 		#--------------------------------------------------------------------------
 		# ● 技能描述
@@ -384,12 +382,8 @@ module RPG
 				state = Jifeng_State.new
 				state.level = @level
 				state.setup(args["source"], "疾风", 32768)
-				if args["source"].state_num(state) > 0
-					return
-				else
-					args["source"].add_state(state)
-					animation_func(args)
-				end
+				args["source"].add_state(state, true, true)
+				animation_func(args)
 			end
 		end
 		#--------------------------------------------------------------------------
@@ -513,6 +507,87 @@ module RPG
 					"【触发技】",
 					"角色受到暴击之后，下一刻立即",
 					"发动下一次攻击",]
+		end
+		#--------------------------------------------------------------------------
+		# ● 价格函数
+		#--------------------------------------------------------------------------
+		def price(scalar = 1)
+			return Fround(1000.0*scalar,1)
+		end
+	end
+	#==============================================================================
+	# ■ 巨化  -- 
+	#------------------------------------------------------------------------------
+	# 	锁定技，每次攻击必暴击，攻速-50%（二级+100%生命恢复，三级+100%生命最大值）
+	#==============================================================================
+	class Juhua_Skill < Skill_Base
+		#--------------------------------------------------------------------------
+		# ● 初始化
+		#--------------------------------------------------------------------------
+		def initialize
+			super
+			# 锁定技
+			@type = 1
+		end
+		#--------------------------------------------------------------------------
+		# ● 设置对象	
+		#	name		:	技能名字
+		#	level		:	技能等级
+		# 	battler		:	技能拥有者
+		# 	priority	:	优先级 - 越低越优先
+		#--------------------------------------------------------------------------
+		def setup(name, level, battler, priority = 0)
+			super(name, level, battler, priority)
+		end
+		#--------------------------------------------------------------------------
+		# ● 锁定技函数
+		# 		在战斗开始的时候被调用，一般是添加状态
+		#--------------------------------------------------------------------------
+		def compulsory_func
+			state = Juhua_State.new
+			state.level = @level
+			case @level
+			when 1
+				state.setup(@battler, "巨化", 8192, 72000)
+			when 2
+				state.setup(@battler, "巨化", 8192, 72000)
+			when 3
+				state.setup(@battler, "巨化", 8192, 72000)
+			end
+			# 按名字添加，以最高等级覆盖之
+			@battler.add_state(state, true, true)
+		end
+		#--------------------------------------------------------------------------
+		# ● 这是一个触发技能，需要实现can_trigger?
+		#--------------------------------------------------------------------------
+		def can_trigger?(args)
+			if self.battler.hero? != args["source"].hero?
+				if $TIME_PRE_DO_DAMAGE == $NOW_TIME
+					return true
+				end
+			end
+			return false
+		end
+		#--------------------------------------------------------------------------
+		# ● 需要实现effect_func触发效果
+		#--------------------------------------------------------------------------
+		def effect_func(args)
+			if (args["source"].hp > 0)
+				# 如果命中则一定暴击
+				args["bomflag"] = args["hitflag"]
+			end
+		end
+		#--------------------------------------------------------------------------
+		# ● 技能描述
+		#--------------------------------------------------------------------------
+		def description
+			return ["巨化：",
+					"【锁定技】",
+					"角色每次攻击如果命中必定暴击；",
+					"1级-50%攻速；",
+					"2级-50%攻速，+100%生命恢复；",
+					"3级-50%攻速，+100%生命恢复，",
+					"+100%最大生命",]
 		end
 		#--------------------------------------------------------------------------
 		# ● 价格函数

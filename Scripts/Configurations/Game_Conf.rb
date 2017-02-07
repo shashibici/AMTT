@@ -80,7 +80,23 @@ module GAME_CONF
 		1 => {
 				"name" 		=> 	"复仇", 
 				"level" 	=> 	1, 
-				"object"	=>  RPG::Fuchou_Skill.new
+				"object"	=>  RPG::Juhua_Skill.new
+		},	
+		# -- 巨化 --
+		44 => {
+				"name" 		=> 	"巨化I", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::Juhua_Skill.new
+		},
+		45 => {
+				"name" 		=> 	"巨化II", 
+				"level" 	=> 	2, 
+				"object"	=>  RPG::Juhua_Skill.new
+		},
+		46 => {
+				"name" 		=> 	"巨化III", 
+				"level" 	=> 	3, 
+				"object"	=>  RPG::Juhua_Skill.new
 		},		
 	}
 	#--------------------------------------------------------------------------

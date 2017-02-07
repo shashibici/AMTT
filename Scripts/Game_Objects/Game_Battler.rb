@@ -100,27 +100,54 @@ class Game_Battler
 	#--------------------------------------------------------------------------
 	# ● 添加状态
 	#	@states = {priority => [state, state, ...]}
+	#
+	#  	state 	: 		需要添加的状态
+	# 	uniq 	:		是否按名字保持唯一性。true-是，false-否
+	#	most	:		true-最高等级覆盖，false-最低等级覆盖 		
+	#
 	#--------------------------------------------------------------------------
-	def add_state(state)
+	def add_state(state, uniq = false, most = true)
 		num = state_num(state)
 		if (!state.can_accumulate? and 0 == num) or (state.can_accumulate? and num < state.max_accumulate)
-			if @states[state.priority] != nil
-				@states[state.priority].push(state)
-			else
-				@states[state.priority] = []
-				@states[state.priority].push(state)
+			# 名字唯一性
+			if true == uniq
+				if @states[state.priority] != nil 
+					for s in @states[state.priority]
+						if s.name == state.name and s.instance_of?(state.class)
+							# 判断最高等级覆盖还是最低等级覆盖
+							if (most and state.level > s.level) or (false == most and state.level < s.level)
+								@states[state.priority].delete(s)
+								@states[state.prioirty].push(state)
+								return 
+							end
+						end
+					end
+				else 
+					@states[state.priority] = []
+					@states[state.priority].push(state)
+				end
+			# 不是名字唯一性
+			else 
+				if @states[state.priority] != nil
+					@states[state.priority].push(state)
+				else
+					@states[state.priority] = []
+					@states[state.priority].push(state)
+				end
 			end
+
 		end
 	end
 	#--------------------------------------------------------------------------
 	# ● 返回角色包含该state的重数，没有改state则返回0
+	#   技能名字与等级唯一确定一个技能。
 	#--------------------------------------------------------------------------
 	def state_num(state)
 		ret = 0
 		for key in @states.keys
 			if @states[key] != nil
 				for s in @states[key]
-					if s.name == state.name and s.instance_of?(state.class)
+					if s.name == state.name and s.level == state.level and s.instance_of?(state.class)
 						ret += 1
 					end
 				end
@@ -137,26 +164,27 @@ class Game_Battler
 		end
 	end
 	#--------------------------------------------------------------------------
+	# ● 刷新所有状态
+	#--------------------------------------------------------------------------
+	def refresh_states
+		for key in @states.keys
+			array_size = @states[key].size - 1
+			# 从后往前删，这一点很关键
+			for i in 0...@states[key].size
+				@states[key][array_size-i].timer -= 1
+				if @states[key][array_size-i].timer <= 0
+					@states[key].delete_at(array_size-i)
+				end
+			end
+		end
+	end
+	#--------------------------------------------------------------------------
 	# ● 重置所有技能
 	#--------------------------------------------------------------------------
 	def reset_skills
 		for priority in @my_skills.keys
 			for key in @my_skills[priority].keys
 				@my_skills[priority][key].reset
-			end
-		end
-	end
-	#--------------------------------------------------------------------------
-	# ● 刷新所有状态
-	#--------------------------------------------------------------------------
-	def refresh_states
-		for key in @states.keys
-			array_size = @states[key].size - 1
-			for i in 0...@states[key].size
-				@states[key][array_size-i].timer -= 1
-				if @states[key][array_size-i].timer <= 0
-					@states[key].delete_at(array_size-i)
-				end
 			end
 		end
 	end
@@ -1471,8 +1499,8 @@ class Game_Battler
 		hit_final = [[hit_hit_eva + hit_cel_cel + hit_def_def, 0.4].max, 2].min
 		# 最后计算命中概率
 		@hitflag = (hit_final * 100 >= rand(101));
-		# 暴击伤害倍数返回0 
-		return 0
+		# 返回暴击伤害倍率
+		return self.final_bomatk / 100.0
 	end
 	#--------------------------------------------------------------------------
 	# ● 执行攻击
