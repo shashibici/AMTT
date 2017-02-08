@@ -558,14 +558,18 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 		end
 		# 打印名字
 		draw_a_line(getColor("white"), @sw_3, @sh_3, @w_3, @h_3, @mname,  1)
-		# 打印技能
+		old_font = self.contents.font.clone
+		self.contents.font.size = 13
+		# 绘制技能以及名字
 		folder_name = "Graphics/System/"
 		for i in 0...@monster_skills.size
 			skill_name = @monster_skills[i].name
 			disabled = @monster_skills[i].locked
-			bitmap = FrameFactory.getBitmapWithSize(48, 48, folder_name, skill_name)
-			self.contents.blt(48*i, @sh_1+@monster_attributes.size*(@h_1), bitmap, bitmap.rect, disabled ? 128 : 255)
+			bitmap = FrameFactory.getBitmapWithSize(44, 44, folder_name, skill_name)
+			self.contents.blt((49)*i, @sh_1+@monster_attributes.size*(@h_1)+8, bitmap, bitmap.rect, disabled ? 128 : 255)
+			draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+44, 50, 24, skill_name, 1)
 		end
+		self.contents.font = old_font
 	end
 end
 ##==========================================================================
@@ -608,7 +612,7 @@ class Window_BattlePanel_Player < Window_BattlePanel
 		@sw_3 = @sw_2							# 名字左边界位置
 		@w_3 = @w_2								# 名字宽度
 
-		@h_1 = 24 + 8 							# 属性每行高度
+		@h_1 = 18 + 8 							# 属性每行高度
 		@sh_1 = 0								# 属性第一行位置
 		@h_2 = 96 								# 图片高度
 		@sh_2 = 96 - 16 						# 图片上沿到窗口上边框的距离
@@ -633,11 +637,23 @@ class Window_BattlePanel_Player < Window_BattlePanel
 			end
 		end
 		for i in 0...@player_attributes.size
-			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*(24+8), @w_1, @h_1, @attributes_string[i],  0)
-			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*(24+8), @w_1-40, @h_1, @player_attributes[i].ceil.to_s,  2)
+			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*@h_1, @w_1, @h_1, @attributes_string[i],  0)
+			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*@h_1, @w_1-40, @h_1, @player_attributes[i].ceil.to_s,  2)
 		end
 		# 打印名字
 		draw_a_line(getColor("white"), @sw_3, @sh_3, @w_3, @h_3, @pname,  1)
+		old_font = self.contents.font.clone
+		self.contents.font.size = 13
+		# 绘制技能以及名字
+		folder_name = "Graphics/System/"
+		for i in 0...@player_skills.size
+			skill_name = @player_skills[i].name
+			disabled = @player_skills[i].locked
+			bitmap = FrameFactory.getBitmapWithSize(48, 48, folder_name, skill_name)
+			self.contents.blt((49)*i, @sh_1+@monster_attributes.size*(@h_1)+8, bitmap, bitmap.rect, disabled ? 128 : 255)
+			draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+48, 50, 24, skill_name, 1)
+		end
+		self.contents.font = old_font
 	end
 end
 

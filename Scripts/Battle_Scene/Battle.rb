@@ -153,6 +153,7 @@ module Battle
 		$attack_strike_back_phase_enemy = 8
 		# 判断怪物是否丢失
 		if true == $game_switches[120]
+			$game_switches[120] = false
 			# 播放闪避音效
 			MySound.play_fail
 			# 显示丢失
@@ -325,6 +326,7 @@ module Battle
 		$attack_phase_enemy = 8
 		# 判断怪物是否丢失
 		if true == $game_switches[106]
+			$game_switches[106] = false
 			# 播放闪避音效
 			MySound.play_fail
 			# 显示丢失
@@ -499,6 +501,7 @@ module Battle
 		$attack_phase_player = 8
 		# 判断玩家是否丢失
 		if true == $game_switches[105]
+			$game_switches[105] = false
 			# 播放闪避音效
 			MySound.play_fail
 			# 显示丢失
@@ -663,6 +666,7 @@ module Battle
 		$attack_strike_back_phase_player = 8
 		# 判断玩家是否丢失
 		if true == $game_switches[119]
+			$game_switches[119] = false
 			# 播放闪避音效
 			MySound.play_fail
 			# 显示丢失

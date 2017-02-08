@@ -40,7 +40,7 @@ class Game_Battler
 		animation_id = {}
 		@states = {}
 		@my_skills = {}
-		@skill_limit = 0
+		@skill_limit = 6
 	end
 	#--------------------------------------------------------------------------
 	# ● 清理能力值增加值
@@ -1381,10 +1381,10 @@ class Game_Battler
 		final_dmg = dodamage(target, dmg, brate, flag)
 		# 如果是怪物受伤
 		if !target.hero?
-			$game_variables[35] = final_dmg
+			$game_variables[157] = final_dmg
 		# 否则是英雄受伤
 		else
-			$game_variables[34] = final_dmg
+			$game_variables[156] = final_dmg
 		end
 		
 		

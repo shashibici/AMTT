@@ -167,9 +167,10 @@ class Scene_Map < Scene_Base
 			@pinfo_window.x = 640
 			# 创建新窗口
 			#$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(20, 80, 300, 320, -300, 80, 0.05, 0)
-			$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(0, 64, 320, 320, -300, 80, 0.05, 0)
+			$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(0, 64, 328, 352, -300, 80, 0.05, 0)
 			$battle_panel_enemy_window.setup($game_party.active, $game_monstor_battle)
-			$battle_panel_player_window = Window_BattlePanel_Player.new(320, 80, 300, 320, 640, 80, 0.05, 0)
+			#$battle_panel_player_window = Window_BattlePanel_Player.new(320, 80, 300, 320, 640, 80, 0.05, 0)
+			$battle_panel_player_window = Window_BattlePanel_Player.new(320, 64, 328, 352, 640, 80, 0.05, 0)
 			$battle_panel_player_window.setup($game_party.active, $game_monstor_battle)
 			
 			$battle_status_enemy_window = Window_BattleStatusEnemy.new(20,-8,600,64+32,20,-(64+32),0,0.04)

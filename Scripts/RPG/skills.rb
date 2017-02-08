@@ -378,6 +378,7 @@ module RPG
 		# ● 这是一个触发技能，需要实现effect_func触发效果
 		#--------------------------------------------------------------------------
 		def effect_func(args)
+			return if true == args["hitflag"]
 			if (args["source"].hp > 0)
 				state = Jifeng_State.new
 				state.level = @level
