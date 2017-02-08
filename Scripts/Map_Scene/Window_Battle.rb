@@ -389,6 +389,8 @@ class Window_BattlePanel < Window_Animated
 			@phit = @player.final_hit,
 			@peva = @player.final_eva,
 		]
+		@monster_skills = @monster.get_skills
+		@player_skills = @player.get_skills
 		refresh
 	end
 	#--------------------------------------------------------------------------
@@ -487,7 +489,7 @@ class Window_BattlePanel < Window_Animated
 end
 
 ##==========================================================================
-	# ■ Window_BattlePanel_Enemy
+# ■ Window_BattlePanel_Enemy
 #---------------------------------------------------------------------------
 #  Battle Panel shows the status of the enemy.
 #  Size: 300(W) * 320*(H)
@@ -525,7 +527,7 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 		@w_3 = @w_2								# 名字宽度
 		@sw_4 = @sw_1 + @w_1 + 48 				# 图片左边到左边框的距离
 		@w_4 = 64 								# 图片宽度
-		@h_1 = 24 + 8 							# 属性每行高度
+		@h_1 = 18 + 8 							# 属性每行高度
 		@sh_1 = 0								# 属性第一行位置
 		@h_2 = 96 								# 图片高度
 		@sh_2 = 96 - 16 						# 图片上沿到窗口上边框的距离
@@ -551,11 +553,19 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 			end
 		end
 		for i in 0...@monster_attributes.size
-			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*(24+8), @w_1, @h_1, @attributes_string[i],  0)
-			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*(24+8), @w_1-40, @h_1, @monster_attributes[i].ceil.to_s,  2)
+			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*(@h_1), @w_1, @h_1, @attributes_string[i],  0)
+			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*(@h_1), @w_1-40, @h_1, @monster_attributes[i].ceil.to_s,  2)
 		end
 		# 打印名字
 		draw_a_line(getColor("white"), @sw_3, @sh_3, @w_3, @h_3, @mname,  1)
+		# 打印技能
+		folder_name = "Graphics/System/"
+		for i in 0...@monster_skills.size
+			skill_name = @monster_skills[i].name
+			disabled = @monster_skills[i].locked
+			bitmap = FrameFactory.getBitmapWithSize(48, 48, folder_name, skill_name)
+			self.contents.blt(48*i, @sh_1+@monster_attributes.size*(@h_1), bitmap, bitmap.rect, disabled ? 128 : 255)
+		end
 	end
 end
 ##==========================================================================

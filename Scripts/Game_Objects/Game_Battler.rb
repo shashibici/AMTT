@@ -102,41 +102,38 @@ class Game_Battler
 	#	@states = {priority => [state, state, ...]}
 	#
 	#  	state 	: 		需要添加的状态
-	# 	uniq 	:		是否按名字保持唯一性。true-是，false-否
+	# 	uniq 	:		是否按名字保持唯一性。true-是，false-否，如果是则不可叠加
 	#	most	:		true-最高等级覆盖，false-最低等级覆盖 		
 	#
 	#--------------------------------------------------------------------------
 	def add_state(state, uniq = false, most = true)
+		# 保证该优先级的状态不为空
+		if nil == @states[state.priority]
+			@states[state.priority] = []
+		end
+		# 名字唯一性
+		if true == uniq
+			# 尝试找同名、捅优先级的技能
+			for s in @states[state.priority]
+				if s.name == state.name and s.instance_of?(state.class)
+					# 找到可以覆盖的，则删除，然后继续
+					if (true == most and state.level > s.level) or (false == most and state.level < s.level)
+						@states[state.priority].delete(s)
+						break 
+					# 否则找到比自己等级高的同类，直接返回
+					elsif (true == most and state.level <= s.level) or (false == most and state.level >= s.level)
+						return 
+					end
+				end
+			end	
+		end
+		# 根据可叠加性质添加
 		num = state_num(state)
 		if (!state.can_accumulate? and 0 == num) or (state.can_accumulate? and num < state.max_accumulate)
-			# 名字唯一性
-			if true == uniq
-				if @states[state.priority] != nil 
-					for s in @states[state.priority]
-						if s.name == state.name and s.instance_of?(state.class)
-							# 判断最高等级覆盖还是最低等级覆盖
-							if (true == most and state.level > s.level) or (false == most and state.level < s.level)
-								@states[state.priority].delete(s)
-								@states[state.prioirty].push(state)
-								return 
-							end
-						end
-					end
-				else 
-					@states[state.priority] = []
-					@states[state.priority].push(state)
-				end
-			# 不是名字唯一性
-			else 
-				if @states[state.priority] != nil
-					@states[state.priority].push(state)
-				else
-					@states[state.priority] = []
-					@states[state.priority].push(state)
-				end
-			end
-
+			@states[state.priority].push(state)
 		end
+		
+		
 	end
 	#--------------------------------------------------------------------------
 	# ● 返回角色包含该state的重数，没有改state则返回0

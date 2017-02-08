@@ -77,7 +77,7 @@ module GAME_CONF
 				"object"	=>  RPG::JiFeng_Skill.new
 		},
 		# -- 复仇 --
-		1 => {
+		37 => {
 				"name" 		=> 	"复仇", 
 				"level" 	=> 	1, 
 				"object"	=>  RPG::Juhua_Skill.new
