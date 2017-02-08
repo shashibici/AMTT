@@ -23,7 +23,14 @@ module RPG
 		# ● 按百分比减速
 		#--------------------------------------------------------------------------
 		def atkspeed_rate
-			return -50
+			case @level 
+			when 1
+				-20
+			when 2
+				-30
+			when 3
+				-40
+			end
 		end
 		#--------------------------------------------------------------------------
 		# ● 该state从百分比上加成battler的hpcover
@@ -181,17 +188,6 @@ module RPG
 		#--------------------------------------------------------------------------
 		def hit_rate
 			return 100*@level
-		end
-		#--------------------------------------------------------------------------
-		# ● 按百分比
-		#--------------------------------------------------------------------------
-		def def_rate
-			if nil == @ratio
-				return (1.0 - @battler.hp.to_f / @battler.maxhp.to_f) * 100
-			else
-				ret = (1.0 - @battler.hp.to_f / @battler.maxhp.to_f) * @ratio
-				return ret
-			end
 		end
 	end
 end

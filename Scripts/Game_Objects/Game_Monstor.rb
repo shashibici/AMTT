@@ -150,6 +150,7 @@ class Game_Monstor < Game_Actor
     # 设置扩张金钱、经验
     @money          +=  $game_variables[90]
     @monstor_exp    +=  $game_variables[91] 
+	
   
     # 属性设置---------------------------------------------
     # 自动计算属性
@@ -189,6 +190,8 @@ class Game_Monstor < Game_Actor
       doAttrExtesion
     end
     
+	money_fix  		=  monstor.read_note('money_fix') == nil ? 0 : monstor.read_note('money_fix')
+	@money          *= money_fix
     
     
     # 装备设置---------------------------------------------

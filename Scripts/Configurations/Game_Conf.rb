@@ -97,7 +97,13 @@ module GAME_CONF
 				"name" 		=> 	"巨化III", 
 				"level" 	=> 	3, 
 				"object"	=>  RPG::Juhua_Skill.new
-		},		
+		},	
+		40 => {
+				"name" 		=> 	"铜头", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::Tongtou_Skill.new
+		},			
+		
 	}
 	#--------------------------------------------------------------------------
 	# 等级差对伤害造成的影响
