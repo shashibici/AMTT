@@ -1593,7 +1593,9 @@ class Game_Battler
 		# 制造随机伤害
 		final_dmg = dmg * (90 + rand(21)) / 100.00
 		# 如果暴击
-		final_dmg = final_dmg *  brate if @bomflag == true and brate > 0
+		if @bomflag == true and brate > 0
+			final_dmg = final_dmg *  brate 
+		end
 		# 首先是反弹——这里没有实现
 		# 然后是减少伤害——这里没有实现
 		# 然后是抵消伤害（格挡）——这里没有实现
