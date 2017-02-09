@@ -190,7 +190,7 @@ class Game_Monstor < Game_Actor
       doAttrExtesion
     end
     
-	money_fix  		=  monstor.read_note('money_fix') == nil ? 0 : monstor.read_note('money_fix')
+	money_fix  		=  monstor.read_note('money_fix') == nil ? 1 : monstor.read_note('money_fix')
 	@money          *= money_fix
     
     

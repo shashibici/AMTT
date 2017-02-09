@@ -42,26 +42,34 @@ module Battle
 		callback_skill = $game_party.active.my_skills
 		for priority in callback_skill.keys.sort
 			for key in callback_skill[priority].keys
-				callback_skill[priority][key].special_func
+				if false == callback_skill[priority][key].locked
+					callback_skill[priority][key].special_func 
+				end
 			end
 		end
 		callback_skill = $game_monstor_battle.my_skills
 		for priority in callback_skill.keys.sort
 			for key in callback_skill[priority].keys
-				callback_skill[priority][key].special_func
+				if false == callback_skill[priority][key].locked
+					callback_skill[priority][key].special_func 
+				end
 			end
 		end
 		# 执行锁定技
 		callback_skill = $game_party.active.my_skills
 		for priority in callback_skill.keys.sort
 			for key in callback_skill[priority].keys
-				callback_skill[priority][key].compulsory_func
+				if false == callback_skill[priority][key].locked
+					callback_skill[priority][key].compulsory_func 
+				end
 			end
 		end
 		callback_skill = $game_monstor_battle.my_skills
 		for priority in callback_skill.keys.sort
 			for key in callback_skill[priority].keys
-				callback_skill[priority][key].compulsory_func
+				if false == callback_skill[priority][key].locked
+					callback_skill[priority][key].compulsory_func 
+				end
 			end
 		end
 	end

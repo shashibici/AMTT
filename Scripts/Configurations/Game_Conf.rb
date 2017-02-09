@@ -80,7 +80,7 @@ module GAME_CONF
 		37 => {
 				"name" 		=> 	"复仇", 
 				"level" 	=> 	1, 
-				"object"	=>  RPG::Juhua_Skill.new
+				"object"	=>  RPG::Fuchou_Skill.new
 		},	
 		# -- 巨化 --
 		44 => {
@@ -98,12 +98,30 @@ module GAME_CONF
 				"level" 	=> 	3, 
 				"object"	=>  RPG::Juhua_Skill.new
 		},	
+		# -- 铜头 --
 		40 => {
 				"name" 		=> 	"铜头", 
 				"level" 	=> 	1, 
 				"object"	=>  RPG::Tongtou_Skill.new
-		},			
-		
+		},		
+		# -- 必中 --
+		47 => {
+				"name" 		=> 	"必中", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::BiZhong_Skill.new
+		},
+		# -- 降龙 --
+		42 => {
+				"name" 		=> 	"降龙", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::XiangLong_Skill.new
+		},		
+		# -- 伏虎 --
+		43 => {
+				"name" 		=> 	"伏虎", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::Fuhu_Skill.new
+		},
 	}
 	#--------------------------------------------------------------------------
 	# 等级差对伤害造成的影响

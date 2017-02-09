@@ -1239,6 +1239,7 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
 		
 		$NOW_TIME = $TIME_PRE_DO_ATTACK
 		## ---- 回调所有技能
@@ -1246,12 +1247,14 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
 		
 		# 获得攻击伤害 -- 物理伤害+攻击/4
 		pre_dmg =  doattack(target)
 		args["pre_dmg"] = pre_dmg
-		args["hitflag"] = @hitflag
-		args["bomflag"] = @bomflag
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
+		brate = args["brate"]
 		
 		$NOW_TIME = $TIME_POST_DO_ATTACK
 		## ---- 回调所有技能
@@ -1259,6 +1262,8 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
 		
 		$NOW_TIME = $TIME_PRE_PRE_DAMGE
 		## ---- 回调所有技能
@@ -1266,12 +1271,16 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
 		
 		# 调整伤害 -- 运用攻防、将暴击效果添加到伤害上
 		dmg = predamage(brate, pre_dmg, target)
 		args["damage"] = dmg
-		args["hitflag"] = @hitflag
-		args["bomflag"] = @bomflag
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
 		
 		$NOW_TIME = $TIME_POST_PRE_DAMAGE
 		## ---- 回调所有技能
@@ -1279,6 +1288,9 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
+		dmg = args["damage"]
 		
 		$NOW_TIME = $TIME_PRE_DO_DAMAGE
 		## ---- 回调所有技能
@@ -1286,6 +1298,9 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
+		dmg = args["damage"]
 		
 		# 执行伤害（包括反弹——反弹的话需要修改上面两个变量）
 		final_dmg = dodamage(target, dmg, brate, flag)
@@ -1297,8 +1312,11 @@ class Game_Battler
 			$game_variables[34] = final_dmg
 		end
 		args["final_dmg"] = final_dmg
-		args["hitflag"] = @hitflag
-		args["bomflag"] = @bomflag
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
+		dmg = args["damage"]
     
 		$NOW_TIME = $TIME_POST_DO_DAMAGE
 		## ---- 回调所有技能
@@ -1306,6 +1324,10 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
+		dmg = args["damage"]
+		final_dmg = args["final_dmg"]
 	
 		$NOW_TIME = $TIME_PRE_POST_DAMAGE
 		## ---- 回调所有技能
@@ -1313,6 +1335,10 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
+		dmg = args["damage"]
+		final_dmg = args["final_dmg"]
 	
 		# 修改命中状况
 		if @hitflag == false and self.hero?
@@ -1332,8 +1358,12 @@ class Game_Battler
 		end
 		# 伤害之后的处理——判断胜负
 		postdamage(target, flag)
-		args["hitflag"] = @hitflag
-		args["bomflag"] = @bomflag
+		@hitflag = args["hitflag"]
+		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
+		dmg = args["damage"]
+		final_dmg = args["final_dmg"]
 		
 		$NOW_TIME = $TIME_POST_POST_DAMAGE
 		## ---- 回调所有技能
@@ -1341,6 +1371,10 @@ class Game_Battler
 		update_skill_callback(target, args)
 		@hitflag = args["hitflag"]
 		@bomflag = args["bomflag"]
+		brate = args["brate"]
+		pre_dmg = args["pre_dmg"]
+		dmg = args["damage"]
+		final_dmg = args["final_dmg"]
 		
 	end
 	#--------------------------------------------------------------------------

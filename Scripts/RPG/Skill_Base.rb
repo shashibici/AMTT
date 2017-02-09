@@ -80,7 +80,7 @@ module RPG
 		# 		args 是一个 hash 结构，用来传递参数
 		#--------------------------------------------------------------------------
 		def trigger_func(args)
-			if can_trigger?(args)
+			if false == locked and can_trigger?(args)
 				effect_func(args)
 			end
 		end

@@ -567,7 +567,11 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 			disabled = @monster_skills[i].locked
 			bitmap = FrameFactory.getBitmapWithSize(44, 44, folder_name, skill_name)
 			self.contents.blt((49)*i, @sh_1+@monster_attributes.size*(@h_1)+8, bitmap, bitmap.rect, disabled ? 128 : 255)
-			draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+44, 50, 24, skill_name, 1)
+			if true == disabled 
+				draw_a_line(getColor("gray"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+44, 50, 24, skill_name, 1)
+			else
+				draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+44, 50, 24, skill_name, 1)
+			end
 		end
 		self.contents.font = old_font
 	end
@@ -651,7 +655,11 @@ class Window_BattlePanel_Player < Window_BattlePanel
 			disabled = @player_skills[i].locked
 			bitmap = FrameFactory.getBitmapWithSize(48, 48, folder_name, skill_name)
 			self.contents.blt((49)*i, @sh_1+@monster_attributes.size*(@h_1)+8, bitmap, bitmap.rect, disabled ? 128 : 255)
-			draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+48, 50, 24, skill_name, 1)
+			if true == disabled
+				draw_a_line(getColor("gray"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+48, 50, 24, skill_name, 1)
+			else 
+				draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+48, 50, 24, skill_name, 1)
+			end
 		end
 		self.contents.font = old_font
 	end
