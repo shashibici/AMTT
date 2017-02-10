@@ -122,6 +122,22 @@ module GAME_CONF
 				"level" 	=> 	1, 
 				"object"	=>  RPG::Fuhu_Skill.new
 		},
+		# -- 顽强 --
+		23 => {
+				"name" 		=> 	"顽强I", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::Wanqiang_Skill.new
+		},
+		24 => {
+				"name" 		=> 	"顽强II", 
+				"level" 	=> 	2, 
+				"object"	=>  RPG::Wanqiang_Skill.new
+		},
+		25 => {
+				"name" 		=> 	"顽强III", 
+				"level" 	=> 	3, 
+				"object"	=>  RPG::Wanqiang_Skill.new
+		},
 	}
 	#--------------------------------------------------------------------------
 	# 等级差对伤害造成的影响
