@@ -401,8 +401,8 @@ class Game_Monstor < Game_Actor
     
     # 暴击技巧不受影响
 #~     @bom                   *= $game_variables[92] / 1000.0
-
-	@bomatk                *= $game_variables[92] / 1000.0
+	# 暴击倍率不受影响
+	# @bomatk                *= $game_variables[92] / 1000.0
     @hit                   *= $game_variables[92] / 1000.0
     @hpcover               *= $game_variables[92] / 1000.0
     @hprate                *= $game_variables[92] / 1000.0

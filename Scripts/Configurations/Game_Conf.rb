@@ -138,6 +138,13 @@ module GAME_CONF
 				"level" 	=> 	3, 
 				"object"	=>  RPG::Wanqiang_Skill.new
 		},
+		# -- 嗜血 --
+		29 => {
+				"name" 		=> 	"嗜血", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::ShiXue_Skill.new
+		},
+		
 	}
 	#--------------------------------------------------------------------------
 	# 等级差对伤害造成的影响
