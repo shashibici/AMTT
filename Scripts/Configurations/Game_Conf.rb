@@ -262,9 +262,9 @@ module GAME_CONF
 	
 	
 	# 每点力量增加的生命恢复量
-	BONUS_STRENGTH_HPCOVER = 0.36
+	BONUS_STRENGTH_HPCOVER = 0.72
 	# 每点力量增加的生命量
-	BONUS_STRENGTH_MAXHP = 14.0
+	BONUS_STRENGTH_MAXHP = 16.0
 	# 每点力量增加的物理破坏
 	BONUS_STRENGTH_DESTROY = 0.38
 	# 每点力量增加暴击技巧
@@ -318,10 +318,10 @@ module GAME_CONF
 	CONST_BASE_DAMAGE_RATE     = 1.0
 	
 	# 没点技能点添加个属性的值
-	HP_ASCEND 				=	70
-	MP_ASCEND					=	70
-	HPCOVER_ASCEND			=	2
-	MPCOVER_ASCEND			=	2
+	HP_ASCEND 				=	80
+	MP_ASCEND					=	80
+	HPCOVER_ASCEND			=	4
+	MPCOVER_ASCEND			=	4
 	ATK_ASCEND				=	3
 	DEF_ASCEND				=	1.5
 	STRENGTH_ASCEND			=	1
