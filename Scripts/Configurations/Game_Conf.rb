@@ -252,7 +252,7 @@ module GAME_CONF
 	BONUS_WISDOM_ATTACK = 0.7
 	
 	# 每点敏捷增加的防御力
-	BONUS_CELERITY_DEF = 0.2
+	BONUS_CELERITY_DEF = 0.3
 	# 每点敏捷增加的攻击速度
 	BONUS_CELERITY_ATKSPEED = 0.2
 	# 每点敏捷增加的命中技巧
