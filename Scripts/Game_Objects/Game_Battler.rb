@@ -1471,12 +1471,12 @@ class Game_Battler
 		# (0.5/2.0) * 1.2 = 0.3 = 30% 会有30% 暴击可能
 		bom_hit = 1.2*(self.final_hit - target.final_eva*1.5) / self.final_hit
 	
-		# 修正，正常提供的暴击不能大于36%，
+		# 修正，正常提供的暴击不能大于100%，
 		# 拖后腿也不会小于 -100% 
 		# 只要保持自身命中 > 对方闪避1.5倍 则不会出现拖后腿现象。
 		# 闪避高可以暴击 - 保护敏捷英雄
 		if bom_hit > 0
-			bom_hit = [bom_hit, 0.36].min
+			bom_hit = [bom_hit, 1].min
 		else
 			bom_hit = [bom_hit, -1.0].max
 		end
@@ -1485,7 +1485,7 @@ class Game_Battler
 		# 防御高可以防暴击 - 保护敏捷英雄
 		bom_def = (self.def-target.def) / self.def
 		if bom_def > 0
-			bom_def = [bom_def, 0.3].min
+			bom_def = [bom_def, 1].min
 		else
 			bom_def = [bom_def, -0.8].max
 		end
@@ -1495,7 +1495,7 @@ class Game_Battler
 		# 此因素普通 （<15%）
 		bom_str = 1.5*(self.final_strength - target.final_strength) / self.final_strength
 		if bom_str > 0
-			bom_str = [bom_str, 0.45].min
+			bom_str = [bom_str, 1].min
 		else
 			bom_str = [bom_str, -0.4].max
 		end

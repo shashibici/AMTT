@@ -144,6 +144,22 @@ module GAME_CONF
 				"level" 	=> 	1, 
 				"object"	=>  RPG::ShiXue_Skill.new
 		},
+		# -- 勇猛 --
+		51 => {
+				"name" 		=> 	"勇猛I", 
+				"level" 	=> 	1, 
+				"object"	=>  RPG::YongMeng_Skill.new
+		},
+		52 => {
+				"name" 		=> 	"勇猛II", 
+				"level" 	=> 	2, 
+				"object"	=>  RPG::YongMeng_Skill.new
+		},
+		53 => {
+				"name" 		=> 	"勇猛III", 
+				"level" 	=> 	3, 
+				"object"	=>  RPG::YongMeng_Skill.new
+		},
 		
 	}
 	#--------------------------------------------------------------------------
