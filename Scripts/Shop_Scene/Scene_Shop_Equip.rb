@@ -12,6 +12,10 @@ class Scene_Shop_Equip < Scene_Base
   #--------------------------------------------------------------------------
   def start
     super
+	# 播放音乐
+	if nil != $shop_bgm
+		Audio.bgm_play("Audio/BGM/" + $shop_bgm["name"], $shop_bgm["volume"], $shop_bgm["pitch"])
+	end
     create_menu_background
     create_command_window
     #@help_window = Window_Help.new
@@ -96,6 +100,14 @@ class Scene_Shop_Equip < Scene_Base
     @number_window.dispose
     @status_window.dispose
     @detail_window.dispose
+	# 停止播放shop背景音乐
+	if nil != $shop_bgm
+		Audio.bgm_stop
+		$shop_bgm = nil
+	end
+	
+	# 继续播放MAP背景音乐
+	$game_temp.map_bgm.play
   end 
   #--------------------------------------------------------------------------
   # ● 更新画面

@@ -42,7 +42,7 @@ class Scene_Map < Scene_Base
 	def update
 		super
 		$game_map.interpreter.update      # 更新解释器
-		$game_map.update                  # 更新滴入
+		$game_map.update                  # 更新地图绘制
 		$game_system.update               # 更新计时器
 		@message_window.update            # 更新消息窗口
 		@spriteset.update                 # 更新活动块元件
