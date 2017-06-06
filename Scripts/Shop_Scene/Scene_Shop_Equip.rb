@@ -105,9 +105,10 @@ class Scene_Shop_Equip < Scene_Base
 		Audio.bgm_stop
 		$shop_bgm = nil
 	end
-	
 	# 继续播放MAP背景音乐
-	$game_temp.map_bgm.play
+	if nil != $game_temp.map_bgm
+		$game_temp.map_bgm.play
+	end
   end 
   #--------------------------------------------------------------------------
   # ● 更新画面

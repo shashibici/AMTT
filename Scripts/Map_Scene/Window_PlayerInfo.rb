@@ -225,14 +225,14 @@ class Window_PlayerInfo < Window_Base
     draw_a_line(color, x, y+WLH*14, 240, WLH, "魔法恢复/秒-------", 0)  
     
     color = Color.new(0, 255, 0)
-    draw_a_line(color, 0, y+WLH, 212, WLH, @hp.ceil, 2 )
-    draw_a_line(color, 0, y+WLH*3, 212, WLH, @pow.ceil, 2)
-    draw_a_line(color, 0, y+WLH*5, 212, WLH, Fround(@atk, 1), 2)
-    draw_a_line(color, 0, y+WLH*7, 212, WLH, Fround(@def, 1), 2)
-    draw_a_line(color, 0, y+WLH*9, 212, WLH, Fround(@atkspeed, 1), 2)
-    draw_a_line(color, 0, y+WLH*11, 212, WLH, Fround(@atkrate, 1).to_s+"﹪", 2)
-    draw_a_line(color, 0, y+WLH*13, 212, WLH, Fround(@hpcover, 2), 2)
-    draw_a_line(color, 0, y+WLH*15, 212, WLH, Fround(@mpcover, 2), 2)
+    draw_a_line(color, 0, y+WLH-4, 212, WLH, @hp.ceil, 2 )
+    draw_a_line(color, 0, y+WLH*3-4, 212, WLH, @pow.ceil, 2)
+    draw_a_line(color, 0, y+WLH*5-4, 212, WLH, Fround(@atk, 1), 2)
+    draw_a_line(color, 0, y+WLH*7-4, 212, WLH, Fround(@def, 1), 2)
+    draw_a_line(color, 0, y+WLH*9-4, 212, WLH, Fround(@atkspeed, 1), 2)
+    draw_a_line(color, 0, y+WLH*11-4, 212, WLH, Fround(@atkrate, 1).to_s+"﹪", 2)
+    draw_a_line(color, 0, y+WLH*13-4, 212, WLH, Fround(@hpcover, 2), 2)
+    draw_a_line(color, 0, y+WLH*15-4, 212, WLH, Fround(@mpcover, 2), 2)
 
   end
  
