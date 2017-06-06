@@ -20,7 +20,7 @@ class Scene_Map < Scene_Base
 		# 玩家信息窗口=========================================
 		@message_window = Window_Message.new
 		# 右边的玩家信息窗口
-		@pinfo_window = Window_PlayerInfo.new(448,0)
+		@pinfo_window = Window_PlayerInfo.new(1024,0)
 		# 默认战斗为false
 		@territory_active = false
 		# 先创建玩家信息窗口，避免到时候出问题
@@ -106,7 +106,7 @@ class Scene_Map < Scene_Base
 		# 首先更新信息更新
 		@pinfo_window.refresh
 		# 窗口的初试位置
-		@pinfo_window.x = 640.0
+		@pinfo_window.x = 1024.0
 		@pinfo_window.visible = true  
 		$game_system.show_info = true
 	end
@@ -164,7 +164,7 @@ class Scene_Map < Scene_Base
 			$battle_back_window.visible = true
 			# 不再更新玩家信息窗口
 			@pinfo_window.visible = false
-			@pinfo_window.x = 640
+			@pinfo_window.x = 1024
 			# 创建新窗口
 			#$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(20, 80, 300, 320, -300, 80, 0.05, 0)
 			$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(0, 64, 328, 352, -300, 80, 0.05, 0)
@@ -226,7 +226,7 @@ class Scene_Map < Scene_Base
 			$Spriteset_Battle.update
 			# 不再更新玩家信息窗口
 			@pinfo_window.visible = false
-			@pinfo_window.x = 640
+			@pinfo_window.x = 1024
 		else
 			# 显示玩家信息
 			@pinfo_window.visible = !$game_switches[112]

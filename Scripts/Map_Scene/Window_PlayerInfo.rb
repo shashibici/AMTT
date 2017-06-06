@@ -13,16 +13,16 @@
 
 class Window_PlayerInfo < Window_Base
   include GAME_CONF
-  WLH = 16
+  WLH = 32
   #--------------------------------------------------------------------------
   # ● 初始化对象
   #--------------------------------------------------------------------------
   def initialize(x,y)
-	super(x, y, 192, 480)
+	super(x, y, 256, Graphics.height)
 	self.windowskin = Cache.system("Window3")
     self.opacity = 255
     self.back_opacity = 128
-    self.contents.font.size = 16
+    self.contents.font.size = 24
 	@refresh_timer = 0
   end
   #--------------------------------------------------------------------------
@@ -59,8 +59,7 @@ class Window_PlayerInfo < Window_Base
    
     # 等级
     @lvl = @actor.level
-    
-    
+   
   end
   #--------------------------------------------------------------------------
   # ● 刷新
@@ -105,26 +104,25 @@ class Window_PlayerInfo < Window_Base
     
     
     #-------------修改这里--------------------------
-    # 绘画名字
-    draw_actor_name(@actor, 96, 0)
+    # 描绘头像
+    draw_actor_face(@actor, 0, 0, 96)
+	# 绘画名字
+    draw_actor_name(@actor, 128, 0)
     
     # 描绘等级
     color = getColor("white")
-    draw_a_line(color, 70, WLH*2,40, WLH, "等级", 1)
-    draw_a_line(color, 110, WLH*2,40, WLH, @lvl , 2) 
+    draw_a_line(color, 114, WLH,60, WLH, "等级", 1)
+    draw_a_line(color, 154, WLH,60, WLH, @lvl , 2) 
     
     # 描绘层数
-    draw_a_line(color, 70, WLH*3,40, WLH, "层数" , 1)  
-    draw_a_line(color, 110, WLH*3,40, WLH, @layer , 2)  
+    draw_a_line(color, 114, WLH*2,60, WLH, "层数" , 1)  
+    draw_a_line(color, 154, WLH*2,60, WLH, @layer , 2)  
     
-    
-    # 描绘信息
-    draw_actor_face(@actor, 0, 0, 64)
     # 绘制角色数据
-    draw_parameters(0, 72)
+    draw_parameters(0, 112)
     
     # 描绘钥匙数量
-    self.contents.font.size = 24
+    self.contents.font.size = 32
     # 如果有黄钥匙
     key = $data_items[1]
     if $game_party.has_item?(key)
@@ -135,9 +133,9 @@ class Window_PlayerInfo < Window_Base
       rect.y = 0
       rect.width = 32
       rect.height = 32
-      self.contents.blt(0, 72+WLH*17, bitmap, rect)
+      self.contents.blt(0, 112+WLH*17, bitmap, rect)
       bitmap.dispose
-      draw_a_line(getColor("white"), 32, 72+4+WLH*17, 35, 24,  @yellowkey) 
+      draw_a_line(getColor("white"), 32, 112+WLH*17, 48, 32,  @yellowkey) 
     end
     
     key = $data_items[2]
@@ -150,9 +148,9 @@ class Window_PlayerInfo < Window_Base
       rect.y = 0
       rect.width = 32
       rect.height = 32
-      self.contents.blt(85, 72+WLH*17, bitmap, rect)
+      self.contents.blt(115, 112+WLH*17, bitmap, rect)
       bitmap.dispose
-      draw_a_line(getColor("white"), 117, 72+4+WLH*17, 35, 24,  @greenkey)
+      draw_a_line(getColor("white"), 147, 112+WLH*17, 48, 32,  @greenkey)
     end
     
     key = $data_items[3]
@@ -165,9 +163,9 @@ class Window_PlayerInfo < Window_Base
       rect.y = 0
       rect.width = 32
       rect.height = 32
-      self.contents.blt(0, 104+WLH*17, bitmap, rect)
+      self.contents.blt(0, 150+WLH*17, bitmap, rect)
       bitmap.dispose
-      draw_a_line(getColor("white"), 32, 104+4+WLH*17, 35, 24,  @bluekey)
+      draw_a_line(getColor("white"), 32, 150+WLH*17, 48, 32,  @bluekey)
     end
     
     key = $data_items[4]
@@ -180,17 +178,13 @@ class Window_PlayerInfo < Window_Base
       rect.y = 0
       rect.width = 32
       rect.height = 32
-      self.contents.blt(85, 104+WLH*17, bitmap, rect)
+      self.contents.blt(115, 150+WLH*17, bitmap, rect)
       bitmap.dispose
-      draw_a_line(getColor("white"), 117, 104+4+WLH*17, 35, 24,  @redkey)
+      draw_a_line(getColor("white"), 147, 150+WLH*17, 48, 32,  @redkey)
     end
     # 钥匙数量绘制完毕
-    self.contents.font.size = 16 
+    self.contents.font.size = 24 
       
-    
-    
-
-    
     #-----------------------------------------------
     
   end
@@ -221,27 +215,25 @@ class Window_PlayerInfo < Window_Base
   def draw_parameters(x, y)
     color = getColor("white")
     
-    draw_a_line(color, x, y, 180, WLH, "生命--------------", 0)
-    draw_a_line(color, x, y+WLH*2,  180, WLH, "魔法--------------", 0)
-    draw_a_line(color, x, y+WLH*4,  180, WLH, "攻击--------------", 0)
-    draw_a_line(color, x, y+WLH*6,  180, WLH, "防御--------------", 0)
-    draw_a_line(color, x, y+WLH*8,  180, WLH, "攻速速度----------", 0)
-    draw_a_line(color, x, y+WLH*10, 180, WLH, "攻击频率----------", 0)
-    draw_a_line(color, x, y+WLH*12, 180, WLH, "生命恢复/秒-------", 0)
-    draw_a_line(color, x, y+WLH*14, 180, WLH, "魔法恢复/秒-------", 0)  
-    
+    draw_a_line(color, x, y, 240, WLH, "生命--------------", 0)
+    draw_a_line(color, x, y+WLH*2,  240, WLH, "魔法--------------", 0)
+    draw_a_line(color, x, y+WLH*4,  240, WLH, "攻击--------------", 0)
+    draw_a_line(color, x, y+WLH*6,  240, WLH, "防御--------------", 0)
+    draw_a_line(color, x, y+WLH*8,  240, WLH, "攻速速度----------", 0)
+    draw_a_line(color, x, y+WLH*10, 240, WLH, "攻击频率----------", 0)
+    draw_a_line(color, x, y+WLH*12, 240, WLH, "生命恢复/秒-------", 0)
+    draw_a_line(color, x, y+WLH*14, 240, WLH, "魔法恢复/秒-------", 0)  
     
     color = Color.new(0, 255, 0)
-    draw_a_line(color, 0, y+WLH, 150, WLH, @hp.ceil, 2 )
-    draw_a_line(color, 0, y+WLH*3, 150, WLH, @pow.ceil, 2)
-    draw_a_line(color, 0, y+WLH*5, 150, WLH, Fround(@atk, 1), 2)
-    draw_a_line(color, 0, y+WLH*7, 150, WLH, Fround(@def, 1), 2)
-    draw_a_line(color, 0, y+WLH*9, 150, WLH, Fround(@atkspeed, 1), 2)
-    draw_a_line(color, 0, y+WLH*11, 150, WLH, Fround(@atkrate, 1).to_s+"﹪", 2)
-    draw_a_line(color, 0, y+WLH*13,150, WLH, Fround(@hpcover, 2), 2)
-    draw_a_line(color, 0, y+WLH*15,150, WLH, Fround(@mpcover, 2), 2)
-    
-    
+    draw_a_line(color, 0, y+WLH, 212, WLH, @hp.ceil, 2 )
+    draw_a_line(color, 0, y+WLH*3, 212, WLH, @pow.ceil, 2)
+    draw_a_line(color, 0, y+WLH*5, 212, WLH, Fround(@atk, 1), 2)
+    draw_a_line(color, 0, y+WLH*7, 212, WLH, Fround(@def, 1), 2)
+    draw_a_line(color, 0, y+WLH*9, 212, WLH, Fround(@atkspeed, 1), 2)
+    draw_a_line(color, 0, y+WLH*11, 212, WLH, Fround(@atkrate, 1).to_s+"﹪", 2)
+    draw_a_line(color, 0, y+WLH*13, 212, WLH, Fround(@hpcover, 2), 2)
+    draw_a_line(color, 0, y+WLH*15, 212, WLH, Fround(@mpcover, 2), 2)
+
   end
  
   #--------------------------------------------------------------------------
@@ -252,8 +244,8 @@ class Window_PlayerInfo < Window_Base
 	  @refresh_timer += 1
       # 更新画面效果
       self.contents_opacity = [self.contents_opacity + 4.25, 255.0].min
-      # 本窗口一直保持在448处
-      self.x += (448.0 - self.x)  if self.x<447 or self.x>449
+      # 本窗口一直保持在768处
+      self.x += (768 - self.x)  if self.x<767 or self.x>769
       # 更新内容
       if need_refresh?
 		refresh
