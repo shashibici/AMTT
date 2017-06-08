@@ -160,22 +160,24 @@ class Scene_Map < Scene_Base
 		# 如果是战斗状态,且是刚刚开始
 		if $game_switches[103] == true and $battle_panel_enemy_window == nil
 			# 创建背景
-			$battle_back_window = Window_BattleBack.new(-32, -32, 640+64, 480+64)
+			$battle_back_window = Window_BattleBack.new(-32, -32, 1024+64, 768+64)
 			$battle_back_window.visible = true
 			# 不再更新玩家信息窗口
 			@pinfo_window.visible = false
 			@pinfo_window.x = 1024
 			# 创建新窗口
 			#$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(20, 80, 300, 320, -300, 80, 0.05, 0)
-			$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(0, 64, 328, 352, -300, 80, 0.05, 0)
+			#$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(0, 64, 328, 352, -300, 80, 0.05, 0)
+			$battle_panel_enemy_window = Window_BattlePanel_Enemy.new(0, 96, 520, 576, -512, 80, 0.05, 0)
 			$battle_panel_enemy_window.setup($game_party.active, $game_monstor_battle)
 			#$battle_panel_player_window = Window_BattlePanel_Player.new(320, 80, 300, 320, 640, 80, 0.05, 0)
-			$battle_panel_player_window = Window_BattlePanel_Player.new(320, 64, 328, 352, 640, 80, 0.05, 0)
+			#$battle_panel_player_window = Window_BattlePanel_Player.new(320, 64, 328, 352, 640, 80, 0.05, 0)
+			$battle_panel_player_window = Window_BattlePanel_Player.new(512, 96, 520, 576, 1024, 80, 0.05, 0)
 			$battle_panel_player_window.setup($game_party.active, $game_monstor_battle)
 			
-			$battle_status_enemy_window = Window_BattleStatusEnemy.new(20,-8,600,64+32,20,-(64+32),0,0.04)
+			$battle_status_enemy_window = Window_BattleStatusEnemy.new(20,0,1024-40,64+32,20,-(64+32),0,0.04)
 			$battle_status_enemy_window.setup($game_monstor_battle)
-			$battle_status_player_window = Window_BattleStatusPlayer.new(20,480-80-8,600,64+32,20,480+64+32,0,0.04)
+			$battle_status_player_window = Window_BattleStatusPlayer.new(20,768-96-32,1024-40,96+32,20,768+96+32,0,0.04)
 			$battle_status_player_window.setup($game_party.active)
 			
 			# 设置战斗图显示的位置

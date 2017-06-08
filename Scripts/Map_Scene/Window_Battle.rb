@@ -8,7 +8,7 @@
 class Window_BattleBack < Window_Base
 	def initialize(x, y, h, w)
 		super(x, y, h, w)
-		self.contents.fill_rect(self.contents.width/2-1, 80, 3, self.contents.height-160, Color.new(255, 255, 255))
+		self.contents.fill_rect(self.contents.width/2-1, 96, 3, self.contents.height-192, Color.new(255, 255, 255))
 	end
 end
 
@@ -107,7 +107,7 @@ class Window_BattleStatusEnemy < Window_Animated
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#--------------------------------------------------------------------------
-	def initialize(x=20,y=-8,w=600,h=64+32,xi=20,yi=-(64+32),dx=0,dy=0.04)
+	def initialize(x=20,y=-8,w=1024-40,h=64+32,xi=20,yi=-(64+32),dx=0,dy=0.04)
 		super(x,y,w,h,xi,yi,dx,dy)
 		@ymoving = true
 		@wlh = 20
@@ -155,15 +155,15 @@ class Window_BattleStatusEnemy < Window_Animated
 			@face_name = @monster.character_name,
 		]
 		# 绘制头像
-		@face_bitmap = FrameFactory.getBitmapWithSize(40,40,"Graphics/Battlers/", @face_name, 0)
+		@face_bitmap = FrameFactory.getBitmapWithSize(72,72,"Graphics/Battlers/", @face_name, 0)
 		rect = Rect.new(0, 0, @face_bitmap.width, @face_bitmap.height)
-		self.contents.blt(12, 12, @face_bitmap, rect)
+		self.contents.blt(0, 0, @face_bitmap, rect)
 		# 绘制名字
 		color = Color.new(255, 255, 255)
-		draw_a_line(color, 64, self.contents.height-@wlh, 200, @wlh, @name, 0)
+		draw_a_line(color, 96, self.contents.height-@wlh, 200, @wlh, @name, 0)
 		# 绘制HP槽
 		rate = @hp / @maxhp
-		gw = Integer((self.contents.width-(64+16)) * rate)
+		gw = Integer((self.contents.width-(96+16)) * rate)
 		if rate < 0.5
 			gc1 = Color.new(255,Integer(255*rate*2),0)
 		else
@@ -171,9 +171,9 @@ class Window_BattleStatusEnemy < Window_Animated
 		end
 		gc2 = Color.new(0,0,0)
 		# 填满指定的颜色
-		self.contents.fill_rect(64+16, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, gc2)
-		self.contents.fill_rect(64+16, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
-		draw_a_line(color, 64+16, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, @hp.ceil.to_s+"/"+@maxhp.ceil.to_s, 1)
+		self.contents.fill_rect(96+16, self.contents.height - 2.5*@wlh, self.contents.width-(96+16), @wlh, gc2)
+		self.contents.fill_rect(96+16, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
+		draw_a_line(color, 96+16, self.contents.height - 2.5*@wlh, self.contents.width-(96+16), @wlh, @hp.ceil.to_s+"/"+@maxhp.ceil.to_s, 1)
 		
 	end
 	#--------------------------------------------------------------------------
@@ -213,7 +213,7 @@ class Window_BattleStatusPlayer < Window_Animated
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#--------------------------------------------------------------------------
-	def initialize(x=20,y=400-8,w=600,h=64+32,xi=20,yi=480+8,dx=0,dy=0.04)
+	def initialize(x=20,y=768-80-8,w=1024-40,h=64+32,xi=20,yi=768+64+32,dx=0,dy=0.04)
 		super(x,y,w,h,xi,yi,dx,dy)
 		@ymoving = true
 		@wlh = 20
@@ -269,17 +269,17 @@ class Window_BattleStatusPlayer < Window_Animated
 		# 绘制脸部
 		bitmap = Cache.face(@face_name)
 		rect = Rect.new(0, 0, 0, 0)
-		rect.x = @face_index % 4 * 96 + (96 - 64) / 2
-		rect.y = @face_index / 4 * 96 + (96 - 64) / 2
-		rect.width = 64
-		rect.height = 64
-		self.contents.blt(self.contents.width - 64, 0, bitmap, rect)
+		rect.x = @face_index % 4 * 96 #+ (96 - 64) / 2
+		rect.y = @face_index / 4 * 96 #+ (96 - 64) / 2
+		rect.width = 96
+		rect.height = 96
+		self.contents.blt(self.contents.width - 96, 0, bitmap, rect)
 		# 绘制名字
 		color = Color.new(255, 255, 255)
-		draw_a_line(color, self.contents.width-(64+16)-200, self.contents.height-@wlh, 200, @wlh, @name, 2)
+		draw_a_line(color, self.contents.width-(96+16)-800, self.contents.height-@wlh, 800, @wlh, @name, 2)
 		# 绘制HP槽
 		rate = @hp / @maxhp
-		gw = Integer((self.contents.width-(64+16)) * rate)
+		gw = Integer((self.contents.width-(96+16)) * rate)
 		if rate < 0.5
 			gc1 = Color.new(255,Integer(255*rate*2),0)
 		else
@@ -287,9 +287,9 @@ class Window_BattleStatusPlayer < Window_Animated
 		end
 		gc2 = Color.new(0,0,0)
 		# 填满指定的颜色
-		self.contents.fill_rect(0, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, gc2)
-		self.contents.fill_rect(self.contents.width-(64+16)-gw, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
-		draw_a_line(color, 0, self.contents.height - 2.5*@wlh, self.contents.width-(64+16), @wlh, @hp.ceil.to_s+"/"+@maxhp.ceil.to_s, 1)
+		self.contents.fill_rect(0, self.contents.height - 2.5*@wlh, self.contents.width-(96+16), @wlh, gc2)
+		self.contents.fill_rect(self.contents.width-(96+16)-gw, self.contents.height - 2.5*@wlh, gw, @wlh, gc1)
+		draw_a_line(color, 0, self.contents.height - 2.5*@wlh, self.contents.width-(96+16), @wlh, @hp.ceil.to_s+"/"+@maxhp.ceil.to_s, 1)
 		
 	end
 	#--------------------------------------------------------------------------
@@ -350,14 +350,16 @@ class Window_BattlePanel < Window_Animated
 		@attributes_color = []
 		# 记录属性字段
 		@attributes_string = [
-			"攻击:","防御:","力量:","敏捷:","恢复:",
-			"伤害:","攻速:","命中:","闪避:",
+			"攻击:","防御:","力量:","敏捷:","生命恢复:",
+			"实际物伤:","暴击技巧:","暴击威力:",
+			"实际攻速:","命中技巧:","闪避技巧:",
 		]
 		# 属性字颜色
 		@attributes_string_color = [
 			"light purple", "light blue", "red", "light green", "white", 
 			"heavy orange", "light purple", "light blue", "light blue"
 		]
+		self.contents.font.size = 24
 	end
 	#--------------------------------------------------------------------------
 	# ● 设置显示参数
@@ -374,6 +376,8 @@ class Window_BattlePanel < Window_Animated
 			@mcelerity = @monster.final_celerity,
 			@mhpcover = @monster.final_hpcover,
 			@mdestroy = @monster.final_destroy,
+			@mbom = @monster.final_bom,
+			@mbomrate = @monster.final_bomrate,
 			@matkspeed = @monster.final_atkspeed,
 			@mhit = @monster.final_hit,
 			@meva = @monster.final_eva,
@@ -385,6 +389,8 @@ class Window_BattlePanel < Window_Animated
 			@pcelerity = @player.final_celerity,
 			@phpcover = @player.final_hpcover,
 			@pdestroy = @player.final_destroy,
+			@pbom = @player.final_bom,
+			@pbomrate = @player.final_bomrate,
 			@patkspeed = @player.final_atkspeed,
 			@phit = @player.final_hit,
 			@peva = @player.final_eva,
@@ -407,6 +413,8 @@ class Window_BattlePanel < Window_Animated
 			@mcelerity = @monster.final_celerity,
 			@mhpcover = @monster.final_hpcover,
 			@mdestroy = @monster.final_destroy,
+			@mbom = @monster.final_bom,
+			@mbomatk = @monster.final_bomatk,
 			@matkspeed = @monster.final_atkspeed,
 			@mhit = @monster.final_hit,
 			@meva = @monster.final_eva,
@@ -418,6 +426,8 @@ class Window_BattlePanel < Window_Animated
 			@pcelerity = @player.final_celerity,
 			@phpcover = @player.final_hpcover,
 			@pdestroy = @player.final_destroy,
+			@pbom = @player.final_bom,
+			@pbomatk = @player.final_bomatk,
 			@patkspeed = @player.final_atkspeed,
 			@phit = @player.final_hit,
 			@peva = @player.final_eva,
@@ -457,6 +467,12 @@ class Window_BattlePanel < Window_Animated
 		if @monster.final_celerity != @mcelerity or @player.final_celerity != @pcelerity
 			return true
 		end
+		if @mbom != @monster.final_bom or @pbom != @player.final_bom
+			return true 
+		end
+		if @mbomatk != @monster.final_bomatk or @pbomatk != @player.final_bomatk
+			return true 
+		end
 		if @mname != @monster.name or @pname != @player.name
 			return true
 		end
@@ -492,7 +508,7 @@ end
 # ■ Window_BattlePanel_Enemy
 #---------------------------------------------------------------------------
 #  Battle Panel shows the status of the enemy.
-#  Size: 300(W) * 320*(H)
+#  Size: 512(W) * 576*(H)
 #  On the left hand side. Onece is colided with the other window, which is of 
 #  the player, the background disappear. 
 #
@@ -517,24 +533,25 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#--------------------------------------------------------------------------
-	def initialize(x,y,w=300, h=320, xi=-300, yi=80, dx=0.07, dy=0)
+	def initialize(x,y,w=512+8, h=576, xi=-512, yi=80, dx=0.07, dy=0)
 		super(x,y,w,h,xi,yi,dx,dy)
-		@w_1 = 140 - 16 						# 属性列宽度
-		@sw_1 = 0 								# 属性到左边框的距离
-		@w_2 = 300 - 32 - @w_1					# 技能列表宽度
-		@sw_2 = @sw_1 + @w_1					# 技能到左边框的距离
+		@w_1 = 216 - 16 						# 属性列宽度
+		@sw_1 = 8 								# 属性到左边框的距离
+		@w_2 = self.width - 32 - @w_1			# 技能列表宽度--暂时没用
+		@sw_2 = @sw_1 + @w_1					# 技能到左边框的距离--暂时没用
 		@sw_3 = @sw_2							# 名字到左边框的距离
 		@w_3 = @w_2								# 名字宽度
-		@sw_4 = @sw_1 + @w_1 + 48 				# 图片左边到左边框的距离
-		@w_4 = 64 								# 图片宽度
-		@h_1 = 18 + 8 							# 属性每行高度
-		@sh_1 = 0								# 属性第一行位置
-		@h_2 = 96 								# 图片高度
-		@sh_2 = 96 - 16 						# 图片上沿到窗口上边框的距离
+		@sw_4 = @sw_1 + @w_1 + 72 				# 图片左边到左边框的距离
+		@w_4 = 128 								# 图片宽度
+		@h_1 = 30 + 8 							# 属性每行高度
+		@sh_1 = 16								# 属性第一行位置
+		@h_2 = 192 								# 图片高度
+		@sh_2 =160- 16 							# 图片上沿到窗口上边框的距离
 		@h_3 = 32 								# 名字高度
-		@sh_3 = @sh_2 + @h_2					# 名字上沿
-		@h_4 = 320 - @sh_2 - @sh_3 - 32			# 技能列表高度
-		@sh_4 = @sh_3 + @h_3 					# 技能列表上沿
+		@sh_3 = @sh_2 + @h_2 + 16				# 名字上沿
+		@sh_4 = @sh_3 + @h_3 + 16				# 技能列表上沿 -- 暂时没用
+		@h_4 = self.contents.height - @sh_4		# 技能列表高度 -- 暂时没用
+		
 		self.windowskin = Cache.system("Booky_Skin")
 		
 	end
@@ -553,24 +570,29 @@ class Window_BattlePanel_Enemy < Window_BattlePanel
 			end
 		end
 		for i in 0...@monster_attributes.size
+			if @attributes_string[i] == "暴击威力:"
+				percentage = "%"
+			else
+				percentage = ""
+			end
 			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*(@h_1), @w_1, @h_1, @attributes_string[i],  0)
-			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*(@h_1), @w_1-40, @h_1, @monster_attributes[i].ceil.to_s,  2)
+			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*(@h_1), @w_1-40, @h_1, @monster_attributes[i].ceil.to_s+percentage,  2)
 		end
 		# 打印名字
 		draw_a_line(getColor("white"), @sw_3, @sh_3, @w_3, @h_3, @mname,  1)
 		old_font = self.contents.font.clone
-		self.contents.font.size = 13
+		self.contents.font.size =19
 		# 绘制技能以及名字
 		folder_name = "Graphics/System/"
 		for i in 0...@monster_skills.size
 			skill_name = @monster_skills[i].name
 			disabled = @monster_skills[i].locked
-			bitmap = FrameFactory.getBitmapWithSize(44, 44, folder_name, skill_name)
-			self.contents.blt((49)*i, @sh_1+@monster_attributes.size*(@h_1)+8, bitmap, bitmap.rect, disabled ? 128 : 255)
+			bitmap = FrameFactory.getBitmapWithSize(64, 64, folder_name, skill_name)
+			self.contents.blt((65)*i, @sh_1+@monster_attributes.size*(@h_1)+16, bitmap, bitmap.rect, disabled ? 128 : 255)
 			if true == disabled 
-				draw_a_line(getColor("gray"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+44, 50, 24, skill_name, 1)
+				draw_a_line(getColor("gray"), (65)*i, @sh_1+@monster_attributes.size*(@h_1)+16+64,60, 24, skill_name, 1)
 			else
-				draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+44, 50, 24, skill_name, 1)
+				draw_a_line(getColor("white"), (65)*i, @sh_1+@monster_attributes.size*(@h_1)+16+64,60, 24, skill_name, 1)
 			end
 		end
 		self.contents.font = old_font
@@ -580,7 +602,7 @@ end
 	# ■ Window_BattlePanel_Player
 #---------------------------------------------------------------------------
 #  Battle Panel shows the status of the player.
-#  Size: 300(W) * 320*(H)
+#  Size: 520(W) * 640*(H)
 #  On the right hand side. Onece is colided with the other window, which is of 
 #  the enemy, the background disappear.
 #  
@@ -605,25 +627,25 @@ class Window_BattlePanel_Player < Window_BattlePanel
 	#--------------------------------------------------------------------------
 	# ● 初始化对象
 	#--------------------------------------------------------------------------
-	def initialize(x,y,w=300, h=320, xi=640, yi=80, dx=0.07, dy=0)
+	def initialize(x,y,w=520, h=640, xi=1024, yi=80, dx=0.07, dy=0)
 		super(x,y,w,h,xi,yi,dx,dy)
-		@sw_4 = 48 - 16			 				# 图片左边到左边框的距离
-		@w_4 = 64 								# 图片宽度
-		@w_1 = 140 - 16 						# 属性列宽度
-		@w_2 = 300 - 32 - @w_1					# 技能列表宽度
-		@sw_1 = @w_2							# 属性到左边框的距离
-		@sw_2 = 0								# 技能到左边框的距离
-		@sw_3 = @sw_2							# 名字左边界位置
-		@w_3 = @w_2								# 名字宽度
+		@sw_4 = 72			 					# 图片左边到左边框的距离
+		@w_4 = 128 								# 图片宽度
+		@w_1 = 200 								# 属性列宽度
+		@w_2 = 300 - 32 - @w_1					# 技能列表宽度  -- 暂时没用
+		@sw_1 = @w_4 + @sw_4 + 72				# 属性到左边框的距离
+		@sw_2 = 0								# 技能到左边框的距离 -- 暂时没用
+		@sw_3 = 72-72							# 名字左边界位置
+		@w_3 = @w_4 + 72*2						# 名字宽度
 
-		@h_1 = 18 + 8 							# 属性每行高度
-		@sh_1 = 0								# 属性第一行位置
-		@h_2 = 96 								# 图片高度
-		@sh_2 = 96 - 16 						# 图片上沿到窗口上边框的距离
+		@h_1 = 30 + 8 							# 属性每行高度
+		@sh_1 = 16								# 属性第一行位置
+		@h_2 = 192 								# 图片高度
+		@sh_2 = 160 - 16 						# 图片上沿到窗口上边框的距离
 		@h_3 = 32 								# 名字高度
-		@sh_3 = @sh_2 + @h_2					# 名字上沿
-		@h_4 = 320 - @sh_2 - @sh_3 - 32			# 技能列表高度
-		@sh_4 = @sh_3 + @h_3 					# 技能列表上沿
+		@sh_3 = @sh_2 + @h_2 + 16				# 名字上沿
+		@h_4 = 320 - @sh_2 - @sh_3 - 32			# 技能列表高度 -- 暂时没用
+		@sh_4 = @sh_3 + @h_3 					# 技能列表上沿 -- 暂时没用
 		self.windowskin = Cache.system("Booky_Skin")
 	end
 	#--------------------------------------------------------------------------
@@ -641,24 +663,29 @@ class Window_BattlePanel_Player < Window_BattlePanel
 			end
 		end
 		for i in 0...@player_attributes.size
+			if @attributes_string[i] == "暴击威力:"
+				percentage = "%"
+			else
+				percentage = ""
+			end
 			draw_a_line(getColor(@attributes_string_color[i]), @sw_1, @sh_1+i*@h_1, @w_1, @h_1, @attributes_string[i],  0)
-			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*@h_1, @w_1-40, @h_1, @player_attributes[i].ceil.to_s,  2)
+			draw_a_line(getColor(@attributes_color[i]), @sw_1+40, @sh_1+i*@h_1, @w_1-40, @h_1, @player_attributes[i].ceil.to_s+percentage,  2)
 		end
 		# 打印名字
 		draw_a_line(getColor("white"), @sw_3, @sh_3, @w_3, @h_3, @pname,  1)
 		old_font = self.contents.font.clone
-		self.contents.font.size = 13
+		self.contents.font.size = 19
 		# 绘制技能以及名字
 		folder_name = "Graphics/System/"
 		for i in 0...@player_skills.size
 			skill_name = @player_skills[i].name
 			disabled = @player_skills[i].locked
-			bitmap = FrameFactory.getBitmapWithSize(48, 48, folder_name, skill_name)
-			self.contents.blt((49)*i, @sh_1+@monster_attributes.size*(@h_1)+8, bitmap, bitmap.rect, disabled ? 128 : 255)
+			bitmap = FrameFactory.getBitmapWithSize(64, 64, folder_name, skill_name)
+			self.contents.blt((65)*i, @sh_1+@monster_attributes.size*(@h_1)+8, bitmap, bitmap.rect, disabled ? 128 : 255)
 			if true == disabled
-				draw_a_line(getColor("gray"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+48, 50, 24, skill_name, 1)
+				draw_a_line(getColor("gray"), (65)*i, @sh_1+@monster_attributes.size*(@h_1)+16+64,60, 24, skill_name, 1)
 			else 
-				draw_a_line(getColor("white"), (49)*i, @sh_1+@monster_attributes.size*(@h_1)+8+48, 50, 24, skill_name, 1)
+				draw_a_line(getColor("white"), (65)*i, @sh_1+@monster_attributes.size*(@h_1)+16+64,60, 24, skill_name, 1)
 			end
 		end
 		self.contents.font = old_font

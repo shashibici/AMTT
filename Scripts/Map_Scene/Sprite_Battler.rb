@@ -74,7 +74,7 @@ class Sprite_Battler < Sprite_Base
 			# 战斗图名字
 			@battler_name = @battler.battler_name
 			@battler_hue = 0
-			self.bitmap = FrameFactory.getBitmapWithSize(64,96,"Graphics/Battlers/", @battler_name, @battler_hue)
+			self.bitmap = FrameFactory.getBitmapWithSize(128,192,"Graphics/Battlers/", @battler_name, @battler_hue)
 			@width = bitmap.width
 			@height = bitmap.height
 			self.ox = 0#@width / 2

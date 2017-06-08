@@ -221,6 +221,19 @@ class Game_Battler
 		return false
 	end
 	#--------------------------------------------------------------------------
+	# ● 根据技能名字查找
+	#--------------------------------------------------------------------------
+	def has_skill_by_name?(name)
+		for priority in @my_skills.keys
+			for key in @my_skills[priority]
+				if key.include?(name)
+					return true
+				end
+			end
+		end
+		return false
+	end
+	#--------------------------------------------------------------------------
 	# ● 添加技能
 	#--------------------------------------------------------------------------
 	def add_skill(skill)
