@@ -2,7 +2,7 @@ module RPG
 	class BaseItem
 		attr_reader    :attrs_all    # 递归计算的属性
 		attr_reader    :attrs_self   # 自身的属性
-		attr_reader    :colstr   # name colors: e.g. "light green"
+		attr_reader    :colstr   	 # name colors: e.g. "light green"
 		attr_accessor  :is_virtual   # 指示是否为virtual装备
 		#--------------------------------------------------------------------------
 		# ●  返回	： 	string, e.g., "linght green"
