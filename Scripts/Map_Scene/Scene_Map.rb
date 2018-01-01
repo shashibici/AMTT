@@ -76,6 +76,7 @@ class Scene_Map < Scene_Base
 		$game_temp.next_scene = nil
 		Audio.se_play("Audio/SE/AMTT_Cancel")
 		$scene = Scene_End.new
+		hide_player_info
 		if $battle_back_window != nil
 			$battle_back_window.visible = $battle_back_window.active = false
 		end
@@ -95,6 +96,7 @@ class Scene_Map < Scene_Base
 			$Spriteset_Battle.visible = $Spriteset_Battle.active = false
 			$Spriteset_Battle.update
 		end
+		Graphics.update
 	end
 	#--------------------------------------------------------------------------
 	# ● 显示玩家信息
