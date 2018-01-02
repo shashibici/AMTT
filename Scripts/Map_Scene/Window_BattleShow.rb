@@ -1,3 +1,6 @@
+#
+#   本文件貌似已经废弃
+#
 ##==========================================================================
 # ■ Window_BattleShow1
 #---------------------------------------------------------------------------
@@ -175,6 +178,9 @@ class Window_BattleShow2 < Window_Base
     # 当前值
     @hp = @actor.hp
     @mp = @actor.mp
+	
+	# 血条效果
+	@current_upper = @actor.current_upper
   end  
   #--------------------------------------------------------------------------
   # ● 重新绘制该窗口
@@ -192,6 +198,8 @@ class Window_BattleShow2 < Window_Base
     # 当前值
     @hp = @actor.hp
     @mp = @actor.mp
+	
+	@current_upper = @actor.current_upper
     
 
     # 描绘HP槽-------------------------------------
@@ -203,10 +211,16 @@ class Window_BattleShow2 < Window_Base
       gc1 = Color.new(255,Integer(255*rate*2),0)
     end
     gc2 = Color.new(0,0,0)
+	# 绘制失血效果槽
+	p @current_upper
+	rate = @current_upper / @maxhp
+	gc3 = Color.new(255,255,255)
+	gw3 = Integer(230 * rate)
     
     # 填满指定的颜色
-    self.contents.fill_rect(0, WLH - 8, 230, 6, gc2)
-    self.contents.fill_rect(0, WLH - 8, gw, 6, gc1)
+    self.contents.fill_rect(0, WLH - 8, 230, 6, gc2) # 黑色背景
+	self.contents.fill_rect(0, WLH - 8, gw3, 6, gc3) # 白色失血效果
+    self.contents.fill_rect(0, WLH - 8, gw, 6, gc1)  # 血条
     
     # 绘制文字
     self.contents.font.color = system_color

@@ -13,7 +13,8 @@
 #  另外重写了其他的属性获取
 #
 #==============================================================================
-
+# 血条效果消失的速度，如果设为x，表示血条消失的速度为x秒移动maxhp的量
+$hp_shade_duration = 2.0
 class Game_Battler
 	include GAME_CONF
 	attr_accessor   	:bomflag           	# 是否暴击
@@ -83,8 +84,12 @@ class Game_Battler
 	# ● 全回复
 	#--------------------------------------------------------------------------
 	def recover_all
-		@hp = maxhp
+		# ole_hp 用来记录血条变化量
+		@old_hp = @hp = maxhp
 		@mp = maxmp
+		# current_shade 用来记录当前血条效果区间
+		@current_shade = [@hp, @hp, maxhp / 2.0]
+		@effect = false
 		self.clear_states
 	end
 	#--------------------------------------------------------------------------
@@ -870,31 +875,78 @@ class Game_Battler
 		@mp = [[mp, maxmp].min, 0].max
 	end
 	#--------------------------------------------------------------------------
+	# ● 返回当前血条效果的上界
+	#--------------------------------------------------------------------------
+	def current_upper
+		return @current_shade[1]
+	end
+	#--------------------------------------------------------------------------
 	# ● 获取生命值
 	#
-	#    屏蔽Game_Battler的hp属性，为了每次获取的时候能够修改
-	#
+	#    1. 屏蔽Game_Battler的hp属性，为了每次获取的时候能够修改
+	#    2. 添加战斗时失血效果 - 类似于街机血条效果
+	#       首先每过一段时间会更新一次显示效果
+	#       当@hp比上次显示的减少时，修改血条效果的下界：@current_shade[0]
+	#       当@hp比上次显示的增加是，修改血条效果的下界：@current_shade[0]，
+	#                                适当修改血条效果上界：@current_shade[1]
+	#       @current_shade[2]表示血条效果消失的速度，单位：血/每秒
 	#--------------------------------------------------------------------------
 	def hp
 		return @hp if @hp <= 0
-		# 间隔设为0.1秒
+		# 最短检查时间设为1/30秒 <<===== 血量增加的最短间隔为1/30，扣血间隔可以小于一帧
 		hpcover_interval = Graphics.frame_rate / 30.0
-		# 每次超过间隔都会更新一下
+		# 每过1/30 秒检查一次是为了性能考虑，如果电脑性能很好，可以每一帧都检查一次
+		# 每次超过检查间隔，都会应用一下血量恢复：战斗时与平时的血量恢复率不一样
 		if (temp = Graphics.frame_count - @fcounthp) >= hpcover_interval
 			# 更新fcounthp
 			@fcounthp = Graphics.frame_count
-			# 过了超过一秒
+			# 计算距离上次检查超过了多长时间（可能小于1秒，也可能大于1秒）
 			temp /= Graphics.frame_rate.to_f
+			
+			#------- 这里是生命恢复更新 ------------------
 			# 非战斗状态，回血快
 			if $game_switches[103] == false
-				@hp = [@hp + temp * self.maxhp * 0.1 * 1.0 / hpcover_interval, self.maxhp].min
-				# 战斗状态，回血慢
+				# 每秒恢量 = self.maxhp * 0.1
+				# 流失时间（单位：秒） = temp 
+				@hp = [@hp +  self.maxhp * 0.1 * temp, self.maxhp].min
+			# 战斗状态，回血慢
 			else
-				@hp = [@hp + temp * self.final_hpcover, self.maxhp].min
+				# 每秒恢量 = self.final_hpcover
+				# 流失时间（单位：秒） = temp
+				@hp = [@hp + self.final_hpcover * temp, self.maxhp].min
 			end
-				# 返回新的hp
-				return @hp
-				# 否则直接返回
+			#--------- 这里是失血效果更新 ----------------
+			# 如果血量减少了，修改bottom
+			if @hp < @old_hp
+				@current_shade[0] = @hp
+			# 如果血量增加了，修改upper和bottom，停止效果
+			elsif @hp > @old_hp
+				@current_shade[0] = @hp
+				if @current_shade[1] < @hp 
+					@current_shade[1] = @hp 
+					@effect = false
+				end
+			end
+			# 如果当前处于效果停止
+			if false == @effect
+				# 只有当上下界不一致的时候，才能够开始显示效果
+				if @current_shade[0] != @current_shade[1]
+					@effect = true
+				end
+			# 如果当前正在播放效果，依据流失的时间修改上界
+			else 
+				@current_shade[1] -= @current_shade[2]*temp
+				# 上界小于下届时效果结束
+				if @current_shade[1] <= @current_shade[0]
+					@current_shade[1] = @current_shade[0]
+					@effect = false
+				end
+			end
+			@old_hp = @hp
+			#----------- 失血效果更新结束 ----------------
+			# 返回新的hp
+			return @hp
+		# 否则没有到检查血量恢复的时候，直接返回
 		else
 			return @hp
 		end

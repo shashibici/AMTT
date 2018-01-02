@@ -27,11 +27,12 @@ class Scene_Map < Scene_Base
 		@pinfo_window.setup($game_heros[$player_type])
 		@pinfo_window.contents_opacity = 0
 		# 根据系统要求显示或隐藏玩家信息
-		if $game_system.show_info
-			show_player_info
-		else
-			hide_player_info
-		end
+		show_player_info
+		# if $game_system.show_info
+			# show_player_info
+		# else
+			# hide_player_info
+		# end
 	end  
 	#--------------------------------------------------------------------------
 	# ● フレーム更新
