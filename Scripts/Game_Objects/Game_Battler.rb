@@ -137,8 +137,6 @@ class Game_Battler
 		if (!state.can_accumulate? and 0 == num) or (state.can_accumulate? and num < state.max_accumulate)
 			@states[state.priority].push(state)
 		end
-		
-		
 	end
 	#--------------------------------------------------------------------------
 	# ● 返回角色包含该state的重数，没有改state则返回0
@@ -150,6 +148,57 @@ class Game_Battler
 			if @states[key] != nil
 				for s in @states[key]
 					if s.name == state.name and s.level == state.level and s.instance_of?(state.class)
+						ret += 1
+					end
+				end
+			end
+		end
+		return ret
+	end
+	#--------------------------------------------------------------------------
+	# ● 返回角色包含该state的重数，没有改state则返回0
+	#   技能名字唯一确定一个技能。
+	#--------------------------------------------------------------------------
+	def state_num_by_name(state_name)
+		ret = 0
+		for key in @states.keys
+			if @states[key] != nil
+				for s in @states[key]
+					if s.name == state_name
+						ret += 1
+					end
+				end
+			end
+		end
+		return ret
+	end
+	#--------------------------------------------------------------------------
+	# ● 返回角色包含该state的重数，没有改state则返回0
+	#   技能等级唯一确定一个技能。
+	#--------------------------------------------------------------------------
+	def state_num_by_level(state_level)
+		ret = 0
+		for key in @states.keys
+			if @states[key] != nil
+				for s in @states[key]
+					if s.level == state_level
+						ret += 1
+					end
+				end
+			end
+		end
+		return ret
+	end
+	#--------------------------------------------------------------------------
+	# ● 返回角色包含该state的重数，没有改state则返回0
+	#   技能名字和等级唯一确定一个技能。
+	#--------------------------------------------------------------------------
+	def state_num_by_name_level(state_name, state_level)
+		ret = 0
+		for key in @states.keys
+			if @states[key] != nil
+				for s in @states[key]
+					if s.name == state_name and s.level == state_level
 						ret += 1
 					end
 				end
@@ -893,14 +942,14 @@ class Game_Battler
 	#--------------------------------------------------------------------------
 	def hp
 		return @hp if @hp <= 0
-		# 最短检查时间设为1/30秒 <<===== 血量增加的最短间隔为1/30，扣血间隔可以小于一帧
-		hpcover_interval = Graphics.frame_rate / 30.0
-		# 每过1/30 秒检查一次是为了性能考虑，如果电脑性能很好，可以每一帧都检查一次
+		# 最短检查时间设为$performance[0]帧
+		hpcover_interval = $performance[0]
+		# 每过$performance[0]帧检查一次是为了性能考虑，如果电脑性能很好，可以每一帧都检查一次
 		# 每次超过检查间隔，都会应用一下血量恢复：战斗时与平时的血量恢复率不一样
 		if (temp = Graphics.frame_count - @fcounthp) >= hpcover_interval
 			# 更新fcounthp
 			@fcounthp = Graphics.frame_count
-			# 计算距离上次检查超过了多长时间（可能小于1秒，也可能大于1秒）
+			# 计算距离上次检查超过了多长时间（单位：秒）
 			temp /= Graphics.frame_rate.to_f
 			
 			#------- 这里是生命恢复更新 ------------------
@@ -936,7 +985,7 @@ class Game_Battler
 			# 如果当前正在播放效果，依据流失的时间修改上界
 			else 
 				@current_shade[1] -= @current_shade[2]*temp
-				# 上界小于下届时效果结束
+				# 上界不大于下届时效果结束
 				if @current_shade[1] <= @current_shade[0]
 					@current_shade[1] = @current_shade[0]
 					@effect = false
@@ -952,7 +1001,7 @@ class Game_Battler
 		end
 	end  
 	#--------------------------------------------------------------------------
-	# ● 获取生命值
+	# ● 获取魔法值
 	#
 	#    屏蔽Game_Battler的mp属性，为了每次获取的时候能够修改
 	#	   暂时不管MP恢复问题	
