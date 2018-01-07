@@ -14,7 +14,7 @@
 #
 #==============================================================================
 # 血条效果消失的速度，如果设为x，表示血条消失的速度为x秒移动maxhp的量
-$hp_shade_duration = 2.0
+$hp_shade_duration = 3.0
 class Game_Battler
 	include GAME_CONF
 	attr_accessor   	:bomflag           	# 是否暴击

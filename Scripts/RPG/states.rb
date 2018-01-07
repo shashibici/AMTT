@@ -25,21 +25,22 @@ module RPG
 		def atkspeed_rate
 			case @level 
 			when 1
-				-10
-			when 2
-				-15
-			when 3
 				-20
+			when 2
+				-40
+			when 3
+				-60
 			end
 		end
 		#--------------------------------------------------------------------------
 		# ● 该state从百分比上加成battler的hpcover
 		#--------------------------------------------------------------------------
 		def hpcover_boost_rate
-			if @level > 1
-				return 100
-			else 
-				return 0
+			case @level
+			when 2
+				return 200
+			when 3
+				return 400
 			end
 		end
 		#--------------------------------------------------------------------------
@@ -47,7 +48,7 @@ module RPG
 		#--------------------------------------------------------------------------
 		def maxhp_rate
 			if @level > 2
-				return 100
+				return 200
 			else 
 				return 0
 			end

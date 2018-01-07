@@ -11,8 +11,8 @@ class Window_Selectable < Window_Base
   # ● 设置详细信息窗口
   #
   #--------------------------------------------------------------------------
-  def window_detail=(new_window)
-    @window_detail = new_window
+  def window_detail=(new_detail_window)
+    @window_detail = new_detail_window
   end  
   #--------------------------------------------------------------------------
   # ● 更新详细信息窗口 (定义继承内容)

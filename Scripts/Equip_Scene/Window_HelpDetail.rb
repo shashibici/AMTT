@@ -13,7 +13,7 @@ class Window_HelpDetail < Window_Base
   #    h    : 高度
   #
   #--------------------------------------------------------------------------
-  def initialize(x,y, w, h, size=19, wlh=20, opacity=255, bopacity=255)
+  def initialize(x,y, w, h, size=22, wlh=24, opacity=255, bopacity=255)
     @wlh = wlh
 	@font_size = size
     super(x, y, w, h)
@@ -49,7 +49,7 @@ class Window_HelpDetail < Window_Base
       # 设置颜色
       self.contents.font.color = getColor(colors == nil ? normal_color : (colors[i]==nil ? normal_color : colors[i])) 
       # 绘制字体
-      self.contents.draw_text(0, @wlh * i, self.width - 40, @wlh, text[i], align)
+      self.contents.draw_text(0, @wlh * i, self.width-24, @wlh, text[i], align)
     end
     
   end

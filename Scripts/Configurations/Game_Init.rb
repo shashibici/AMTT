@@ -75,7 +75,7 @@ module GAME_INIT
     
 	strength_val = item.read_suit_attr('strength')
 	if nil != strength_val
-		values.push("力量            +  "+strength_val.to_s) 
+		values.push("力量           +  "+strength_val.to_s) 
 		colors.push("red")
 	end
 	
@@ -108,7 +108,7 @@ module GAME_INIT
 	end
     bomrate_val = item.read_suit_attr('bomrate')
 	if nil != bomrate_val
-		values.push("暴击率      +  "+bomrate_val.to_s+"%") 
+		values.push("暴击率       +  "+bomrate_val.to_s+"%") 
 		colors.push("light yellow")
 	end
 	
@@ -121,18 +121,18 @@ module GAME_INIT
 	#---------------------------------------------------
 	celerity_val = item.read_suit_attr('celerity')
 	if nil != celerity_val
-		values.push("敏捷            +  "+celerity_val.to_s) 
+		values.push("敏捷           +  "+celerity_val.to_s) 
 		colors.push("light green")
 	end
 	
     atk_val = item.read_suit_attr('atk')
 	if nil != atk_val
-		values.push("攻击            +  "+atk_val.to_s) 
+		values.push("攻击           +  "+atk_val.to_s) 
 		colors.push("light purple")
 	end
     atkrate_val = item.read_suit_attr('atkrate')
 	if nil != atkrate_val
-		values.push("攻击            +  "+atkrate_val.to_s+"%") 
+		values.push("攻击           +  "+atkrate_val.to_s+"%") 
 		colors.push("light purple")
 	end
     
@@ -150,12 +150,12 @@ module GAME_INIT
 	
     ddef_val = item.read_suit_attr('ddef')
 	if nil != ddef_val 
-		values.push("防御            +  "+ddef_val.to_s) 
+		values.push("防御           +  "+ddef_val.to_s) 
 		colors.push("light blue")
 	end
     defrate_val = item.read_suit_attr('defrate')
 	if nil != defrate_val
-		values.push("防御            +  "+defrate_val.to_s+"%") 
+		values.push("防御           +  "+defrate_val.to_s+"%") 
 		colors.push("light blue")
 	end
 	
@@ -166,7 +166,7 @@ module GAME_INIT
 	end
     hitrate_val = item.read_suit_attr('hitrate')
 	if nil != hitrate_val
-		values.push("命中率        +  "+hitrate_val.to_s+"%") 
+		values.push("命中率       +  "+hitrate_val.to_s+"%") 
 		colors.push("light blue")
 	end
 	
@@ -192,19 +192,17 @@ module GAME_INIT
 	end
     hprate_val = item.read_suit_attr('hprate')
 	if nil != hprate_val
-		values.push("每秒恢复   +  "+hprate_val.to_s+"%") 
+		values.push("生命恢复   +  "+hprate_val.to_s+"%") 
 		colors.push("light gray")
 	end
     
     # --- No use. -----------------------------
     wisdom_val = item.read_suit_attr('wisdom')
 	if nil != wisdom_val
-		values.push("智力          +"+wisdom_val.to_s) 
+		values.push("智力           +  "+wisdom_val.to_s) 
 		colors.push("light purple")
     end
-    
-    
-    
+	
     if values.size > 0
       return [values, colors]  
     else

@@ -41,13 +41,13 @@ class Scene_Equip2 < Scene_Base
     # 头像
     @status_window1 = Window_EquipStatus1.new(0,0,@actor)
     # 生命槽
-    @status_window2 = Window_EquipStatus2.new(0,128-24,@actor)
+    @status_window2 = Window_EquipStatus2.new(0,192-32,@actor)
 
     # 生成物品窗口
     create_item_windows
 
     # 生成装备窗口
-    @equip_window = Window_Equip_Select.new(168, 0, @actor)
+    @equip_window = Window_Equip_Select.new(288, 0, @actor)
     @equip_window.opacity = 0
     
     # 刚开始，设置装备窗口的索引，以后不用这种方法设置
@@ -193,12 +193,12 @@ class Scene_Equip2 < Scene_Base
     # 0：武器  1：头部  2：项链  3：盾  4：衣服  5：戒指  6：鞋子  7：宝物
     for i in 0...EQUIP_TYPE_MAX
       # 创建物品窗口
-      @item_windows[i] = Window_EquipItem.new(0, 280, 640, 200, @actor, i)
+      @item_windows[i] = Window_EquipItem.new(0, 0, $screen_width, 256, @actor, i)
       # 选择哪一类装备，哪一类物品窗口设为可见
       @item_windows[i].visible = (@equip_index == i)
       # 坐标
-      @item_windows[i].y = 374
-      @item_windows[i].height = 104
+      @item_windows[i].y = $screen_height-256
+      @item_windows[i].height = 256
       # 只是可见，没有被激活
       @item_windows[i].active = false
       # 索引也没有
