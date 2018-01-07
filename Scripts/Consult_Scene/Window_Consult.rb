@@ -11,14 +11,14 @@ class Window_Consult_Status1 < Window_Base
 		# ● 初始化对象
 	#--------------------------------------------------------------------------
 	def initialize(x,y,actor)
-		super(x, y, 384, 264) # x, y, 384, 264
+		super(x, y, 288, 200) # x, y, 288, 200
 		self.contents.font.size = 24
 		self.contents.font.name = "华文细黑"
 		self.opacity = 0
-		@face_width = 128
-		@face_height = 192
-		@pic_size = 192
-		@edge = 16
+		@face_width = 64
+		@face_height = 96
+		@pic_size = 96
+		@edge = 8
 		setup(actor)
 		@isInit = true
 	end
@@ -35,7 +35,7 @@ class Window_Consult_Status1 < Window_Base
 		end
 		# 头像
 		#@actor_monstor_face = @actor.character_name
-		@battler_name = @actor.battler_name
+		@battler_name = @actor.battler_name+"-face"
 		@battler_hue = @actor.battler_hue
 		# 名字
 		@name = @actor.name
@@ -55,31 +55,32 @@ class Window_Consult_Status1 < Window_Base
 		setup(@actor)
 		#-------------描绘角色--------------------------
 		# 描绘脸部 (64*64)
-		dst_rect = Rect.new((@pic_size-@face_width)/2,(@pic_size-@face_height)/2,@face_width,@face_height)
+		dst_rect = Rect.new((@pic_size-@face_width)/2,(self.contents.height-@face_height)/2,@face_width,@face_height)
 		#bitmap = FrameFactory.getBitmap("Graphics/battlers/", @actor_monstor_face)
 		bitmap = FrameFactory.getBitmapWithSize(@face_width,@face_height,"Graphics/Battlers/", @battler_name, @battler_hue)
 		src_rect = Rect.new(0, 0, @face_width, @face_height) 
 		self.contents.stretch_blt(dst_rect, bitmap, src_rect)
 		#bitmap.dispose
 		# 描绘名字(72+108=180)
-		self.contents.font.size = 20
+		self.contents.font.size = 24
 		self.contents.font.name = "黑体"
 		color = Color.new(255, 255, 255)
-		draw_a_line(color, 0, @pic_size + RW, @pic_size, WLH, @name, 1) 
+		draw_a_line(color, @pic_size + RW, 0, self.width-@pic_size-RW, WLH, @name, 0)
+		# draw_a_line(color, 0, @pic_size + RW, @pic_size, WLH, @name, 1) 
 		# 描绘攻、防、力、敏
 		self.contents.font.size = 24
 		color = getColor("light purple")
-		draw_a_line(color, @pic_size + RW, 0, 56, WLH, "攻: ", 0)
-		draw_a_line(color, @pic_size + RW+56, 0, self.width-32-@pic_size-RW-32, WLH, @atk.ceil.to_s, 0)
+		draw_a_line(color, @pic_size + RW, @edge+WLH, 56, WLH, "攻: ", 0)
+		draw_a_line(color, @pic_size + RW+56, @edge+WLH, self.width-32-@pic_size-RW-32, WLH, @atk.ceil.to_s, 0)
 		color = getColor("light blue")
-		draw_a_line(color, @pic_size + RW, @edge+WLH, 56, WLH, "防: ", 0)
-		draw_a_line(color, @pic_size + RW+56, @edge+WLH, self.width-32-@pic_size-RW-32, WLH, @ddef.ceil.to_s, 0)
+		draw_a_line(color, @pic_size + RW, (@edge+WLH)*2, 56, WLH, "防: ", 0)
+		draw_a_line(color, @pic_size + RW+56, (@edge+WLH)*2, self.width-32-@pic_size-RW-32, WLH, @ddef.ceil.to_s, 0)
 		color = getColor("red")
-		draw_a_line(color, @pic_size + RW, (@edge+WLH)*2, 56, WLH, "力: ", 0)
-		draw_a_line(color, @pic_size + RW+56, (@edge+WLH)*2, self.width-32-@pic_size-RW-32, WLH, @strength.ceil.to_s, 0)
+		draw_a_line(color, @pic_size + RW, (@edge+WLH)*3, 56, WLH, "力: ", 0)
+		draw_a_line(color, @pic_size + RW+56, (@edge+WLH)*3, self.width-32-@pic_size-RW-32, WLH, @strength.ceil.to_s, 0)
 		color = getColor("light green")
-		draw_a_line(color, @pic_size + RW, (@edge+WLH)*3, 56, WLH, "敏: ", 0)
-		draw_a_line(color, @pic_size + RW+56, (@edge+WLH)*3, self.width-32-@pic_size-RW-32, WLH, @celerity.ceil.to_s, 0)
+		draw_a_line(color, @pic_size + RW, (@edge+WLH)*4, 56, WLH, "敏: ", 0)
+		draw_a_line(color, @pic_size + RW+56, (@edge+WLH)*4, self.width-32-@pic_size-RW-32, WLH, @celerity.ceil.to_s, 0)
 	end    
 	#--------------------------------------------------------------------------
 		# ● 判断是否需要重新获取数据
@@ -87,7 +88,7 @@ class Window_Consult_Status1 < Window_Base
 	def need_refresh?
 		return true if @isInit
 		return true if @name != @actor.name
-		return true if @battler_name != @actor.battler_name 
+		return true if @battler_name != @actor.battler_name+"-face"
 		return true if @battler_hue != @actor.battler_hue
 		return true if @actor.atk != @atk
 		return true if @actor.def != @ddef
@@ -118,7 +119,7 @@ class Window_Consult_Status2 < Window_Base
 	#--------------------------------------------------------------------------
 		# ● 初始化对象
 	#--------------------------------------------------------------------------
-	def initialize(x,y,actor, w = 384, h = $screen_height-y)
+	def initialize(x,y,actor, w = 288, h = $screen_height-y)
 		super(x, y, w, h)
 		self.opacity = 0
 		self.contents.font.size = 30
@@ -306,7 +307,7 @@ class Window_Consult_Status3 < Window_Base
 		self.opacity = 0
 		self.contents.font.size = 24
 		self.contents.font.name = "黑体" 
-		@edge = 16
+		@edge = 8
 		setup(actor)
 		refresh
 	end

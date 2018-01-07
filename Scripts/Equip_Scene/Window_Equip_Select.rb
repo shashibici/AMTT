@@ -23,7 +23,7 @@ class Window_Equip_Select < Window_Selectable
 		self.opacity = 0
 		@actor = actor
 		self.contents.font.size = 28
-		self.contents.font.name = "黑体" #"华文细黑"
+		self.contents.font.name = "华文细黑"
 		@edge = 0
 		refresh
 		@index = 0

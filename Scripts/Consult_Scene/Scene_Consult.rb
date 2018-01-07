@@ -20,25 +20,28 @@ class Scene_Consult < Scene_Base
   #--------------------------------------------------------------------------
   def start
     super
+	# 头像以及攻、防、力、敏显示窗口
     @consult_window1 = Window_Consult_Status1.new(0,0,@monstor)
-    @consult_window2 = Window_Consult_Status2.new(0,264,@monstor)
-	@consult_window3 = Window_Consult_Status3.new(384, 0, @monstor)
+	# 血条、各个属性显示窗口
+    @consult_window2 = Window_Consult_Status2.new(0,@consult_window1.height,@monstor)
+	# 金钱、经验、等级显示窗口
+	@consult_window3 = Window_Consult_Status3.new(@consult_window1.width, 0, @monstor)
 	# 生成指令窗口
 	create_commands
 	# 生成装备窗口
-    @equip_window = Window_Consult_Equip.new(384, @command_window.y+@command_window.height, @monstor)
+    @equip_window = Window_Consult_Equip.new(@consult_window1.width, @command_window.y+@command_window.height, @monstor)
     @equip_window.opacity = 0
 	@equip_window.index = @equip_index
 	@equip_window.active = false
     # 详细信息窗口
-	@help_detail = Window_HelpDetail.new(0,0,256,
+	@help_detail = Window_HelpDetail.new(0,0,352,
 										#$screen_width-@equip_window.x-@equip_window.width,
 										$screen_height-(@command_window.y+@command_window.height))
 	@help_detail.opacity = 0
     @help_detail.visible = true
 	@equip_window.window_detail = @help_detail
 	# 生成技能窗口
-	@skill_window = Window_Consult_Skill.new(384, 
+	@skill_window = Window_Consult_Skill.new(@consult_window1.width, 
 											@command_window.y+@command_window.height, 
 											106, 
 											$screen_height-(@command_window.y+@command_window.height), 
@@ -47,9 +50,9 @@ class Scene_Consult < Scene_Base
 	@skill_window.active = false
 	@skill_window.visible = false
 	# 生成技能信息窗口
-	@des_window = Window_SkillDescription.new(384+106, 
+	@des_window = Window_SkillDescription.new(@consult_window1.width+106, 
 											@command_window.y+@command_window.height, 
-											$screen_width-(384+106), 
+											$screen_width-(@consult_window1.width+106), 
 											$screen_height-(@command_window.y+@command_window.height))
 	@des_window.opacity = 0
 	@des_window.item = nil
@@ -78,9 +81,9 @@ class Scene_Consult < Scene_Base
   # ● 生成指令窗口
   #--------------------------------------------------------------------------
   def create_commands
-	@command_window = Window_Consult_Command.new($screen_width-384, ["查看装备", "查看技能"],2)
+	@command_window = Window_Consult_Command.new($screen_width-288, ["查看装备", "查看技能"],2)
 	@command_window.opacity = 0
-	@command_window.x = 384
+	@command_window.x = 288
 	@command_window.y = 128+32
 	@command_window.active = true
   end
