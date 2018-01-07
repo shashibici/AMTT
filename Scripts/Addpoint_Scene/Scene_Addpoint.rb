@@ -40,8 +40,6 @@ class Game_Actor < Game_Battler
   end
 end
 
-
-
 #==============================================================================
 # ■ Scene_Addpoint
 #------------------------------------------------------------------------------
@@ -293,20 +291,23 @@ class Scene_Addpoint < Scene_Base
   #--------------------------------------------------------------------------
   def start
     super
+	# 创建左边的项目选择窗口
+    create_command_window
     # 创建右边的属性窗口
-    @lvup_window1 = Window_Addpoint1.new(230,0)
+    @lvup_window1 = Window_Addpoint1.new(@command_window.width,0)
     @lvup_window1.setup(@hero)
     @lvup_window1.refresh
     
-    # 创建左边的项目选择窗口
-    create_command_window
-    
     # 创建最下方的点数显示窗口
-    @point_window = Window_Base.new(0,415,230, 65)
+    @point_window = Window_Base.new(0,@command_window.height,
+								@command_window.width, 
+								$screen_height-@command_window.height)
     refresh_point
     
     # 创建右下方的说明窗口
-    @abstract_window = Window_Base.new(230,370,410,110)
+    @abstract_window = Window_Base.new(@command_window.width,@lvup_window1.height,
+									$screen_width-@lvup_window1.x,
+									$screen_height-@lvup_window1.height)
     refresh_abstract
 
 
@@ -340,7 +341,7 @@ class Scene_Addpoint < Scene_Base
     ]
      
     # 创建指令窗口
-    @command_window = Window_Addpoint2.new(230, texts)
+    @command_window = Window_Addpoint2.new(288, texts)
     @command_window.index = @menu_index
     
   end  
@@ -360,21 +361,22 @@ class Scene_Addpoint < Scene_Base
     # 获取副本英雄的能力值
     getClone_attr
     
+	@lvup_window1.refresh_improvements(@totally_ascend.size, @clone_attr, @current_attr)
     # 画出增值的部分
-    for i in 0...@totally_ascend.size do
-      if Fround(@clone_attr[i],2) > Fround(@current_attr[i],2) 
-        # 浅绿色
-        color = getColor("green")
-        @lvup_window1.draw_a_line(color, 205, 24*i, 100, 24, Fround(@clone_attr[i],2), 2) 
-      elsif Fround(@clone_attr[i],2) < Fround(@current_attr[i],2) 
-        # 红色
-        color = getColor("red")
-        @lvup_window1.draw_a_line(color, 205, 24*i, 100, 24, Fround(@clone_attr[i],2), 2)
-      else
-        # 不作绘画
-      end
+    # for i in 0...@totally_ascend.size do
+      # if Fround(@clone_attr[i],2) > Fround(@current_attr[i],2) 
+        #浅绿色
+        # color = getColor("green")
+        # @lvup_window1.draw_a_line(color, 205, 24*i, 100, 24, Fround(@clone_attr[i],2), 2) 
+      # elsif Fround(@clone_attr[i],2) < Fround(@current_attr[i],2) 
+        #红色
+        # color = getColor("red")
+        # @lvup_window1.draw_a_line(color, 205, 24*i, 100, 24, Fround(@clone_attr[i],2), 2)
+      # else
+        #不作绘画
+      # end
       
-    end
+    # end
     
   end
   #--------------------------------------------------------------------------
@@ -383,18 +385,18 @@ class Scene_Addpoint < Scene_Base
   def refresh_point
     # 描绘“剩余点数”
     @point_window.contents.clear
-    @point_window.contents.font.size = 26
+    @point_window.contents.font.size = 32
     color = Color.new(255,255,255)
-    @point_window.draw_a_line(color, 0, 0, 80, 26, "剩余点数", 0)
+    @point_window.draw_a_line(color, 0, 0, @point_window.contents.width, 32, "剩余点数", 0)
     
     # 描绘剩余的点数，采用粗体描绘技术
-    color = Color.new(0,0,0)
-    @point_window.draw_a_line(color, 80+1, 0-1, 100, 26, @hero.point, 2)
-    @point_window.draw_a_line(color, 80+1, 0+1, 100, 26, @hero.point, 2)
-    @point_window.draw_a_line(color, 80-2, 0-1, 100, 26, @hero.point, 2)
-    @point_window.draw_a_line(color, 80-1, 0+1, 100, 26, @hero.point, 2)
+    # color = Color.new(0,0,0)
+    # @point_window.draw_a_line(color, 0+1, 0-1, 100, 26, @hero.point, 2)
+    # @point_window.draw_a_line(color, 0+1, 0+1, 100, 26, @hero.point, 2)
+    # @point_window.draw_a_line(color, 0-2, 0-1, 100, 26, @hero.point, 2)
+    # @point_window.draw_a_line(color, 0-1, 0+1, 100, 26, @hero.point, 2)
     color = @point_window.system_color
-    @point_window.draw_a_line(color, 80, 0, 100, 26, @hero.point, 2)
+    @point_window.draw_a_line(color, 0, 0, @point_window.contents.width, 32, @hero.point, 2)
     
   end  
   
@@ -440,7 +442,7 @@ class Scene_Addpoint < Scene_Base
   def update_command_window
     # 取消------------------------------------
     if Input.trigger?(Input::B)
-      
+	
       # 归还没有确定的点数
       for i in 0...@totally_ascend.size do
         # 英雄获得点数
