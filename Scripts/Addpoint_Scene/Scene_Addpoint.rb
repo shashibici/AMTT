@@ -48,7 +48,7 @@ end
 class Scene_Addpoint < Scene_Base
   include GAME_CONF
   MIN_FLOAT	=	0.000001
-  WLH = 18             # 帮助窗口每行的高度
+  WLH = 32             # 帮助窗口每行的高度
   #--------------------------------------------------------------------------
   # ● 初始化对像
   #     actor_index : 角色索引
@@ -320,17 +320,17 @@ class Scene_Addpoint < Scene_Base
     texts = [
     
     s1 = "增加生命",
-    s2 = "增加魔法",
+    s2 = "增加魔法（暂废弃）",
     s3 = "增加生命恢复",
-    s4 = "增加魔法恢复" ,  
+    s4 = "增加魔法恢复（暂废弃）" ,  
     s5 = "增加攻击" ,
     s6 = "增加防御",
     s7 = "增加力量",
-    s8 = "增加智力" ,
+    s8 = "增加智力（暂废弃）" ,
     s9 = "增加敏捷",
     
     s10 = "增加物理伤害",
-    s11 = "增加魔法伤害",
+    s11 = "增加魔法伤害（暂废弃）",
     s12 = "增加攻击速度" ,
     s13 = "增加命中技巧",
     s14 = "增加闪避技巧",
@@ -389,12 +389,7 @@ class Scene_Addpoint < Scene_Base
     color = Color.new(255,255,255)
     @point_window.draw_a_line(color, 0, 0, @point_window.contents.width, 32, "剩余点数", 0)
     
-    # 描绘剩余的点数，采用粗体描绘技术
-    # color = Color.new(0,0,0)
-    # @point_window.draw_a_line(color, 0+1, 0-1, 100, 26, @hero.point, 2)
-    # @point_window.draw_a_line(color, 0+1, 0+1, 100, 26, @hero.point, 2)
-    # @point_window.draw_a_line(color, 0-2, 0-1, 100, 26, @hero.point, 2)
-    # @point_window.draw_a_line(color, 0-1, 0+1, 100, 26, @hero.point, 2)
+    # 描绘剩余的点数
     color = @point_window.system_color
     @point_window.draw_a_line(color, 0, 0, @point_window.contents.width, 32, @hero.point, 2)
     
@@ -409,7 +404,7 @@ class Scene_Addpoint < Scene_Base
     
     # 字体设置
     @abstract_window.contents.font.name = "黑体"
-    @abstract_window.contents.font.size = 17
+    @abstract_window.contents.font.size = 22
     color = Color.new(255,255,255)
     
     # 根据当前选项进行显示
@@ -423,7 +418,7 @@ class Scene_Addpoint < Scene_Base
         color = getColor("orange")
       end
       # 描绘一行
-      @abstract_window.draw_a_line(color, 0, WLH*i, 410, 26, texts[i], 0)
+      @abstract_window.draw_a_line(color, 0, WLH*i, @abstract_window.contents.width, WLH, texts[i], 0)
     end
     
   end  
